@@ -1,0 +1,24 @@
+# Ignore node_modules — Docker will install them fresh via npm install
+node_modules/
+
+# Ignore previous build output — Docker will build fresh via ng build
+dist/
+
+# Ignore Angular cache
+.angular/
+
+# Ignore git history
+.git/
+.gitignore
+
+# Ignore IDE / OS files
+.vscode/
+.DS_Store
+*.bak
+
+# Ignore test coverage output
+coverage/
+
+# Ignore Docker files themselves (not needed inside the container)
+Dockerfile
+.dockerignore
