@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: voltstream-ev-charging
+    runtime: node
+    region: singapore   # closest to India — change to 'oregon' for US
+
+    # ── Build Phase ─────────────────────────────────────────────────────────
+    # Installs all dependencies (including 'serve') then compiles Angular
+    # to /dist/voltstream/browser using the production configuration.
+    buildCommand: npm install && npm run build
+
+    # ── Start Phase ──────────────────────────────────────────────────────────
+    # Serves the pre-built STATIC files using the tiny 'serve' package.
+    # This uses ~15 MB RAM instead of 512 MB that 'ng serve' needs.
+    # Render injects $PORT automatically — serve binds to it.
+    startCommand: npm run start:prod
+
+    # ── Render free-tier plan ────────────────────────────────────────────────
+    plan: free
+
+    # Health-check endpoint (Render pings this to confirm the app is up)
+    healthCheckPath: /
+
+    # Environment variables
+    envVars:
+      - key: NODE_ENV
+        value: production
