@@ -1,0 +1,218 @@
+<!-- Hackathon Theme 4 Evaluator Console Card -->
+<div class="hackathon-console-card glass" *ngIf="eco.currentRole === 'operator'" style="margin-bottom: 20px; padding: 18px; border: 1px solid rgba(168, 85, 247, 0.3); background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(6, 182, 212, 0.08) 100%); position: relative; overflow: hidden; border-radius: var(--border-radius-lg);">
+    <!-- Decorative background elements -->
+    <div style="position: absolute; right: -50px; top: -50px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%); pointer-events: none;"></div>
+    
+    <div style="display: flex; gap: 16px; align-items: flex-start; position: relative; z-index: 2;">
+        <div style="background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); color: white; width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4); flex-shrink: 0;">
+            <i class="fa-solid fa-award"></i>
+        </div>
+        <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span class="badge" style="background: rgba(168, 85, 247, 0.15); color: var(--neon-purple); border: 1px solid rgba(168, 85, 247, 0.3); font-weight: 700; font-size: 11px; letter-spacing: 0.5px;">ET AUTOTECH HACKATHON 2026</span>
+                <span class="badge" style="background: rgba(6, 182, 212, 0.15); color: var(--neon-cyan); border: 1px solid rgba(6, 182, 212, 0.3); font-weight: 700; font-size: 11px; letter-spacing: 0.5px;">THEME 4: SEAMLESS EV CHARGING ECOSYSTEM</span>
+            </div>
+            <h3 style="margin: 8px 0 4px 0; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 18px; color: var(--text-primary);">Evaluator Console &amp; Focus Area Matrix</h3>
+            <p style="margin: 0 0 12px 0; font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                <strong>Problem Statement:</strong> Design solutions to enable a connected, interoperable, and reliable EV charging ecosystem that delivers a seamless and user-friendly experience across networks and platforms.
+            </p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 10px;">
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px;">
+                    <strong style="font-size: 12px; color: var(--neon-cyan);"><i class="fa-solid fa-network-wired"></i> Focus Area 1: Interoperability</strong>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Multi-network Map (Tata, Zeon, ChargeZone, Bolt) with individual Gun-level status feeds.</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px;">
+                    <strong style="font-size: 12px; color: var(--neon-purple);"><i class="fa-solid fa-tower-broadcast"></i> Focus Area 2: Reliable Comm</strong>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Live OCPP 2.0.1 monitor, offline Flash buffer backup, &amp; Smart Grid peak-load throttling simulator.</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px;">
+                    <strong style="font-size: 12px; color: var(--neon-yellow);"><i class="fa-solid fa-credit-card"></i> Focus Area 3: Unified Access</strong>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">ISO 15118 crypt Plug &amp; Charge and unified settlement ledger with cross-operator wallet balance.</div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass); padding: 10px; border-radius: 8px;">
+                    <strong style="font-size: 12px; color: var(--text-success);"><i class="fa-solid fa-route"></i> Focus Area 4: Availability &amp; Routing</strong>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">HTML5 Live Geolocation tracking, nearby Petrol Pump EV hub synthesis, and dynamic routing.</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div style="font-size: 11px; color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-circle-check text-green animate-pulse"></i>
+                    <span>Ready for evaluation (Correctness &amp; Performance: 30% | UX &amp; Design: 10%)</span>
+                </div>
+                <button class="btn btn-primary btn-sm" (click)="eco.showThemeMapping = !eco.showThemeMapping" style="padding: 6px 12px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid" [ngClass]="eco.showThemeMapping ? 'fa-eye-slash' : 'fa-eye'"></i>
+                    <span>{{ eco.showThemeMapping ? 'Hide Mapped Focus Areas' : 'Show Mapped Focus Areas' }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="metrics-grid">
+    <div class="metric-card glass">
+        <div class="metric-icon bg-cyan"><i class="fa-solid fa-wallet"></i></div>
+        <div class="metric-data">
+            <div class="metric-label">Unified Wallet Balance</div>
+            <div class="metric-value">₹<span>{{ eco.walletBalance | number:'1.2-2' }}</span></div>
+            <div class="metric-subtext">Tata Power • Zeon • ChargeZone • Bolt</div>
+        </div>
+    </div>
+    <div class="metric-card glass">
+        <div class="metric-icon bg-green"><i class="fa-solid fa-leaf"></i></div>
+        <div class="metric-data">
+            <div class="metric-label">CO2 Saved</div>
+            <div class="metric-value"><span>{{ eco.co2Saved | number:'1.1-1' }}</span> kg</div>
+            <div class="metric-subtext">Lifetime ecological offset</div>
+        </div>
+    </div>
+    <div class="metric-card glass">
+        <div class="metric-icon bg-blue"><i class="fa-solid fa-road"></i></div>
+        <div class="metric-data">
+            <div class="metric-label">Indian Road Range Est.</div>
+            <div class="metric-value"><span>{{ eco.estimatedRange }}</span> km</div>
+            <div class="metric-subtext">Adaptive traffic consumption (65%)</div>
+        </div>
+    </div>
+    <div class="metric-card glass">
+        <div class="metric-icon bg-yellow"><i class="fa-solid fa-circle-nodes"></i></div>
+        <div class="metric-data">
+            <div class="metric-label">Reliability Index</div>
+            <div class="metric-value">99.8%</div>
+            <div class="metric-subtext">OCPP failover availability rate</div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-columns">
+    <!-- Left Column: Active session / Quick actions -->
+    <div class="dash-column-main">
+        <!-- Active Charging Session Panel -->
+        <div class="session-panel glass card-wrapper" id="active-session-panel">
+            <div class="theme-overlay" [class.show]="eco.showThemeMapping">
+                <div class="theme-overlay-content">
+                    <h4>Core Objective: Customer &amp; In-car Experience</h4>
+                    <p>Enhances the driver companion journey by utilizing AI/data integrations. Combines real-time telemetry from multiple charging networks with vehicle telematics to dynamically forecast adaptive ranges and charging durations, directly elevating the in-car experience.</p>
+                </div>
+            </div>
+            <div class="panel-header" style="display: flex; gap: 8px; align-items: center;">
+                <h2 class="panel-title" style="margin-right: auto;"><i class="fa-solid fa-bolt-lightning text-yellow"></i> Live Session &amp; Adaptive Range Predictor</h2>
+                <span *ngIf="eco.activeSession && eco.isGridOverloaded" class="badge" style="background-color: rgba(168, 85, 247, 0.15); color: var(--neon-purple); border: 1px solid rgba(168, 85, 247, 0.3); display: inline-flex; align-items: center; gap: 4px; font-weight: 600;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> GRID THROTTLED (SetChargingProfile active)
+                </span>
+                <span class="badge" [ngClass]="eco.activeSession ? 'badge-charging animate-pulse' : 'badge-success'">
+                    {{ eco.activeSession ? 'CHARGING' : 'STANDBY' }}
+                </span>
+            </div>
+            
+            <!-- Empty State -->
+            <div class="session-empty" *ngIf="!eco.activeSession">
+                <i class="fa-solid fa-plug-circle-exclamation empty-icon"></i>
+                <h3>No Active Charging Session</h3>
+                <p>Select a charging station from the map to plug in and initiate unified payment/charging.</p>
+                <button class="btn btn-primary" (click)="openMap()">
+                    <i class="fa-solid fa-map-location-dot"></i> Open Interoperability Map
+                </button>
+            </div>
+
+            <!-- Active State -->
+            <div class="session-active-grid" *ngIf="eco.activeSession">
+                <div class="charging-radial-container">
+                    <div class="radial-progress" [style.--percent]="eco.vehicleSoc">
+                        <!-- Outer Rotating Dashed Ring -->
+                        <div class="charging-ring"></div>
+                        
+                        <!-- Rising Energy Particles -->
+                        <div class="bubbles-container">
+                            <span class="bubble"></span>
+                            <span class="bubble"></span>
+                            <span class="bubble"></span>
+                            <span class="bubble"></span>
+                            <span class="bubble"></span>
+                        </div>
+
+                        <!-- Core Bolt Glow -->
+                        <div class="charging-bolt-glow">
+                            <i class="fa-solid fa-bolt-lightning"></i>
+                        </div>
+
+                        <div class="radial-inner" style="position: relative; z-index: 5;">
+                            <span class="radial-number">{{ eco.vehicleSoc | number:'1.0-0' }}</span>
+                            <span class="radial-unit">%</span>
+                        </div>
+                    </div>
+                    <div class="radial-label">State of Charge</div>
+                </div>
+                <div class="charging-stats">
+                    <div class="station-brief">
+                        <div class="brief-title">{{ eco.activeSession.station.name }}</div>
+                        <div class="brief-network"><span class="network-tag">{{ eco.activeSession.station.network }}</span> • DC Ultra-Fast CCS2</div>
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <div class="stat-lbl">Charging Rate</div>
+                            <div class="stat-val"><span>{{ activeKwRate }}</span> kW</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-lbl">Energy Delivered</div>
+                            <div class="stat-val"><span>{{ eco.activeSession.energyDelivered | number:'1.2-2' }}</span> kWh</div>
+                        </div>
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <div class="stat-lbl">Estimated Price</div>
+                            <div class="stat-val">₹<span>{{ eco.activeSession.cost | number:'1.2-2' }}</span></div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-lbl">Time Remaining</div>
+                            <div class="stat-val">{{ activeTimeRemaining }}</div>
+                        </div>
+                    </div>
+                    <div class="action-row">
+                        <button class="btn btn-danger" (click)="stopCharging()">
+                            <i class="fa-solid fa-circle-stop"></i> Stop Charging Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Quick Stats / Plug & Charge Simulation -->
+    <div class="dash-column-side">
+        <div class="iso-simulation-card glass card-wrapper">
+            <div class="theme-overlay" [class.show]="eco.showThemeMapping">
+                <div class="theme-overlay-content">
+                    <h4>Core Objective: EV Ecosystem Scalability &amp; Customer Experience</h4>
+                    <p>Scales the EV charging ecosystem by deploying secure <strong>ISO 15118 Plug &amp; Charge</strong>. Auto-identifies the vehicle and authorizes charging and settlement cryptographically upon connection, streamlining payments and scaling network operations.</p>
+                </div>
+            </div>
+            <h3><i class="fa-solid fa-key-skeleton"></i> ISO 15118 Plug &amp; Charge</h3>
+            <p class="sec-text">Automatically identify the vehicle and authorise payment immediately upon plugging in the connector.</p>
+            <div class="plug-cable-sim">
+                <div class="car-plug-socket" [class.connected]="eco.connected">
+                    <i class="fa-solid fa-car-battery socket-icon"></i>
+                    <div class="plug-status-indicator">{{ eco.plugStatus }}</div>
+                </div>
+                <div class="cable-connector" [class.plugged]="eco.plugged" (click)="startPlugAndCharge()">
+                    <i class="fa-solid fa-plug cable-icon"></i>
+                </div>
+            </div>
+            <div class="handshake-steps">
+                <div class="step" [ngClass]="eco.plugged ? 'completed' : 'disabled'">
+                    <i class="fa-solid fa-circle-check"></i> Physical Connection
+                </div>
+                <div class="step" [ngClass]="eco.handshakeSteps.tls === 'completed' ? 'completed' : (eco.handshakeSteps.tls === 'active' ? 'active' : 'disabled')">
+                    <i class="fa-solid fa-lock"></i> TLS Cryptographic Handshake
+                </div>
+                <div class="step" [ngClass]="eco.handshakeSteps.auth === 'completed' ? 'completed' : (eco.handshakeSteps.auth === 'active' ? 'active' : (eco.handshakeSteps.auth === 'error' ? 'disabled text-red' : 'disabled'))">
+                    <i class="fa-solid fa-id-card"></i> ISO 15118 Contract Verification
+                </div>
+                <div class="step" [ngClass]="eco.handshakeSteps.charge === 'completed' ? 'completed' : (eco.handshakeSteps.charge === 'active' ? 'active' : 'disabled')">
+                    <i class="fa-solid fa-charging-station"></i> OCPP Energy Transaction Start
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

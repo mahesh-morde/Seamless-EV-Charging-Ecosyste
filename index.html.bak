@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoltStream - Interoperable EV Charging Ecosystem</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-mode">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-bolt-lightning neon-glow-text"></i>
+                <span class="logo-text">Volt<span class="accent-text">Stream</span></span>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#dashboard" class="nav-item active" id="nav-dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#map-view" class="nav-item" id="nav-map">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <span>Interoperability Map</span>
+                </a>
+                <a href="#ocpp-simulator" class="nav-item" id="nav-ocpp">
+                    <i class="fa-solid fa-terminal"></i>
+                    <span>OCPP Protocol Monitor</span>
+                </a>
+                <a href="#wallet" class="nav-item" id="nav-wallet">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Unified Payment Gateway</span>
+                </a>
+                <a href="#analytics" class="nav-item" id="nav-analytics">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Degradation Analytics</span>
+                </a>
+            </nav>
+
+            <div class="vehicle-card glass">
+                <div class="vehicle-info">
+                    <div class="vehicle-title">Connected EV</div>
+                    <div class="vehicle-name" id="vehicle-name">Mahindra XUV400</div>
+                </div>
+                <div class="soc-display">
+                    <div class="soc-icon"><i class="fa-solid fa-battery-three-quarters"></i></div>
+                    <div class="soc-value"><span id="sidebar-soc">65</span>%</div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="sidebar-progress-bar" style="width: 65%;"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-title">
+                    <h1 id="page-title">Dashboard Overview</h1>
+                    <p class="subtitle" id="page-subtitle">Real-time status of your charging sessions and vehicle metrics</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="btn-toggle-theme-mapping" style="background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); color: white; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);">
+                        <i class="fa-solid fa-eye"></i>
+                        <span>Show Hackathon Insights</span>
+                    </button>
+                    <div class="system-status-indicator online" id="network-status-badge">
+                        <span class="status-dot"></span>
+                        <span id="network-status-text">SYSTEM ONLINE (OCPP Connected)</span>
+                    </div>
+                    <button class="btn btn-secondary" id="btn-toggle-network">
+                        <i class="fa-solid fa-wifi-slash"></i>
+                        <span>Simulate Network Drop</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Container for pages (tabs) -->
+            <div class="content-body">
+                
+                <!-- 1. DASHBOARD PAGE -->
+                <section id="dashboard-page" class="tab-page active">
+                    <div class="metrics-grid">
+                        <div class="metric-card glass">
+                            <div class="metric-icon bg-cyan"><i class="fa-solid fa-wallet"></i></div>
+                            <div class="metric-data">
+                                <div class="metric-label">Unified Wallet Balance</div>
+                                <div class="metric-value">₹<span id="dash-wallet-bal">1,250.00</span></div>
+                                <div class="metric-subtext">Tata Power • Zeon • ChargeZone • Bolt</div>
+                            </div>
+                        </div>
+                        <div class="metric-card glass">
+                            <div class="metric-icon bg-green"><i class="fa-solid fa-leaf"></i></div>
+                            <div class="metric-data">
+                                <div class="metric-label">CO2 Saved</div>
+                                <div class="metric-value"><span id="dash-co2-saved">184.5</span> kg</div>
+                                <div class="metric-subtext">Lifetime ecological offset</div>
+                            </div>
+                        </div>
+                        <div class="metric-card glass">
+                            <div class="metric-icon bg-blue"><i class="fa-solid fa-road"></i></div>
+                            <div class="metric-data">
+                                <div class="metric-label">Indian Road Range Est.</div>
+                                <div class="metric-value"><span id="dash-range-est">245</span> km</div>
+                                <div class="metric-subtext">Adaptive traffic consumption (65%)</div>
+                            </div>
+                        </div>
+                        <div class="metric-card glass">
+                            <div class="metric-icon bg-yellow"><i class="fa-solid fa-circle-nodes"></i></div>
+                            <div class="metric-data">
+                                <div class="metric-label">Reliability Index</div>
+                                <div class="metric-value">99.8%</div>
+                                <div class="metric-subtext">OCPP failover availability rate</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-columns">
+                        <!-- Left Column: Active session / Quick actions -->
+                        <div class="dash-column-main">
+                            <!-- Active Charging Session Panel -->
+                            <div class="session-panel glass card-wrapper" id="active-session-panel">
+                                <div class="theme-overlay" data-overlay-id="session-overlay">
+                                    <div class="theme-overlay-content">
+                                        <h4>Theme 1 &amp; Theme 2 Interoperability</h4>
+                                        <p>Integrates <strong>Theme 2 (Unified Interface)</strong> showing real-timeFast Charger telemetry with <strong>Theme 1 (Indian Driving Context)</strong> recalculating vehicle range based on stop-and-go Indian road congestion constraints.</p>
+                                    </div>
+                                </div>
+                                <div class="panel-header">
+                                    <h2 class="panel-title"><i class="fa-solid fa-bolt-lightning text-yellow"></i> Live Session &amp; Adaptive Range Predictor</h2>
+                                    <span class="badge badge-charging animate-pulse" id="session-badge">STANDBY</span>
+                                </div>
+                                <div class="session-empty" id="session-empty-state">
+                                    <i class="fa-solid fa-plug-circle-exclamation empty-icon"></i>
+                                    <h3>No Active Charging Session</h3>
+                                    <p>Select a charging station from the map to plug in and initiate unified payment/charging.</p>
+                                    <button class="btn btn-primary" id="btn-go-to-map">
+                                        <i class="fa-solid fa-map-location-dot"></i> Open Interoperability Map
+                                    </button>
+                                </div>
+                                <div class="session-active-grid hidden" id="session-active-state">
+                                    <div class="charging-radial-container">
+                                        <div class="radial-progress" id="charging-radial-progress" style="--percent: 65;">
+                                            <div class="radial-inner">
+                                                <span class="radial-number" id="radial-soc-num">65</span>
+                                                <span class="radial-unit">%</span>
+                                            </div>
+                                        </div>
+                                        <div class="radial-label">State of Charge</div>
+                                    </div>
+                                    <div class="charging-stats">
+                                        <div class="station-brief">
+                                            <div class="brief-title" id="active-station-name">Tata Power Substation DC03</div>
+                                            <div class="brief-network"><span class="network-tag" id="active-station-network">Tata Power</span> • DC Ultra-Fast CCS2</div>
+                                        </div>
+                                        <div class="stats-row">
+                                            <div class="stat-box">
+                                                <div class="stat-lbl">Charging Rate</div>
+                                                <div class="stat-val"><span id="active-kw">85.4</span> kW</div>
+                                            </div>
+                                            <div class="stat-box">
+                                                <div class="stat-lbl">Energy Delivered</div>
+                                                <div class="stat-val"><span id="active-kwh">22.8</span> kWh</div>
+                                            </div>
+                                        </div>
+                                        <div class="stats-row">
+                                            <div class="stat-box">
+                                                <div class="stat-lbl">Estimated Price</div>
+                                                <div class="stat-val">₹<span id="active-cost">410.40</span></div>
+                                            </div>
+                                            <div class="stat-box">
+                                                <div class="stat-lbl">Time Remaining</div>
+                                                <div class="stat-val" id="active-time-left">18 mins</div>
+                                            </div>
+                                        </div>
+                                        <div class="action-row">
+                                            <button class="btn btn-danger" id="btn-stop-charging">
+                                                <i class="fa-solid fa-circle-stop"></i> Stop Charging Session
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Quick Stats / Plug & Charge Simulation -->
+                        <div class="dash-column-side">
+                            <div class="iso-simulation-card glass card-wrapper">
+                                <div class="theme-overlay" data-overlay-id="iso-overlay">
+                                    <div class="theme-overlay-content">
+                                        <h4>Theme 2, Pillar 3: Unified User Access</h4>
+                                        <p>Demonstrates <strong>ISO 15118 Plug &amp; Charge</strong>. Authenticates the vehicle cryptographically via secure TLS handshake and initiates the transaction instantly without requiring third-party mobile apps.</p>
+                                    </div>
+                                </div>
+                                <h3><i class="fa-solid fa-key-skeleton"></i> ISO 15118 Plug &amp; Charge</h3>
+                                <p class="sec-text">Automatically identify the vehicle and authorise payment immediately upon plugging in the connector.</p>
+                                <div class="plug-cable-sim">
+                                    <div class="car-plug-socket" id="socket-visual">
+                                        <i class="fa-solid fa-car-battery socket-icon"></i>
+                                        <div class="plug-status-indicator" id="plug-status">Unplugged</div>
+                                    </div>
+                                    <div class="cable-connector" id="cable-connector">
+                                        <i class="fa-solid fa-plug cable-icon"></i>
+                                    </div>
+                                </div>
+                                <div class="handshake-steps" id="handshake-timeline">
+                                    <div class="step disabled" id="step-connect"><i class="fa-solid fa-circle-check"></i> Physical Connection</div>
+                                    <div class="step disabled" id="step-tls"><i class="fa-solid fa-lock"></i> TLS Cryptographic Handshake</div>
+                                    <div class="step disabled" id="step-auth"><i class="fa-solid fa-id-card"></i> ISO 15118 Contract Verification</div>
+                                    <div class="step disabled" id="step-charge"><i class="fa-solid fa-charging-station"></i> OCPP Energy Transaction Start</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. STATION MAP PAGE -->
+                <section id="map-page" class="tab-page">
+                    <div class="map-layout">
+                        <!-- Sidebar Station List / Filters -->
+                        <div class="map-sidebar glass">
+                            <div class="filter-section">
+                                <h3>Interoperability Grid Controller</h3>
+                                <div class="form-group">
+                                    <label>Network Provider</label>
+                                    <div class="checkbox-group">
+                                        <label><input type="checkbox" checked value="Tata Power" class="filter-network"> Tata Power</label>
+                                        <label><input type="checkbox" checked value="Zeon" class="filter-network"> Zeon</label>
+                                        <label><input type="checkbox" checked value="ChargeZone" class="filter-network"> ChargeZone</label>
+                                        <label><input type="checkbox" checked value="Bolt" class="filter-network"> Bolt</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Connector Type</label>
+                                    <div class="checkbox-group">
+                                        <label><input type="checkbox" checked value="CCS2" class="filter-connector"> CCS2 (DC)</label>
+                                        <label><input type="checkbox" checked value="Type 2" class="filter-connector"> Type 2 (AC)</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Status</label>
+                                    <div class="checkbox-group">
+                                        <label><input type="checkbox" checked value="Available" class="filter-status"> Available</label>
+                                        <label><input type="checkbox" checked value="Occupied" class="filter-status"> Occupied</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="station-list-container">
+                                <h3>Stations Near You</h3>
+                                <div class="station-list" id="station-items-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Map Visual Element -->
+                        <div class="map-wrapper glass card-wrapper">
+                            <div class="theme-overlay" data-overlay-id="map-overlay">
+                                <div class="theme-overlay-content">
+                                    <h4>Theme 2, Pillar 1: Charger Interoperability</h4>
+                                    <p>Unifies fragmented charging networks (Tata, Zeon, ChargeZone) into a single control plane. Live availability updates and location routing ensure seamless access for drivers.</p>
+                                </div>
+                            </div>
+                            <div id="leaflet-map-container" style="height: 100%; width: 100%;"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. OCPP 2.0.1 TERMINAL PAGE -->
+                <section id="ocpp-page" class="tab-page">
+                    <div class="terminal-layout">
+                        <div class="terminal-header glass">
+                            <div class="terminal-title-container">
+                                <h3><i class="fa-solid fa-code"></i> Reliable Communication &amp; Load Protocol Monitor</h3>
+                                <p class="sec-text">Live Web-Socket messages exchanging between the Charging Point (CP) and Central System (CS)</p>
+                            </div>
+                            <div class="terminal-actions">
+                                <button class="btn btn-secondary" id="btn-clear-logs">
+                                    <i class="fa-solid fa-trash-can"></i> Clear Terminal
+                                </button>
+                                <button class="btn btn-secondary" id="btn-simulate-reboot">
+                                    <i class="fa-solid fa-rotate"></i> OCPP Reset Command
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="terminal-body glass card-wrapper">
+                            <div class="theme-overlay" data-overlay-id="ocpp-overlay">
+                                <div class="theme-overlay-content">
+                                    <h4>Theme 2, Pillar 2: Reliable Communication</h4>
+                                    <p>Logs raw standard <strong>OCPP 2.0.1 JSON packets</strong>. Showcases local Flash memory queue buffering when network dropouts are simulated, preventing billing or telemetry data loss.</p>
+                                </div>
+                            </div>
+                            <div class="log-output" id="ocpp-logs-output">
+                                <div class="log-line system">[SYSTEM] Terminal initialized. Waiting for connection...</div>
+                            </div>
+                        </div>
+
+                        <!-- Offline Queue Status (Reliability demonstration) -->
+                        <div class="offline-queue-card glass hidden" id="offline-queue-panel">
+                            <div class="queue-header">
+                                <div class="queue-title-container">
+                                    <i class="fa-solid fa-database text-yellow"></i>
+                                    <strong>Offline Messages Cached in Station Memory</strong>
+                                </div>
+                                <span class="badge badge-offline" id="offline-cache-count">0 messages queued</span>
+                            </div>
+                            <p class="sec-text">The network link to the central system is down. The charging station is storing transaction updates locally in Flash memory and will sync automatically once network connectivity is restored.</p>
+                            <div class="progress-bar-container mt-10">
+                                <div class="progress-bar progress-yellow" id="offline-progress" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. UNIFIED WALLET & TRANSACTIONS PAGE -->
+                <section id="wallet-page" class="tab-page">
+                    <div class="wallet-layout">
+                        <!-- Wallet Balance Card -->
+                        <div class="wallet-balance-card glass card-wrapper">
+                            <div class="theme-overlay" data-overlay-id="wallet-overlay">
+                                <div class="theme-overlay-content">
+                                    <h4>Theme 2, Pillar 3: Unified Payments</h4>
+                                    <p>Consolidates payment and wallet balance across distinct providers. Deducts billing amounts instantly from a central pool, eliminating the need to hold active balances across multiple separate charging apps.</p>
+                                </div>
+                            </div>
+                            <div class="logo-group">
+                                <i class="fa-solid fa-bolt-lightning wallet-bolt"></i>
+                                <strong>VoltStream Pay</strong>
+                            </div>
+                            <div class="balance-display">
+                                <div class="bal-label">Unified Payment Gateway Balance</div>
+                                <div class="bal-amt">₹<span id="wallet-current-bal">1,250.00</span></div>
+                            </div>
+                            <div class="payment-partners">
+                                <span class="partner-label">Interoperable Networks:</span>
+                                <div class="partner-logos">
+                                    <span class="network-pill np-tata">Tata Power</span>
+                                    <span class="network-pill np-zeon">Zeon</span>
+                                    <span class="network-pill np-charge">ChargeZone</span>
+                                    <span class="network-pill np-bolt">Bolt</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top-up / Credit Card Form -->
+                        <div class="wallet-topup-card glass">
+                            <h3>Add Funds</h3>
+                            <p class="sec-text">Fund your unified wallet via simulated UPI or Credit/Debit Card.</p>
+                            <form id="topup-form" class="topup-form">
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label for="topup-amount">Amount (INR)</label>
+                                        <div class="amount-input-wrapper">
+                                            <span class="currency-symbol">₹</span>
+                                            <input type="number" id="topup-amount" value="500" min="100" max="10000" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="payment-method">Payment Method</label>
+                                        <select id="payment-method">
+                                            <option value="upi">UPI (GPay/PhonePe)</option>
+                                            <option value="card">Credit / Debit Card</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full" id="btn-topup">
+                                    <i class="fa-solid fa-circle-plus"></i> Load Funds
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Interoperability Log / Transaction History -->
+                    <div class="transactions-panel glass">
+                        <div class="panel-header">
+                            <h3 class="panel-title"><i class="fa-solid fa-list-check"></i> Unified Session History</h3>
+                            <button class="btn btn-secondary btn-sm" id="btn-export-csv"><i class="fa-solid fa-file-export"></i> Export</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="transaction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date/Time</th>
+                                        <th>Station Name</th>
+                                        <th>Network</th>
+                                        <th>Energy (kWh)</th>
+                                        <th>Duration</th>
+                                        <th>Cost</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transaction-rows">
+                                    <!-- Dynamic rows -->
+                                    <tr>
+                                        <td>2026-06-08 18:32</td>
+                                        <td>Zeon Fast-Charge Zone A2</td>
+                                        <td><span class="network-tag net-zeon">Zeon</span></td>
+                                        <td>35.4 kWh</td>
+                                        <td>35 mins</td>
+                                        <td>₹637.20</td>
+                                        <td><span class="tag-success">Paid (VoltStream)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2026-06-05 10:14</td>
+                                        <td>Tata Power Substation DC03</td>
+                                        <td><span class="network-tag net-tata">Tata Power</span></td>
+                                        <td>18.2 kWh</td>
+                                        <td>20 mins</td>
+                                        <td>₹327.60</td>
+                                        <td><span class="tag-success">Paid (VoltStream)</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2026-06-01 14:02</td>
+                                        <td>ChargeZone Highway Hub B1</td>
+                                        <td><span class="network-tag net-charge">ChargeZone</span></td>
+                                        <td>44.5 kWh</td>
+                                        <td>48 mins</td>
+                                        <td>₹845.50</td>
+                                        <td><span class="tag-success">Paid (VoltStream)</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. ANALYTICS PAGE -->
+                <section id="analytics-page" class="tab-page">
+                    <div class="analytics-grid">
+                        <div class="analytics-chart-card glass flex-2 card-wrapper">
+                            <div class="theme-overlay" data-overlay-id="chart-overlay">
+                                <div class="theme-overlay-content">
+                                    <h4>Theme 5 Cross-Pollination</h4>
+                                    <p>Tracks Fast Charging cell thermal stress degradation over time, giving <strong>State of Health (SoH)</strong> predictions and battery passports to facilitate circular second-life reuse.</p>
+                                </div>
+                            </div>
+                            <h3>State of Health (SoH) &amp; Battery Lifecycle Tracker</h3>
+                            <p class="sec-text">Total power delivered in kWh across different networks</p>
+                            <div class="chart-container">
+                                <canvas id="energy-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="analytics-chart-card glass flex-1">
+                            <h3>Charging by Network Provider</h3>
+                            <p class="sec-text">Distribution of charging sessions by provider</p>
+                            <div class="chart-container-radial">
+                                <canvas id="provider-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-grid mt-20">
+                        <div class="analytics-chart-card glass flex-1">
+                            <h3>Co2 Savings Trend</h3>
+                            <div class="chart-container-small">
+                                <canvas id="co2-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="analytics-chart-card glass flex-2">
+                            <div class="stats-summary-card">
+                                <h3>Eco-efficiency &amp; Circular SOH Passport</h3>
+                                <div class="grid-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label">AI SOH Prediction (Theme 5)</div>
+                                        <div class="stat-number text-green" id="battery-soh-val">94.5%</div>
+                                        <div class="metric-subtext mt-10">Eligible for Second-Life Grid Storage</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">Total Cost Saved (vs Gas)</div>
+                                        <div class="stat-number text-cyan">₹14,832.00</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">Average Charging Price</div>
+                                        <div class="stat-number">₹17.80/kWh</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">Active Charge Points Visited</div>
+                                        <div class="stat-number text-yellow">12 Stations</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Toast Element -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Leaflet.js script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Chart.js script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Core Application Logic script -->
+    <script src="app.js"></script>
+</body>
+</html>

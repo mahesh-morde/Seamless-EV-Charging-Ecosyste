@@ -1,0 +1,76 @@
+<div class="map-layout">
+    <!-- Sidebar Station List / Filters -->
+    <div class="map-sidebar glass">
+        <div class="filter-section">
+            <h3>Interoperability Grid Controller</h3>
+            <div class="form-group">
+                <label>Network Provider</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" [(ngModel)]="filterNetworks['Tata Power']" (change)="onFilterChange()"> Tata Power</label>
+                    <label><input type="checkbox" [(ngModel)]="filterNetworks['Zeon']" (change)="onFilterChange()"> Zeon</label>
+                    <label><input type="checkbox" [(ngModel)]="filterNetworks['ChargeZone']" (change)="onFilterChange()"> ChargeZone</label>
+                    <label><input type="checkbox" [(ngModel)]="filterNetworks['Bolt']" (change)="onFilterChange()"> Bolt</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Connector Type</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" [(ngModel)]="filterConnectors['CCS2']" (change)="onFilterChange()"> CCS2 (DC)</label>
+                    <label><input type="checkbox" [(ngModel)]="filterConnectors['Type 2']" (change)="onFilterChange()"> Type 2 (AC)</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" [(ngModel)]="filterStatuses['Available']" (change)="onFilterChange()"> Available</label>
+                    <label><input type="checkbox" [(ngModel)]="filterStatuses['Occupied']" (change)="onFilterChange()"> Occupied</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="station-list-container">
+            <h3>Stations Near You</h3>
+            <div class="station-list">
+                <div class="station-item" *ngFor="let st of filteredStations; let i = index" [class.active]="eco.selectedStation?.id === st.id" (click)="onStationItemClick(st)">
+                    <div class="st-header" style="align-items: center;">
+                        <span class="st-name" style="display: flex; align-items: center;">
+                            <span style="background-color: {{ eco.networkColors[st.network] }}; color: white; width: 18px; height: 18px; border-radius: 50%; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 6px; flex-shrink: 0;">{{ i + 1 }}</span>
+                            {{ st.name }}
+                        </span>
+                        <span class="st-status" [ngClass]="st.status === 'Available' ? 'status-available' : 'status-occupied'">{{ st.status }}</span>
+                    </div>
+                    <div class="st-meta">
+                        {{ st.network }} • {{ st.speed }}
+                    </div>
+                    <div class="st-tags">
+                        <span class="tag-pill">{{ st.connector }}</span>
+                        <span class="tag-pill tag-fast">₹{{ st.price }}/kWh</span>
+                    </div>
+                    <!-- Multi-gun Status Feed -->
+                    <div class="st-guns" style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span *ngFor="let gun of st.guns" style="padding: 2px 6px; border-radius: 4px; font-size: 10px; display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass);" [ngClass]="gun.status === 'Available' ? 'text-green' : 'text-muted'">
+                            <i class="fa-solid fa-plug" style="font-size: 8px;"></i> Gun {{ gun.id }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Visual Element -->
+    <div class="map-wrapper glass card-wrapper" style="position: relative;">
+        <div class="theme-overlay" [class.show]="eco.showThemeMapping">
+            <div class="theme-overlay-content">
+                <h4>Core Objective: EV Ecosystem Scalability</h4>
+                <p>Removes network fragmentation barriers to accelerate EV ecosystem scalability. Unifies independent charge point operators (Tata Power, Zeon, ChargeZone, Bolt) into a single map and routing view, optimizing grid charger utilisation.</p>
+            </div>
+        </div>
+        
+        <!-- Locate Me Floating Button -->
+        <button class="locate-me-btn glass" (click)="locateUser()" title="Center on My Location">
+            <i class="fa-solid fa-crosshairs"></i>
+        </button>
+
+        <div id="leaflet-map-container" style="height: 100%; width: 100%;"></div>
+    </div>
+</div>

@@ -1,0 +1,815 @@
+// VoltStream - Seamless EV Charging Ecosystem Core Logic
+
+// 1. GLOBAL STATE
+const state = {
+    walletBalance: 1250.00,
+    co2Saved: 184.5,
+    vehicleSoc: 65,
+    estimatedRange: 245,
+    isNetworkOnline: true,
+    activeSession: null,
+    offlineQueue: [],
+    sessionHistory: [
+        { date: "2026-06-08 18:32", station: "Zeon Fast-Charge Zone A2", network: "Zeon", energy: 35.4, duration: 35, cost: 637.20, status: "Paid (VoltStream)" },
+        { date: "2026-06-05 10:14", station: "Tata Power Substation DC03", network: "Tata Power", energy: 18.2, duration: 20, cost: 327.60, status: "Paid (VoltStream)" },
+        { date: "2026-06-01 14:02", station: "ChargeZone Highway Hub B1", network: "ChargeZone", energy: 44.5, duration: 48, cost: 845.50, status: "Paid (VoltStream)" }
+    ],
+    // Leaflet map and layer group references
+    map: null,
+    markerLayers: null,
+    selectedStation: null,
+    chargingInterval: null,
+    showThemeMapping: false
+};
+
+// 2. MOCK STATIONS DATA (Centred around Pune, India)
+const stationsData = [
+    { id: 1, name: "Tata Power Substation DC03", network: "Tata Power", lat: 18.5252, lng: 73.8540, speed: "DC 150kW", connector: "CCS2", price: 18.00, status: "Available" },
+    { id: 2, name: "Zeon Fast-Charge Zone A2", network: "Zeon", lat: 18.5140, lng: 73.8420, speed: "DC 50kW", connector: "CCS2", price: 16.50, status: "Available" },
+    { id: 3, name: "ChargeZone Mall Charging Hub", network: "ChargeZone", lat: 18.5300, lng: 73.8750, speed: "DC 120kW", connector: "CCS2", price: 17.50, status: "Occupied" },
+    { id: 4, name: "Bolt Smart AC Charger S2", network: "Bolt", lat: 18.5410, lng: 73.8310, speed: "AC 7.4kW", connector: "Type 2", price: 12.00, status: "Available" },
+    { id: 5, name: "Tata Power Highway Hub DC01", network: "Tata Power", lat: 18.5020, lng: 73.8180, speed: "DC 150kW", connector: "CCS2", price: 19.50, status: "Available" },
+    { id: 6, name: "Zeon TechPark Charger B4", network: "Zeon", lat: 18.5580, lng: 73.8990, speed: "DC 60kW", connector: "CCS2", price: 17.00, status: "Occupied" },
+    { id: 7, name: "Bolt Residency AC Point S8", network: "Bolt", lat: 18.5204, lng: 73.8660, speed: "AC 22kW", connector: "Type 2", price: 11.50, status: "Available" }
+];
+
+// Custom icons based on network providers
+const networkColors = {
+    "Tata Power": "#06b6d4", // Cyan
+    "Zeon": "#10b981",       // Green
+    "ChargeZone": "#a855f7", // Purple
+    "Bolt": "#fbbf24"        // Yellow
+};
+
+// 3. APPLICATION INITS & CHARTS
+document.addEventListener("DOMContentLoaded", () => {
+    initNavigation();
+    initLeafletMap();
+    initCharts();
+    initEventListeners();
+    populateStationList();
+});
+
+// Toast notification helper
+function showToast(message, type = "info") {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    
+    let icon = "fa-circle-info";
+    if (type === "success") icon = "fa-circle-check";
+    if (type === "warning") icon = "fa-circle-exclamation";
+    if (type === "danger") icon = "fa-triangle-exclamation";
+    
+    toast.innerHTML = `
+        <i class="fa-solid ${icon} toast-icon"></i>
+        <span class="toast-msg">${message}</span>
+    `;
+    container.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+// 4. NAVIGATION TAB CONTROL
+function initNavigation() {
+    const navItems = document.querySelectorAll(".nav-item");
+    const tabPages = document.querySelectorAll(".tab-page");
+    const pageTitle = document.getElementById("page-title");
+    const pageSubtitle = document.getElementById("page-subtitle");
+
+    navItems.forEach(item => {
+        item.addEventListener("click", (e) => {
+            e.preventDefault();
+            
+            // Toggle nav item classes
+            navItems.forEach(i => i.classList.remove("active"));
+            item.classList.add("active");
+            
+            // Toggle page visibility
+            const targetTabId = item.getAttribute("href").substring(1) + "-page";
+            tabPages.forEach(page => {
+                page.classList.remove("active");
+                if (page.id === targetTabId) {
+                    page.classList.add("active");
+                }
+            });
+
+            // Update Header labels
+            switch (item.id) {
+                case "nav-dashboard":
+                    pageTitle.textContent = "Dashboard Overview";
+                    pageSubtitle.textContent = "Real-time status of your charging sessions and vehicle metrics";
+                    break;
+                case "nav-map":
+                    pageTitle.textContent = "Interoperability Map";
+                    pageSubtitle.textContent = "Find interoperable EV charging stations across multi-provider networks";
+                    // Refresh map layout once displayed (forces Leaflet recalculation)
+                    if (state.map) {
+                        setTimeout(() => state.map.invalidateSize(), 100);
+                    }
+                    break;
+                case "nav-ocpp":
+                    pageTitle.textContent = "OCPP Protocol Monitor";
+                    pageSubtitle.textContent = "Examine raw charging communications, telemetry, and fault reporting";
+                    break;
+                case "nav-wallet":
+                    pageTitle.textContent = "Unified Payment Gateway";
+                    pageSubtitle.textContent = "Fund your centralized wallet to pay across multiple independent operators";
+                    break;
+                case "nav-analytics":
+                    pageTitle.textContent = "Degradation Analytics";
+                    pageSubtitle.textContent = "Track your charging cost savings, efficiency, and ecological offsets";
+                    break;
+            }
+        });
+    });
+
+    // Dashboard quick map navigation
+    document.getElementById("btn-go-to-map").addEventListener("click", () => {
+        document.getElementById("nav-map").click();
+    });
+}
+
+// 5. INTERACTIVE MAP (Leaflet)
+function initLeafletMap() {
+    // Center at Pune
+    state.map = L.map("leaflet-map-container").setView([18.5204, 73.8567], 13);
+    
+    // Premium Dark Mode tiles from CartoDB
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(state.map);
+
+    state.markerLayers = L.layerGroup().addTo(state.map);
+    renderMapMarkers();
+}
+
+function renderMapMarkers() {
+    state.markerLayers.clearLayers();
+    
+    // Get filter states
+    const activeNetworks = Array.from(document.querySelectorAll(".filter-network:checked")).map(el => el.value);
+    const activeConnectors = Array.from(document.querySelectorAll(".filter-connector:checked")).map(el => el.value);
+    const activeStatuses = Array.from(document.querySelectorAll(".filter-status:checked")).map(el => el.value);
+
+    stationsData.forEach(st => {
+        const matchesNetwork = activeNetworks.includes(st.network);
+        const matchesConnector = activeConnectors.includes(st.connector);
+        const matchesStatus = activeStatuses.includes(st.status);
+
+        if (matchesNetwork && matchesConnector && matchesStatus) {
+            const color = networkColors[st.network];
+            
+            // Custom CSS styled marker
+            const customIcon = L.divIcon({
+                className: "custom-map-marker",
+                html: `<div style="background-color: ${color}; width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 0 10px ${color}"></div>`,
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
+            });
+
+            const marker = L.marker([st.lat, st.lng], { icon: customIcon }).addTo(state.markerLayers);
+            
+            const popupContent = `
+                <div class="map-popup">
+                    <h4>${st.name}</h4>
+                    <p><strong>Provider:</strong> ${st.network}</p>
+                    <p><strong>Speed:</strong> ${st.speed} (${st.connector})</p>
+                    <p><strong>Price:</strong> ₹${st.price.toFixed(2)}/kWh</p>
+                    <p><strong>Status:</strong> <span class="st-status ${st.status === 'Available' ? 'status-available' : 'status-occupied'}">${st.status}</span></p>
+                    ${st.status === 'Available' ? `<button class="btn btn-primary btn-sm" onclick="selectStationForCharging(${st.id})">Initiate Session</button>` : ''}
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+        }
+    });
+}
+
+function populateStationList() {
+    const listContainer = document.getElementById("station-items-list");
+    listContainer.innerHTML = "";
+    
+    stationsData.forEach(st => {
+        const item = document.createElement("div");
+        item.className = "station-item";
+        item.innerHTML = `
+            <div class="st-header">
+                <span class="st-name">${st.name}</span>
+                <span class="st-status ${st.status === 'Available' ? 'status-available' : 'status-occupied'}">${st.status}</span>
+            </div>
+            <div class="st-meta">
+                ${st.network} • ${st.speed}
+            </div>
+            <div class="st-tags">
+                <span class="tag-pill">${st.connector}</span>
+                <span class="tag-pill tag-fast">₹${st.price}/kWh</span>
+            </div>
+        `;
+        
+        item.addEventListener("click", () => {
+            // Pan map to marker
+            state.map.setView([st.lat, st.lng], 15);
+            // Highlight list item
+            document.querySelectorAll(".station-item").forEach(el => el.classList.remove("active"));
+            item.classList.add("active");
+            
+            // Automatically select if available and clicked
+            if (st.status === "Available") {
+                selectStationForCharging(st.id);
+            } else {
+                showToast(`Station ${st.name} is currently occupied.`, "warning");
+            }
+        });
+        
+        listContainer.appendChild(item);
+    });
+}
+
+// Global scope selector bridge for marker popup click
+window.selectStationForCharging = (stationId) => {
+    const st = stationsData.find(s => s.id === stationId);
+    if (!st) return;
+    
+    state.selectedStation = st;
+    showToast(`Connected to ${st.name}. Initializing ISO 15118 protocol...`, "info");
+    
+    // Switch to Dashboard Tab to see the progress
+    document.getElementById("nav-dashboard").click();
+    
+    // Init Plug & Charge Animation
+    startPlugAndChargeSimulation();
+};
+
+
+// 6. ISO 15118 PLUG & CHARGE FLOW SIMULATION
+function startPlugAndChargeSimulation() {
+    const connector = document.getElementById("cable-connector");
+    const socket = document.getElementById("socket-visual");
+    
+    // Reset steps
+    document.querySelectorAll(".handshake-steps .step").forEach(s => {
+        s.className = "step disabled";
+    });
+    
+    // Animate connector plugging in
+    connector.classList.add("plugged");
+    
+    // Timeline steps
+    setTimeout(() => {
+        socket.classList.add("connected");
+        document.getElementById("plug-status").textContent = "Connected";
+        document.getElementById("step-connect").className = "step completed";
+        logOcppMessage("SYSTEM", `Physical cable connection detected. Connector type: ${state.selectedStation.connector}. Locking connector...`);
+        showToast("Connector plugged in successfully.", "success");
+    }, 1000);
+
+    setTimeout(() => {
+        document.getElementById("step-tls").className = "step active";
+        logOcppMessage("SEND", `[2, "${generateOcppId()}", "SignCertificate", {"keyType": "ECDSA", "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE7v... "}]`);
+        setTimeout(() => {
+            document.getElementById("step-tls").className = "step completed";
+            logOcppMessage("RECEIVE", `[3, "msg-auth-cert", "SignCertificateResponse", {"status": "Accepted"}]`);
+            logOcppMessage("SYSTEM", `Secure TLS channel established. Contract Certificate Valid.`);
+        }, 1200);
+    }, 2500);
+
+    setTimeout(() => {
+        document.getElementById("step-auth").className = "step active";
+        logOcppMessage("SEND", `[2, "${generateOcppId()}", "Authorize", {"idToken": {"idToken": "IN-VOLT-MAHINDRA-983D", "type": "EMAID"}}]`);
+        
+        setTimeout(() => {
+            // Check unified balance for authorization
+            if (state.walletBalance < 100) {
+                document.getElementById("step-auth").className = "step error";
+                logOcppMessage("RECEIVE", `[3, "msg-auth-id", "AuthorizeResponse", {"idTokenInfo": {"status": "Blocked", "reason": "Insufficient Wallet Funds"}}]`);
+                showToast("Unified Wallet balance too low to authorize transaction.", "danger");
+                resetChargingUI();
+                return;
+            }
+            
+            document.getElementById("step-auth").className = "step completed";
+            logOcppMessage("RECEIVE", `[3, "msg-auth-id", "AuthorizeResponse", {"idTokenInfo": {"status": "Accepted", "groupIdToken": "VoltStreamUnifiedPay"}}]`);
+            logOcppMessage("SYSTEM", `Contract Verified. ISO 15118 authentication successful. Payment pre-authorized.`);
+        }, 1500);
+    }, 4500);
+
+    setTimeout(() => {
+        if (state.walletBalance < 100) return; // Halt if blocked above
+        
+        document.getElementById("step-charge").className = "step active";
+        logOcppMessage("SEND", `[2, "${generateOcppId()}", "TransactionEvent", {"eventType": "Started", "transactionId": "tx-volt-${Date.now()}", "timestamp": "${new Date().toISOString()}", "triggerReason": "CablePluggedIn", "seqNo": 0, "evse": {"id": 1, "connectorId": 1}}]`);
+        
+        setTimeout(() => {
+            document.getElementById("step-charge").className = "step completed";
+            logOcppMessage("RECEIVE", `[3, "msg-tx-start", "TransactionEventResponse", {"totalCost": 0.0}]`);
+            logOcppMessage("SYSTEM", `OCPP Energy Transaction started. Relays closed. Energizing...`);
+            
+            // Start actual charging loops
+            startChargingTransaction();
+        }, 1500);
+    }, 7000);
+}
+
+function startChargingTransaction() {
+    // Toggle active session pane view
+    document.getElementById("session-badge").textContent = "CHARGING";
+    document.getElementById("session-badge").className = "badge badge-charging animate-pulse";
+    document.getElementById("session-empty-state").classList.add("hidden");
+    document.getElementById("session-active-state").classList.remove("hidden");
+    
+    // Set station texts
+    document.getElementById("active-station-name").textContent = state.selectedStation.name;
+    document.getElementById("active-station-network").textContent = state.selectedStation.network;
+    
+    // Set session parameters
+    state.activeSession = {
+        station: state.selectedStation,
+        energyDelivered: 0.0,
+        cost: 0.0,
+        duration: 0,
+        startSoc: state.vehicleSoc
+    };
+
+    const chargingSpeedkW = state.selectedStation.speed.includes("150kW") ? 150 : 
+                            state.selectedStation.speed.includes("120kW") ? 120 : 
+                            state.selectedStation.speed.includes("60kW") ? 60 : 
+                            state.selectedStation.speed.includes("50kW") ? 50 : 22;
+
+    showToast(`Charging started at ${chargingSpeedkW} kW.`, "success");
+
+    // Live charging loop (Every 1.5 seconds)
+    state.chargingInterval = setInterval(() => {
+        if (state.vehicleSoc >= 100) {
+            stopChargingSession();
+            return;
+        }
+
+        // Increment SOC
+        const socIncrement = (chargingSpeedkW / 3600) * 8; // scaled for demo speed
+        state.vehicleSoc = Math.min(100, state.vehicleSoc + socIncrement);
+        
+        // Energy Delivered
+        state.activeSession.energyDelivered += (chargingSpeedkW / 3600) * 12; // scaled
+        
+        // Costs
+        state.activeSession.cost = state.activeSession.energyDelivered * state.selectedStation.price;
+        
+        // Duration
+        state.activeSession.duration += 1; // minutes simulation
+        
+        // Live UI updates
+        updateLiveTelemetryUI(chargingSpeedkW);
+        
+        // OCPP log telemetry packet
+        sendOcppTelemetryUpdate();
+
+    }, 1500);
+}
+
+function updateLiveTelemetryUI(speedkW) {
+    const socRounded = Math.round(state.vehicleSoc);
+    
+    // Sidebar EV stats
+    document.getElementById("sidebar-soc").textContent = socRounded;
+    document.getElementById("sidebar-progress-bar").style.width = `${socRounded}%`;
+    document.getElementById("dash-range-est").textContent = Math.round(state.vehicleSoc * 3.7);
+
+    // Radial dashboard charge indicator
+    document.getElementById("charging-radial-progress").style.setProperty('--percent', socRounded);
+    document.getElementById("radial-soc-num").textContent = socRounded;
+
+    // Active session dashboard panels
+    document.getElementById("active-kw").textContent = (speedkW + (Math.random() * 4 - 2)).toFixed(1); // add mock fluctuation
+    document.getElementById("active-kwh").textContent = state.activeSession.energyDelivered.toFixed(2);
+    document.getElementById("active-cost").textContent = state.activeSession.cost.toFixed(2);
+    
+    const minLeft = Math.round(((100 - state.vehicleSoc) / (speedkW / 60)) * 0.15); // estimation scale
+    document.getElementById("active-time-left").textContent = minLeft > 0 ? `${minLeft} mins` : "Almost done";
+}
+
+function stopChargingSession() {
+    if (!state.activeSession) return;
+    
+    clearInterval(state.chargingInterval);
+    showToast("Stopping charging transaction...", "warning");
+
+    // OCPP Stop Transaction Handshake
+    logOcppMessage("SEND", `[2, "${generateOcppId()}", "TransactionEvent", {"eventType": "Ended", "transactionId": "tx-volt-${Date.now()}", "timestamp": "${new Date().toISOString()}", "triggerReason": "StopAuthorize", "seqNo": 1, "meterValue": [{"timestamp": "${new Date().toISOString()}", "sampledValue": [{"value": "${state.activeSession.energyDelivered.toFixed(2)}"}]}]}]`);
+    
+    setTimeout(() => {
+        logOcppMessage("RECEIVE", `[3, "msg-tx-stop", "TransactionEventResponse", {"totalCost": ${state.activeSession.cost.toFixed(2)}, "idTokenInfo": {"status": "Accepted"}}]`);
+        logOcppMessage("SYSTEM", `Relays open. Charger de-energized. Please unplug the connector.`);
+        
+        // Execute unified billing deduction
+        deductUnifiedWallet(state.activeSession.cost);
+        
+        // Save to Session history
+        saveTransactionRecord();
+        
+        // Reset UI Elements
+        resetChargingUI();
+        
+        showToast("Charging session complete. Transaction settled.", "success");
+    }, 1500);
+}
+
+function deductUnifiedWallet(cost) {
+    state.walletBalance = Math.max(0, state.walletBalance - cost);
+    
+    // Update dashboard UI
+    document.getElementById("dash-wallet-bal").textContent = state.walletBalance.toFixed(2);
+    document.getElementById("wallet-current-bal").textContent = state.walletBalance.toFixed(2);
+    
+    // Eco offset additions
+    const carbonSavedThisSession = state.activeSession.energyDelivered * 0.72; // Avg kg CO2 saved per kWh
+    state.co2Saved += carbonSavedThisSession;
+    document.getElementById("dash-co2-saved").textContent = state.co2Saved.toFixed(1);
+}
+
+function saveTransactionRecord() {
+    const now = new Date();
+    const formattedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    const newRecord = {
+        date: formattedDate,
+        station: state.activeSession.station.name,
+        network: state.activeSession.station.network,
+        energy: parseFloat(state.activeSession.energyDelivered.toFixed(2)),
+        duration: state.activeSession.duration,
+        cost: parseFloat(state.activeSession.cost.toFixed(2)),
+        status: "Paid (VoltStream)"
+    };
+    
+    state.sessionHistory.unshift(newRecord);
+    renderTransactionTable();
+    updateChartsData();
+}
+
+function renderTransactionTable() {
+    const tableBody = document.getElementById("transaction-rows");
+    tableBody.innerHTML = "";
+    
+    state.sessionHistory.forEach(r => {
+        const tr = document.createElement("tr");
+        const netClass = r.network === "Tata Power" ? "net-tata" :
+                         r.network === "Zeon" ? "net-zeon" :
+                         r.network === "ChargeZone" ? "net-charge" : "net-bolt";
+                         
+        tr.innerHTML = `
+            <td>${r.date}</td>
+            <td>${r.station}</td>
+            <td><span class="network-tag ${netClass}">${r.network}</span></td>
+            <td>${r.energy} kWh</td>
+            <td>${r.duration} mins</td>
+            <td>₹${r.cost.toFixed(2)}</td>
+            <td><span class="tag-success">${r.status}</span></td>
+        `;
+        tableBody.appendChild(tr);
+    });
+}
+
+function resetChargingUI() {
+    state.activeSession = null;
+    state.selectedStation = null;
+    
+    // Reset visual connector
+    document.getElementById("cable-connector").classList.remove("plugged");
+    document.getElementById("socket-visual").classList.remove("connected");
+    document.getElementById("plug-status").textContent = "Unplugged";
+    
+    // Toggle dashboard active session panel state
+    document.getElementById("session-badge").textContent = "STANDBY";
+    document.getElementById("session-badge").className = "badge badge-success";
+    document.getElementById("session-empty-state").classList.remove("hidden");
+    document.getElementById("session-active-state").classList.add("hidden");
+}
+
+
+// 7. OCPP LOGIC & NETWORK RESILIENCE (FAILOVER QUEUE)
+function logOcppMessage(direction, message) {
+    // If network is offline, queue message instead of outputting immediately (Reliability simulation)
+    if (!state.isNetworkOnline && direction !== "SYSTEM") {
+        state.offlineQueue.push({ direction, message });
+        updateOfflineQueueUI();
+        return;
+    }
+
+    const output = document.getElementById("ocpp-logs-output");
+    const logLine = document.createElement("div");
+    
+    const time = new Date().toLocaleTimeString();
+    
+    if (direction === "SYSTEM") {
+        logLine.className = "log-line system";
+        logLine.textContent = `[${time}] [SYSTEM] ${message}`;
+    } else if (direction === "SEND") {
+        logLine.className = "log-line send";
+        logLine.textContent = `[${time}] [CLIENT -> CENTRAL] ${message}`;
+    } else {
+        logLine.className = "log-line receive";
+        logLine.textContent = `[${time}] [CENTRAL -> CLIENT] ${message}`;
+    }
+    
+    output.appendChild(logLine);
+    output.scrollTop = output.scrollHeight;
+}
+
+function sendOcppTelemetryUpdate() {
+    if (!state.activeSession) return;
+    const msg = `[2, "${generateOcppId()}", "TransactionEvent", {"eventType": "Updated", "transactionId": "tx-volt", "timestamp": "${new Date().toISOString()}", "seqNo": 1, "meterValue": [{"timestamp": "${new Date().toISOString()}", "sampledValue": [{"value": "${state.activeSession.energyDelivered.toFixed(2)}", "measurand": "Energy.Active.Import.Register"}, {"value": "${state.vehicleSoc.toFixed(1)}", "measurand": "SoC"}]}]}]`;
+    logOcppMessage("SEND", msg);
+}
+
+function generateOcppId() {
+    return Math.random().toString(36).substring(2, 11).toUpperCase();
+}
+
+function toggleNetworkConnection() {
+    const badge = document.getElementById("network-status-badge");
+    const text = document.getElementById("network-status-text");
+    const button = document.getElementById("btn-toggle-network");
+    const queuePanel = document.getElementById("offline-queue-panel");
+
+    state.isNetworkOnline = !state.isNetworkOnline;
+
+    if (state.isNetworkOnline) {
+        // Recovering network connection
+        badge.className = "system-status-indicator online";
+        text.textContent = "SYSTEM ONLINE (OCPP Connected)";
+        button.innerHTML = `<i class="fa-solid fa-wifi-slash"></i> <span>Simulate Network Drop</span>`;
+        logOcppMessage("SYSTEM", "Network link recovered. Synchronizing cached telemetry with Central Management System...");
+        
+        // Flush queue
+        flushOfflineQueue();
+        queuePanel.classList.add("hidden");
+    } else {
+        // Disconnecting network connection
+        badge.className = "system-status-indicator offline";
+        text.textContent = "SYSTEM OFFLINE (Offline Cache Active)";
+        button.innerHTML = `<i class="fa-solid fa-wifi"></i> <span>Restore Network Connection</span>`;
+        logOcppMessage("SYSTEM", "WARNING: Web-Socket link disconnected. Local transaction recovery buffer initiated.");
+        showToast("Network connection lost. Offline buffer enabled.", "warning");
+        
+        queuePanel.classList.remove("hidden");
+        updateOfflineQueueUI();
+    }
+}
+
+function updateOfflineQueueUI() {
+    const countLabel = document.getElementById("offline-cache-count");
+    const progress = document.getElementById("offline-progress");
+    
+    const count = state.offlineQueue.length;
+    countLabel.textContent = `${count} message(s) queued`;
+    
+    // Scale progress bar based on mock flash storage limit (max 20 messages)
+    const pct = Math.min(100, (count / 20) * 100);
+    progress.style.width = `${pct}%`;
+}
+
+function flushOfflineQueue() {
+    if (state.offlineQueue.length === 0) return;
+    
+    showToast(`Flushing ${state.offlineQueue.length} cached transaction messages.`, "success");
+    
+    // Bulk dump logs
+    state.offlineQueue.forEach((item, index) => {
+        setTimeout(() => {
+            logOcppMessage(item.direction, `[RECOVERY-FLUSH] ${item.message}`);
+            if (index === state.offlineQueue.length - 1) {
+                logOcppMessage("SYSTEM", "Offline cache synchronization complete. Network status fully aligned.");
+                state.offlineQueue = [];
+                updateOfflineQueueUI();
+            }
+        }, index * 200); // slight stagger visual effect
+    });
+}
+
+
+// 8. GRAPH VISUALIZATIONS (Chart.js)
+let energyChartInstance = null;
+let providerChartInstance = null;
+let co2ChartInstance = null;
+
+function initCharts() {
+    // A. Weekly energy line chart
+    const energyCtx = document.getElementById("energy-chart").getContext("2d");
+    const cyanGradient = energyCtx.createLinearGradient(0, 0, 0, 200);
+    cyanGradient.addColorStop(0, 'rgba(6, 182, 212, 0.4)');
+    cyanGradient.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
+
+    energyChartInstance = new Chart(energyCtx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Energy Consumption (kWh)',
+                data: [12, 19, 3, 25, 2, 45, 18],
+                borderColor: '#06b6d4',
+                backgroundColor: cyanGradient,
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointBackgroundColor: '#06b6d4'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } },
+                x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+            }
+        }
+    });
+
+    // B. Provider Breakdown doughnut
+    const providerCtx = document.getElementById("provider-chart").getContext("2d");
+    providerChartInstance = new Chart(providerCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Tata Power', 'Zeon', 'ChargeZone', 'Bolt'],
+            datasets: [{
+                data: [45, 25, 20, 10],
+                backgroundColor: ['#06b6d4', '#10b981', '#a855f7', '#fbbf24'],
+                borderWidth: 0,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#9ca3af', font: { family: 'Inter' } }
+                }
+            }
+        }
+    });
+
+    // C. CO2 offset bar chart
+    const co2Ctx = document.getElementById("co2-chart").getContext("2d");
+    co2ChartInstance = new Chart(co2Ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+                label: 'CO2 Offset (kg)',
+                data: [42, 68, 110, 184.5],
+                backgroundColor: '#10b981',
+                borderRadius: 6,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } },
+                x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+            }
+        }
+    });
+}
+
+function updateChartsData() {
+    if (!energyChartInstance || !providerChartInstance || !co2ChartInstance) return;
+    
+    // Recalculate based on state history
+    let tata = 0, zeon = 0, cz = 0, bolt = 0;
+    let energies = [0, 0, 0, 0, 0, 0, 0]; // Mon-Sun
+    
+    state.sessionHistory.forEach((r, idx) => {
+        // Networks count
+        if (r.network === "Tata Power") tata++;
+        else if (r.network === "Zeon") zeon++;
+        else if (r.network === "ChargeZone") cz++;
+        else if (r.network === "Bolt") bolt++;
+        
+        // Distribute mock energy across days
+        const dayIdx = (idx * 2) % 7;
+        energies[dayIdx] += r.energy;
+    });
+
+    // Update charts datasets
+    providerChartInstance.data.datasets[0].data = [tata, zeon, cz, bolt];
+    providerChartInstance.update();
+
+    energyChartInstance.data.datasets[0].data = energies.map(e => e === 0 ? Math.random() * 15 + 5 : e);
+    energyChartInstance.update();
+
+    co2ChartInstance.data.datasets[0].data[3] = parseFloat(state.co2Saved.toFixed(1));
+    co2ChartInstance.update();
+}
+
+// 9. FORM SUBMISSIONS & EVENT LISTENERS
+function initEventListeners() {
+    // Map filters change
+    document.querySelectorAll(".filter-network, .filter-connector, .filter-status").forEach(el => {
+        el.addEventListener("change", () => {
+            renderMapMarkers();
+        });
+    });
+
+    // Top-up form handler
+    document.getElementById("topup-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const amtInput = document.getElementById("topup-amount");
+        const method = document.getElementById("payment-method").value;
+        const amount = parseFloat(amtInput.value);
+
+        if (isNaN(amount) || amount <= 0) {
+            showToast("Please enter a valid amount.", "danger");
+            return;
+        }
+
+        state.walletBalance += amount;
+        document.getElementById("dash-wallet-bal").textContent = state.walletBalance.toFixed(2);
+        document.getElementById("wallet-current-bal").textContent = state.walletBalance.toFixed(2);
+        
+        showToast(`₹${amount.toFixed(2)} added to Unified Wallet via ${method.toUpperCase()}.`, "success");
+        amtInput.value = "500";
+    });
+
+    // Network connection toggle button
+    document.getElementById("btn-toggle-network").addEventListener("click", () => {
+        toggleNetworkConnection();
+    });
+
+    // Clear logs button
+    document.getElementById("btn-clear-logs").addEventListener("click", () => {
+        document.getElementById("ocpp-logs-output").innerHTML = "";
+        logOcppMessage("SYSTEM", "Terminal logs cleared.");
+    });
+
+    // OCPP Reboot command button
+    document.getElementById("btn-simulate-reboot").addEventListener("click", () => {
+        showToast("Sending remote OCPP Hard Reset command...", "warning");
+        logOcppMessage("RECEIVE", `[2, "${generateOcppId()}", "Reset", {"type": "Hard"}]`);
+        
+        setTimeout(() => {
+            logOcppMessage("SEND", `[3, "msg-reboot", "ResetResponse", {"status": "Accepted"}]`);
+            logOcppMessage("SYSTEM", "Initiating Charger Hard Reset. Halting transactions...");
+            
+            if (state.activeSession) {
+                clearInterval(state.chargingInterval);
+                resetChargingUI();
+            }
+            
+            setTimeout(() => {
+                logOcppMessage("SYSTEM", "Charger booting up...");
+                logOcppMessage("SEND", `[2, "${generateOcppId()}", "BootNotification", {"chargerModel": "VoltStream-DC150", "chargerVendor": "VoltStream Tech"}]`);
+                logOcppMessage("RECEIVE", `[3, "msg-boot", "BootNotificationResponse", {"status": "Accepted", "currentTime": "${new Date().toISOString()}", "interval": 60}]`);
+                logOcppMessage("SYSTEM", "Charger fully booted. Status: Available.");
+                showToast("Charger successfully rebooted and online.", "success");
+            }, 2000);
+        }, 1000);
+    });
+
+    // Manual stop charging button
+    document.getElementById("btn-stop-charging").addEventListener("click", () => {
+        stopChargingSession();
+    });
+
+    // Toggle Hackathon Theme overlays mapping button
+    document.getElementById("btn-toggle-theme-mapping").addEventListener("click", () => {
+        const overlays = document.querySelectorAll(".theme-overlay");
+        const btn = document.getElementById("btn-toggle-theme-mapping");
+        const span = btn.querySelector("span");
+        const icon = btn.querySelector("i");
+        
+        state.showThemeMapping = !state.showThemeMapping;
+        
+        overlays.forEach(overlay => {
+            if (state.showThemeMapping) {
+                overlay.classList.add("show");
+            } else {
+                overlay.classList.remove("show");
+            }
+        });
+        
+        if (state.showThemeMapping) {
+            span.textContent = "Hide Hackathon Insights";
+            icon.className = "fa-solid fa-eye-slash";
+            showToast("Hackathon theme mapping overlays visible.", "info");
+        } else {
+            span.textContent = "Show Hackathon Insights";
+            icon.className = "fa-solid fa-eye";
+            showToast("Returning to active dashboard.", "info");
+        }
+    });
+}
