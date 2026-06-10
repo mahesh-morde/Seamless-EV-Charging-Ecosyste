@@ -9,7 +9,7 @@
 
 | Resource | Link |
 |:---|:---|
-| 🌐 **Interactive Prototype (Live)** | [voltstream-ev-charging.onrender.com](https://voltstream-ev-charging.onrender.com) |
+| 🌐 **Interactive Prototype (Live)** | [seamless-ev-charging-ecosyste.onrender.com](https://seamless-ev-charging-ecosyste.onrender.com) |
 | 📊 **Presentation (Slides)** | [mahesh-morde.github.io/Seamless-EV-Charging-Ecosyste](https://mahesh-morde.github.io/Seamless-EV-Charging-Ecosyste/) |
 | 🎬 **Demo Video (Screen Recording)** | [Watch on YouTube](https://youtu.be/h-na91u-GgA) |
 | 💻 **Source Code** | [github.com/mahesh-morde/Seamless-EV-Charging-Ecosyste](https://github.com/mahesh-morde/Seamless-EV-Charging-Ecosyste) |
