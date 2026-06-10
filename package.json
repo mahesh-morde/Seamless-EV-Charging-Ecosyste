@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "start:prod": "node node_modules/serve/build/main.js -s dist/voltstream/browser -l $PORT",
+    "start": "node node_modules/serve/build/main.js -s dist/voltstream/browser -l $PORT",
+    "dev": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
