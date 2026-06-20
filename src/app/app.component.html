@@ -1,43 +1,48 @@
-<div class="app-container">
+<div class="app-container" *ngIf="eco.isLoggedIn; else loginTemplate">
     <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-        <div class="logo">
-            <i class="fa-solid fa-bolt-lightning neon-glow-text"></i>
-            <span class="logo-text">Volt<span class="accent-text">Stream</span></span>
+    <aside class="sidebar" [class.collapsed]="isSidebarCollapsed" (click)="isSidebarCollapsed ? toggleSidebar() : null">
+        <div class="logo" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
+                <i class="fa-solid fa-bolt-lightning neon-glow-text" style="flex-shrink: 0;"></i>
+                <span class="logo-text" *ngIf="!isSidebarCollapsed">Volt<span class="accent-text">Stream</span></span>
+            </div>
+            <button (click)="toggleSidebar(); $event.stopPropagation()" [title]="(isSidebarCollapsed ? 'EXPAND' : 'COLLAPSE') | translate" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; outline: none; margin-left: auto;">
+                <i class="fa-solid" [ngClass]="isSidebarCollapsed ? 'fa-chevron-right' : 'fa-chevron-left'"></i>
+            </button>
         </div>
         
         <nav class="nav-menu">
             <!-- Dashboard (Dynamic based on Role) -->
-            <a href="#" class="nav-item" [class.active]="eco.activeTab === 'dashboard'" (click)="switchTab('dashboard'); $event.preventDefault()">
+            <a href="#" class="nav-item" [class.active]="eco.activeTab === 'dashboard'" (click)="switchTab('dashboard'); $event.preventDefault()" [title]="(eco.currentRole === 'driver' ? 'DRIVER_DASHBOARD' : 'ECOSYSTEM_OVERVIEW') | translate">
                 <i class="fa-solid fa-chart-pie"></i>
-                <span>{{ eco.currentRole === 'driver' ? 'Driver Dashboard' : 'Ecosystem Overview' }}</span>
+                <span *ngIf="!isSidebarCollapsed">{{ (eco.currentRole === 'driver' ? 'DRIVER_DASHBOARD' : 'ECOSYSTEM_OVERVIEW') | translate }}</span>
             </a>
             <!-- Map (Dynamic based on Role) -->
-            <a href="#" class="nav-item" [class.active]="eco.activeTab === 'map'" (click)="switchTab('map'); $event.preventDefault()">
+            <a href="#" class="nav-item" [class.active]="eco.activeTab === 'map'" (click)="switchTab('map'); $event.preventDefault()" [title]="(eco.currentRole === 'driver' ? 'STATION_FINDER_NAV' : 'GRID_MAP_STATUS') | translate">
                 <i class="fa-solid fa-map-location-dot"></i>
-                <span>{{ eco.currentRole === 'driver' ? 'Station Finder & Navigation' : 'Grid Map & Port Status' }}</span>
+                <span *ngIf="!isSidebarCollapsed">{{ (eco.currentRole === 'driver' ? 'STATION_FINDER_NAV' : 'GRID_MAP_STATUS') | translate }}</span>
             </a>
             <!-- OCPP Terminal (Operator Only) -->
-            <a *ngIf="eco.currentRole === 'operator'" href="#" class="nav-item" [class.active]="eco.activeTab === 'ocpp'" (click)="switchTab('ocpp'); $event.preventDefault()">
+            <a *ngIf="eco.currentRole === 'operator'" href="#" class="nav-item" [class.active]="eco.activeTab === 'ocpp'" (click)="switchTab('ocpp'); $event.preventDefault()" [title]="'OCPP_PROTOCOL_MONITOR' | translate">
                 <i class="fa-solid fa-terminal"></i>
-                <span>OCPP Protocol Monitor</span>
+                <span *ngIf="!isSidebarCollapsed">{{ 'OCPP_PROTOCOL_MONITOR' | translate }}</span>
             </a>
             <!-- Wallet (Dynamic based on Role) -->
-            <a href="#" class="nav-item" [class.active]="eco.activeTab === 'wallet'" (click)="switchTab('wallet'); $event.preventDefault()">
+            <a href="#" class="nav-item" [class.active]="eco.activeTab === 'wallet'" (click)="switchTab('wallet'); $event.preventDefault()" [title]="(eco.currentRole === 'driver' ? 'UNIFIED_WALLET' : 'UNIFIED_SETTLEMENT_LEDGER') | translate">
                 <i class="fa-solid fa-wallet"></i>
-                <span>{{ eco.currentRole === 'driver' ? 'Unified Wallet' : 'Unified Settlement Ledger' }}</span>
+                <span *ngIf="!isSidebarCollapsed">{{ (eco.currentRole === 'driver' ? 'UNIFIED_WALLET' : 'UNIFIED_SETTLEMENT_LEDGER') | translate }}</span>
             </a>
             <!-- Analytics (Dynamic based on Role) -->
-            <a href="#" class="nav-item" [class.active]="eco.activeTab === 'analytics'" (click)="switchTab('analytics'); $event.preventDefault()">
+            <a href="#" class="nav-item" [class.active]="eco.activeTab === 'analytics'" (click)="switchTab('analytics'); $event.preventDefault()" [title]="(eco.currentRole === 'driver' ? 'MY_EV_ANALYTICS' : 'BATTERY_LIFECYCLE_ANALYTICS') | translate">
                 <i class="fa-solid fa-chart-line"></i>
-                <span>{{ eco.currentRole === 'driver' ? 'My EV Analytics' : 'Battery Lifecycle Analytics' }}</span>
+                <span *ngIf="!isSidebarCollapsed">{{ (eco.currentRole === 'driver' ? 'MY_EV_ANALYTICS' : 'BATTERY_LIFECYCLE_ANALYTICS') | translate }}</span>
             </a>
         </nav>
 
-        <div class="vehicle-card glass">
+        <div class="vehicle-card glass" *ngIf="!isSidebarCollapsed">
             <div class="vehicle-info">
-                <div class="vehicle-title">Connected EV</div>
-                <div class="vehicle-name">Mahindra XUV400</div>
+                <div class="vehicle-title">{{ 'CONNECTED_EV' | translate }}</div>
+                <div class="vehicle-name">{{ 'VEHICLE_NAME' | translate }}</div>
             </div>
             <div class="soc-display">
                 <div class="soc-icon"><i class="fa-solid fa-battery-three-quarters"></i></div>
@@ -48,16 +53,36 @@
             </div>
         </div>
 
-        <!-- Role Switcher Panel -->
-        <div class="role-switcher-card glass" style="margin-top: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600;">Perspective Switcher</div>
-            <button class="btn btn-secondary w-full" (click)="toggleRole()" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.03); border-color: var(--border-glass);">
-                <span style="font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid" [ngClass]="eco.currentRole === 'driver' ? 'fa-user text-cyan' : 'fa-network-wired text-purple'"></i>
-                    {{ eco.currentRole === 'driver' ? 'Driver Companion' : 'Grid Operations' }}
-                </span>
-                <i class="fa-solid fa-right-left" style="font-size: 10px; color: var(--text-muted);"></i>
+        <!-- Logout Action -->
+        <div class="logout-card" [style.margin-top]="isSidebarCollapsed ? 'auto' : '16px'">
+            <button class="btn btn-secondary" [class.w-full]="!isSidebarCollapsed" (click)="logout(); $event.stopPropagation()" [title]="'LOGOUT_BTN' | translate" [style.padding]="isSidebarCollapsed ? '10px' : '10px 14px'" [style.width]="isSidebarCollapsed ? '44px' : 'auto'" [style.height]="isSidebarCollapsed ? '44px' : 'auto'" style="display: flex; justify-content: center; align-items: center; border-color: rgba(244,63,94,0.25); background: rgba(244,63,94,0.05); color: var(--neon-red); font-weight: 600; border-radius: 10px; outline: none;">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span *ngIf="!isSidebarCollapsed" style="margin-left: 8px;">{{ 'LOGOUT_BTN' | translate }}</span>
             </button>
+        </div>
+
+        <!-- User Profile Section / Perspective Switcher -->
+        <div class="user-profile-section" 
+             (click)="toggleRole()"
+             [style.cursor]="'pointer'"
+             [style.margin-top]="isSidebarCollapsed ? '16px' : '24px'" 
+             [style.border-top]="'1px solid var(--border-glass)'" 
+             [style.padding-top]="'16px'" 
+             [title]="((eco.currentRole === 'driver' ? 'GRID_OPERATIONS' : 'DRIVER_COMPANION') | translate)"
+             style="display: flex; align-items: center; gap: 12px; width: 100%; justify-content: center; transition: background var(--transition-speed) ease; border-radius: 8px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px rgba(6, 182, 212, 0.4); flex-shrink: 0; position: relative;">
+                <i class="fa-solid fa-user" style="color: white; font-size: 14px;"></i>
+                <div style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg-secondary); border: 1.5px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 8px; color: var(--neon-cyan);">
+                    <i class="fa-solid fa-right-left"></i>
+                </div>
+            </div>
+            <div *ngIf="!isSidebarCollapsed" style="flex: 1; text-align: left; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <div style="overflow: hidden;">
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">VoltStream User</div>
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">{{ (eco.currentRole === 'driver' ? 'DRIVER_COMPANION' : 'GRID_OPERATIONS') | translate }}</div>
+                </div>
+                <i class="fa-solid fa-right-left" style="font-size: 11px; color: var(--text-muted); flex-shrink: 0;"></i>
+            </div>
         </div>
     </aside>
 
@@ -68,34 +93,41 @@
             <div class="header-title">
                 <!-- Driver Headers -->
                 <ng-container *ngIf="eco.currentRole === 'driver'">
-                    <h1 *ngIf="eco.activeTab === 'dashboard'">Driver Dashboard Overview</h1>
-                    <h1 *ngIf="eco.activeTab === 'map'">Charger Finder &amp; Navigation</h1>
-                    <h1 *ngIf="eco.activeTab === 'wallet'">Unified Wallet Portal</h1>
-                    <h1 *ngIf="eco.activeTab === 'analytics'">Eco &amp; Battery Analytics</h1>
+                    <h1 *ngIf="eco.activeTab === 'dashboard'">{{ 'DRIVER_DASHBOARD_OVERVIEW' | translate }}</h1>
+                    <h1 *ngIf="eco.activeTab === 'map'">{{ 'CHARGER_FINDER_NAV_HEADER' | translate }}</h1>
+                    <h1 *ngIf="eco.activeTab === 'wallet'">{{ 'UNIFIED_WALLET_PORTAL' | translate }}</h1>
+                    <h1 *ngIf="eco.activeTab === 'analytics'">{{ 'ECO_BATTERY_ANALYTICS' | translate }}</h1>
                     
-                    <p class="subtitle" *ngIf="eco.activeTab === 'dashboard'">Real-time status of your vehicle's SoC, remaining range, and active session</p>
-                    <p class="subtitle" *ngIf="eco.activeTab === 'map'">Find and navigate to interoperable fast-chargers near your location</p>
-                    <p class="subtitle" *ngIf="eco.activeTab === 'wallet'">Manage pre-funded wallet balances and unified payment methods across operators</p>
-                    <p class="subtitle" *ngIf="eco.activeTab === 'analytics'">Track your carbon offset, fuel savings, and battery health history</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'dashboard'">{{ 'DRIVER_DASHBOARD_SUBTITLE' | translate }}</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'map'">{{ 'CHARGER_FINDER_SUBTITLE' | translate }}</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'wallet'">{{ 'UNIFIED_WALLET_SUBTITLE' | translate }}</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'analytics'">{{ 'ECO_BATTERY_SUBTITLE' | translate }}</p>
                 </ng-container>
 
                 <!-- Operator Headers -->
                 <ng-container *ngIf="eco.currentRole === 'operator'">
-                    <h1 *ngIf="eco.activeTab === 'dashboard'">Grid Operations Overview</h1>
-                    <h1 *ngIf="eco.activeTab === 'map'">Ecosystem Interoperability Map</h1>
-                    <h1 *ngIf="eco.activeTab === 'ocpp'">OCPP Central Protocol Monitor</h1>
-                    <h1 *ngIf="eco.activeTab === 'wallet'">Unified Clearing &amp; Settlement Ledger</h1>
-                    <h1 *ngIf="eco.activeTab === 'analytics'">Cell Stress &amp; Battery Lifecycle Analytics</h1>
+                    <h1 *ngIf="eco.activeTab === 'dashboard'">{{ 'GRID_OPERATIONS_OVERVIEW' | translate }}</h1>
+                    <h1 *ngIf="eco.activeTab === 'map'">{{ 'ECOSYSTEM_INTEROP_MAP' | translate }}</h1>
+                    <h1 *ngIf="eco.activeTab === 'ocpp'">{{ 'OCPP_CENTRAL_MONITOR' | translate }}</h1>
+                    <h1 *ngIf="eco.activeTab === 'wallet'">{{ 'UNIFIED_CLEARING_LEDGER' | translate }}</h1>
+                    <h1 *ngIf="eco.activeTab === 'analytics'">{{ 'CELL_STRESS_ANALYTICS' | translate }}</h1>
                     
-                    <p class="subtitle" *ngIf="eco.activeTab === 'dashboard'">Live grid load factor, active charging speed metrics, and router statuses</p>
-                    <p class="subtitle" *ngIf="eco.activeTab === 'map'">Geospatial tracking of Pune EV grid nodes and active connector availability</p>
-                    <p class="subtitle" *ngIf="eco.activeTab === 'ocpp'">Examine raw charging communications, standard telemetry, and remote reset frames</p>
-                    <p class="subtitle" *ngIf="eco.activeTab === 'wallet'">Audit centralized wallet pool balances, provider distributions, and settlements</p>
-                    <p class="subtitle" *ngIf="eco.activeTab === 'analytics'">Analyze electrochemical SOH degradation and grid battery life passport predictions</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'dashboard'">{{ 'GRID_OPS_SUBTITLE' | translate }}</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'map'">{{ 'INTEROP_MAP_SUBTITLE' | translate }}</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'ocpp'">{{ 'OCPP_TERMINAL_SUBTITLE' | translate }}</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'wallet'">{{ 'WALLET_LEDGER_SUBTITLE' | translate }}</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'analytics'">{{ 'BATTERY_ANALYTICS_SUBTITLE' | translate }}</p>
                 </ng-container>
             </div>
             
             <div class="header-actions">
+                <!-- Language Switcher -->
+                <select [ngModel]="ts.getCurrentLanguage()" (change)="changeLang($event)" style="width: auto; padding: 10px 14px; background-color: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm); color: var(--text-primary); cursor: pointer; font-weight: 600;">
+                    <option value="en">English (EN)</option>
+                    <option value="es">Español (ES)</option>
+                    <option value="hi">हिन्दी (HI)</option>
+                </select>
+
                 <!-- Theme Mode Toggle -->
                 <button class="btn btn-secondary" (click)="toggleTheme()" title="Toggle Theme" style="padding: 10px 14px;">
                     <i class="fa-solid" [ngClass]="eco.currentTheme === 'dark' ? 'fa-sun text-yellow' : 'fa-moon text-cyan'"></i>
@@ -104,7 +136,7 @@
                 <!-- Hackathon Insights Overlay Toggle (Operator Only) -->
                 <button *ngIf="eco.currentRole === 'operator'" class="btn btn-primary" (click)="toggleThemeMapping()" style="background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); color: white; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);">
                     <i class="fa-solid" [ngClass]="eco.showThemeMapping ? 'fa-eye-slash' : 'fa-eye'"></i>
-                    <span>{{ eco.showThemeMapping ? 'Hide Focus Areas' : 'Show Focus Areas' }}</span>
+                    <span>{{ (eco.showThemeMapping ? 'HIDE_FOCUS_AREAS' : 'SHOW_FOCUS_AREAS') | translate }}</span>
                 </button>
 
                 <!-- Operator-only Network & Grid Simulation Tools -->
@@ -112,21 +144,21 @@
                     <!-- Substation Grid Load -->
                     <div class="system-status-indicator" [ngClass]="eco.isGridOverloaded ? 'offline' : 'online'" style="background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.2); color: var(--neon-purple); display: inline-flex; align-items: center; gap: 8px;">
                         <i class="fa-solid fa-bolt-lightning" [style.color]="'var(--neon-purple)'"></i>
-                        <span>Grid Load: {{ eco.gridLoad }}%</span>
+                        <span>{{ 'GRID_LOAD_LABEL' | translate }}: {{ eco.gridLoad }}%</span>
                     </div>
                     <!-- Simulate Overload -->
                     <button class="btn btn-secondary" (click)="toggleGridOverload()" style="border-color: rgba(168, 85, 247, 0.25);">
                         <i class="fa-solid" [ngClass]="eco.isGridOverloaded ? 'fa-square-check text-green' : 'fa-triangle-exclamation text-purple'"></i>
-                        <span>{{ eco.isGridOverloaded ? 'Normalize Grid' : 'Simulate Grid Peak' }}</span>
+                        <span>{{ (eco.isGridOverloaded ? 'NORMALIZE_GRID' : 'SIMULATE_GRID_PEAK') | translate }}</span>
                     </button>
                     <!-- NOC / OCPP Link -->
                     <div class="system-status-indicator" [ngClass]="eco.isNetworkOnline ? 'online' : 'offline'">
                         <span class="status-dot"></span>
-                        <span>{{ eco.isNetworkOnline ? 'NOC ONLINE (OCPP Connected)' : 'NOC OFFLINE (Local Buffer Active)' }}</span>
+                        <span>{{ (eco.isNetworkOnline ? 'NOC_ONLINE' : 'NOC_OFFLINE') | translate }}</span>
                     </div>
                     <button class="btn btn-secondary" (click)="toggleNetworkConnection()">
                         <i class="fa-solid" [ngClass]="eco.isNetworkOnline ? 'fa-wifi-slash' : 'fa-wifi'"></i>
-                        <span>{{ eco.isNetworkOnline ? 'Simulate Connection Cut' : 'Restore Connection' }}</span>
+                        <span>{{ (eco.isNetworkOnline ? 'SIMULATE_CONN_CUT' : 'RESTORE_CONN') | translate }}</span>
                     </button>
                 </ng-container>
             </div>
@@ -142,6 +174,10 @@
         </div>
     </main>
 </div>
+
+<ng-template #loginTemplate>
+    <app-login></app-login>
+</ng-template>
 
 <!-- Notification Toast Element -->
 <div class="toast-container" id="toast-container">

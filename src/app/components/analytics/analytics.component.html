@@ -2,20 +2,20 @@
     <div class="analytics-chart-card glass flex-2 card-wrapper">
         <div class="theme-overlay" [class.show]="eco.showThemeMapping">
             <div class="theme-overlay-content">
-                <h4>Core Objective: Supply Chain Resilience &amp; Manufacturing Efficiency</h4>
-                <p>Enhances supply chain resilience and manufacturing efficiency by tracking battery health (SoH). AI models evaluate electrode degradation patterns, generating digital battery passports that qualify cells for second-life grid storage reuse.</p>
+                <h4>{{ 'ANALYTICS_OBJECTIVE_TITLE' | translate }}</h4>
+                <p>{{ 'ANALYTICS_OBJECTIVE_DESC' | translate }}</p>
             </div>
         </div>
-        <h3>State of Health (SoH) &amp; Battery Lifecycle Tracker</h3>
-        <p class="sec-text">Total power delivered in kWh across different networks</p>
+        <h3>{{ 'SOH_TRACKER_TITLE' | translate }}</h3>
+        <p class="sec-text">{{ 'SOH_TRACKER_SUB' | translate }}</p>
         <div class="chart-container">
             <canvas id="energy-chart"></canvas>
         </div>
     </div>
 
     <div class="analytics-chart-card glass flex-1">
-        <h3>Charging by Network Provider</h3>
-        <p class="sec-text">Distribution of charging sessions by provider</p>
+        <h3>{{ 'CHARGING_BY_PROVIDER_TITLE' | translate }}</h3>
+        <p class="sec-text">{{ 'CHARGING_BY_PROVIDER_SUB' | translate }}</p>
         <div class="chart-container-radial">
             <canvas id="provider-chart"></canvas>
         </div>
@@ -24,31 +24,31 @@
 
 <div class="analytics-grid mt-20">
     <div class="analytics-chart-card glass flex-1">
-        <h3>Co2 Savings Trend</h3>
+        <h3>{{ 'CO2_SAVINGS_TREND' | translate }}</h3>
         <div class="chart-container-small">
             <canvas id="co2-chart"></canvas>
         </div>
     </div>
     <div class="analytics-chart-card glass flex-2">
         <div class="stats-summary-card">
-            <h3>Eco-efficiency &amp; Circular SOH Passport</h3>
+            <h3>{{ 'ECO_EFFICIENCY_PASSPORT_TITLE' | translate }}</h3>
             <div class="grid-stats">
                 <div class="stat-item">
-                    <div class="stat-label">AI SOH Prediction (Battery Health)</div>
+                    <div class="stat-label">{{ 'AI_SOH_PREDICTION' | translate }}</div>
                     <div class="stat-number text-green" id="battery-soh-val">94.5%</div>
-                    <div class="metric-subtext mt-10">Eligible for Second-Life Grid Storage</div>
+                    <div class="metric-subtext mt-10">{{ 'SECOND_LIFE_ELIGIBLE' | translate }}</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">Total Cost Saved (vs Gas)</div>
+                    <div class="stat-label">{{ 'TOTAL_COST_SAVED' | translate }}</div>
                     <div class="stat-number text-cyan">₹14,832.00</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">Average Charging Price</div>
+                    <div class="stat-label">{{ 'AVG_CHARGING_PRICE' | translate }}</div>
                     <div class="stat-number">₹17.80/kWh</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">Active Charge Points Visited</div>
-                    <div class="stat-number text-yellow">12 Stations</div>
+                    <div class="stat-label">{{ 'ACTIVE_POINTS_VISITED' | translate }}</div>
+                    <div class="stat-number text-yellow">{{ 'STATIONS_COUNT_VALUE' | translate }}</div>
                 </div>
             </div>
         </div>

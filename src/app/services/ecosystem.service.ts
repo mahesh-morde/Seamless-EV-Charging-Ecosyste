@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { TranslationService } from './translation.service';
 
 export interface ChargingStation {
   id: number;
@@ -40,6 +41,8 @@ export interface ToastMessage {
 })
 export class EcosystemService {
   // Global State
+  isLoggedIn = false;
+  loggedInUser: 'user' | 'admin' | null = null;
   walletBalance = 1250.00;
   co2Saved = 184.5;
   vehicleSoc = 71;
@@ -58,16 +61,17 @@ export class EcosystemService {
   carLocation = { lat: 18.5220, lng: 73.8480 };
   gridLoad = 72;
   isGridOverloaded = false;
+  userStations: ChargingStation[] = [];
 
   // Mock Stations Data
   stationsData: ChargingStation[] = [
-    { id: 1, name: "IOCL Petrol Pump - Tata Power Fast-Charger", network: "Tata Power", lat: 18.5252, lng: 73.8540, speed: "DC 150kW", connector: "CCS2", price: 18.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
-    { id: 2, name: "HPCL Fuel Oasis - Zeon Fast-Charge Zone", network: "Zeon", lat: 18.5140, lng: 73.8420, speed: "DC 50kW", connector: "CCS2", price: 16.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }] },
-    { id: 3, name: "BPCL Highway Stop - ChargeZone Hub", network: "ChargeZone", lat: 18.5300, lng: 73.8750, speed: "DC 120kW", connector: "CCS2", price: 17.50, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
-    { id: 4, name: "Jio-bp Pulse Petrol Pump EV Hub", network: "Tata Power", lat: 18.5020, lng: 73.8180, speed: "DC 150kW", connector: "CCS2", price: 19.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Available' }] },
-    { id: 5, name: "Bolt Smart AC Charger S2", network: "Bolt", lat: 18.5410, lng: 73.8310, speed: "AC 7.4kW", connector: "Type 2", price: 12.00, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] },
-    { id: 6, name: "Zeon TechPark Charger B4", network: "Zeon", lat: 18.5580, lng: 73.8990, speed: "DC 60kW", connector: "CCS2", price: 17.00, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }] },
-    { id: 7, name: "Bolt Residency AC Point S8", network: "Bolt", lat: 18.5204, lng: 73.8660, speed: "AC 22kW", connector: "Type 2", price: 11.50, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] }
+    { id: 1, name: "Tata Power Fast-Charger - JW Marriott Hotel, SB Road", network: "Tata Power", lat: 18.5327, lng: 73.8300, speed: "DC 60kW", connector: "CCS2", price: 19.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
+    { id: 2, name: "Zeon Charging - Sayaji Hotel, Wakad", network: "Zeon", lat: 18.5960, lng: 73.7600, speed: "DC 50kW", connector: "CCS2", price: 17.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }] },
+    { id: 3, name: "ChargeZone Station - Courtyard by Marriott, Hinjewadi", network: "ChargeZone", lat: 18.5912, lng: 73.7388, speed: "DC 120kW", connector: "CCS2", price: 18.00, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
+    { id: 4, name: "Tata Power Charging - Amanora Mall, Hadapsar", network: "Tata Power", lat: 18.5204, lng: 73.9358, speed: "DC 150kW", connector: "CCS2", price: 18.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Available' }] },
+    { id: 5, name: "Bolt Smart AC Charger - Phoenix Marketcity, Viman Nagar", network: "Bolt", lat: 18.5624, lng: 73.9168, speed: "AC 7.4kW", connector: "Type 2", price: 12.00, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] },
+    { id: 6, name: "ChargeZone Hub - Hyatt Regency, Weikfield IT Park", network: "ChargeZone", lat: 18.5615, lng: 73.9090, speed: "DC 60kW", connector: "CCS2", price: 17.00, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }] },
+    { id: 7, name: "Bolt Smart AC Point - Season's Mall, Hadapsar", network: "Bolt", lat: 18.5200, lng: 73.9320, speed: "AC 22kW", connector: "Type 2", price: 11.50, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] }
   ];
 
   networkColors: { [key: string]: string } = {
@@ -83,9 +87,7 @@ export class EcosystemService {
     { date: "2026-06-01 14:02", station: "ChargeZone Highway Hub B1", network: "ChargeZone", energy: 44.5, duration: 48, cost: 845.50, status: "Paid (VoltStream)" }
   ];
 
-  ocppLogs: LogLine[] = [
-    { time: new Date().toLocaleTimeString(), direction: 'SYSTEM', message: 'Terminal initialized. Waiting for connection...' }
-  ];
+  ocppLogs: LogLine[] = [];
 
   toasts: ToastMessage[] = [];
   toastCounter = 0;
@@ -103,6 +105,46 @@ export class EcosystemService {
 
   // Listeners for chart updates
   private chartCallbacks: (() => void)[] = [];
+  images: any = {};
+
+  constructor(private ts: TranslationService) {
+    this.loadImages();
+    this.checkSession();
+    this.logOcppMessage('SYSTEM', 'LOG_TERMINAL_INIT');
+  }
+
+  checkSession() {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const sessionStr = localStorage.getItem('voltstream_session');
+        if (sessionStr) {
+          const session = JSON.parse(sessionStr);
+          if (session && session.username && session.expiry && session.expiry > Date.now()) {
+            this.isLoggedIn = true;
+            this.loggedInUser = session.username;
+            this.currentRole = session.username === 'user' ? 'driver' : 'operator';
+          } else {
+            localStorage.removeItem('voltstream_session');
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse session from localStorage', e);
+      }
+    }
+  }
+
+  async loadImages() {
+    try {
+      const response = await fetch('./images.json');
+      const data = await response.json();
+      this.images = {};
+      for (const key of Object.keys(data)) {
+        this.images[key] = data[key].replace(/^public\//, '');
+      }
+    } catch (e) {
+      console.error('Failed to load images.json', e);
+    }
+  }
 
   registerChartCallback(cb: () => void) {
     this.chartCallbacks.push(cb);
@@ -128,9 +170,15 @@ export class EcosystemService {
   }
 
   // Toast notifier
-  showToast(message: string, type = 'info') {
+  showToast(messageKey: string, type = 'info', params?: any) {
+    let msg = this.ts.translate(messageKey);
+    if (params) {
+      Object.keys(params).forEach(k => {
+        msg = msg.replace(`{{${k}}}`, params[k]);
+      });
+    }
     const id = this.toastCounter++;
-    this.toasts.push({ id, message, type });
+    this.toasts.push({ id, message: msg, type });
     setTimeout(() => {
       this.toasts = this.toasts.filter(t => t.id !== id);
     }, 4500);
@@ -140,20 +188,53 @@ export class EcosystemService {
     const station = this.stationsData.find(s => s.id === stationId);
     if (station) {
       this.selectedStation = station;
-      this.activeTab = 'dashboard';
-      this.showToast(`Selected station: ${station.name}. Pre-authorization initiated via ISO 15118.`, 'info');
+      this.showToast('TOAST_SELECTED_STATION', 'info', { name: station.name });
     }
   }
 
   clearLogs() {
     this.ocppLogs = [
-      { time: new Date().toLocaleTimeString(), direction: 'SYSTEM', message: 'Terminal cleared by operator.' }
+      { time: new Date().toLocaleTimeString(), direction: 'SYSTEM', message: this.ts.translate('LOG_TERMINAL_CLEARED') }
     ];
+  }
+
+  login(username: string, password: string): boolean {
+    const u = username.trim().toLowerCase();
+    if ((u === 'user' || u === 'admin') && password === 'password') {
+      this.isLoggedIn = true;
+      this.loggedInUser = u as 'user' | 'admin';
+      this.currentRole = u === 'user' ? 'driver' : 'operator';
+
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const expiry = Date.now() + 60 * 60 * 1000; // 1 hour expiry
+        localStorage.setItem('voltstream_session', JSON.stringify({
+          username: u,
+          expiry: expiry
+        }));
+      }
+
+      this.showToast('TOAST_LOGIN_SUCCESS', 'success', { name: u.toUpperCase() });
+      return true;
+    }
+    this.showToast('TOAST_LOGIN_FAILED', 'danger');
+    return false;
+  }
+
+  logout() {
+    this.isLoggedIn = false;
+    this.loggedInUser = null;
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('voltstream_session');
+    }
+    this.showToast('TOAST_LOGGED_OUT', 'info');
   }
 
   toggleRole() {
     this.currentRole = this.currentRole === 'driver' ? 'operator' : 'driver';
-    this.showToast(`Switched perspective to: ${this.currentRole === 'driver' ? 'Driver Companion' : 'Grid Operations Console'}`, 'success');
+    const roleTranslated = this.currentRole === 'driver' 
+      ? this.ts.translate('DRIVER_COMPANION') 
+      : this.ts.translate('GRID_OPERATIONS');
+    this.showToast('TOAST_SWITCHED_PERSPECTIVE', 'success', { role: roleTranslated });
     if (this.currentRole === 'driver' && this.activeTab === 'ocpp') {
       this.activeTab = 'dashboard';
     }
@@ -168,7 +249,7 @@ export class EcosystemService {
         document.body.classList.remove('light-mode');
       }
     }
-    this.showToast(`Theme switched to ${this.currentTheme.toUpperCase()} mode.`, 'info');
+    this.showToast('TOAST_THEME_SWITCHED', 'info', { theme: this.currentTheme.toUpperCase() });
     this.notifyThemeChange();
   }
 
@@ -178,26 +259,84 @@ export class EcosystemService {
     
     if (this.isGridOverloaded) {
       this.logOcppMessage('RECEIVE', `[2, "${this.generateOcppId()}", "SetChargingProfile", {"chargingProfile": {"profileId": 101, "stackLevel": 1, "chargingProfilePurpose": "TxProfile", "chargingProfileKind": "Absolute", "chargingSchedule": {"duration": 1800, "chargingRateUnit": "W", "chargingSchedulePeriod": [{"startPeriod": 0, "limit": 70000}]}}}]`);
-      this.logOcppMessage('SYSTEM', "Smart Grid Command: Local charging output throttled to 70kW due to substation load-shedding.");
-      this.showToast("Grid capacity warning! Substation load-shedding activated.", "warning");
+      this.logOcppMessage('SYSTEM', 'LOG_GRID_THROTTLE');
+      this.showToast('TOAST_GRID_WARNING', 'warning');
       if (this.activeSession) {
         this.activeSession.kwRate = Math.min(this.activeSession.kwRate, 70);
       }
     } else {
-      this.logOcppMessage('SYSTEM', "Smart Grid Recovery: Grid load normalized. Restoring maximum port capacity.");
-      this.showToast("Grid load normalized. Charging limits restored.", "success");
+      this.logOcppMessage('SYSTEM', 'LOG_GRID_NORMAL');
+      this.showToast('TOAST_GRID_NORMALIZED', 'success');
     }
   }
 
-  generateLocalStations(lat: number, lng: number) {
+  async generateLocalStations(lat: number, lng: number) {
     this.stationsData = [
-      { id: 11, name: "IOCL Petrol Pump - Tata Power Fast-Charger", network: "Tata Power", lat: lat + 0.0035, lng: lng + 0.0041, speed: "DC 150kW", connector: "CCS2", price: 18.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
-      { id: 12, name: "BPCL Highway Oasis - Zeon Charger Zone", network: "Zeon", lat: lat - 0.0042, lng: lng + 0.0053, speed: "DC 120kW", connector: "CCS2", price: 17.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Available' }] },
-      { id: 13, name: "HPCL Fuel Point - ChargeZone EV Hub", network: "ChargeZone", lat: lat + 0.0063, lng: lng - 0.0032, speed: "DC 60kW", connector: "CCS2", price: 16.50, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }] },
-      { id: 14, name: "Jio-bp Pulse Petrol Pump Charging Point", network: "Tata Power", lat: lat - 0.0024, lng: lng - 0.0051, speed: "DC 120kW", connector: "CCS2", price: 18.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
-      { id: 15, name: "Shell Retail Fuel Station - Bolt AC Point", network: "Bolt", lat: lat + 0.0012, lng: lng - 0.0019, speed: "AC 7.4kW", connector: "Type 2", price: 12.00, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] },
-      { id: 16, name: "Highway Fuel Stop Petrol Pump - Zeon DC03", network: "Zeon", lat: lat + 0.0085, lng: lng + 0.0091, speed: "DC 50kW", connector: "CCS2", price: 17.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }] }
+      { id: 11, name: "Tata Power - Westin Hotel EV Zone", network: "Tata Power", lat: lat + 0.0035, lng: lng + 0.0041, speed: "DC 150kW", connector: "CCS2", price: 18.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
+      { id: 12, name: "Zeon Charging Hub - Shell Fuel Hub", network: "Zeon", lat: lat - 0.0042, lng: lng + 0.0053, speed: "DC 120kW", connector: "CCS2", price: 17.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Available' }] },
+      { id: 13, name: "ChargeZone Hub - Vivanta Hotel EV Point", network: "ChargeZone", lat: lat + 0.0063, lng: lng - 0.0032, speed: "DC 60kW", connector: "CCS2", price: 16.50, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }] },
+      { id: 14, name: "Tata Power - Radisson EV Station", network: "Tata Power", lat: lat - 0.0024, lng: lng - 0.0051, speed: "DC 120kW", connector: "CCS2", price: 18.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
+      { id: 15, name: "Bolt Smart AC - Decathlon Sports Hub", network: "Bolt", lat: lat + 0.0012, lng: lng - 0.0019, speed: "AC 7.4kW", connector: "Type 2", price: 12.00, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] },
+      { id: 16, name: "Zeon Charging - Express Highway Station", network: "Zeon", lat: lat + 0.0085, lng: lng + 0.0091, speed: "DC 50kW", connector: "CCS2", price: 17.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }] }
     ];
+
+    try {
+      const url = `https://overpass-api.de/api/interpreter?data=[out:json][timeout:15];node["amenity"="fuel"](around:4000,${lat},${lng});out;`;
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (data && data.elements) {
+        data.elements.forEach((element: any, idx: number) => {
+          const name = element.tags.name || element.tags.brand || "Petrol Pump Charging Hub";
+          const networks = ["Tata Power", "Zeon", "ChargeZone", "Bolt"];
+          const brand = element.tags.brand ? element.tags.brand.toLowerCase() : "";
+          let net = networks[idx % networks.length];
+          if (brand.includes("tata")) net = "Tata Power";
+          else if (brand.includes("zeon")) net = "Zeon";
+          else if (brand.includes("charge")) net = "ChargeZone";
+          else if (brand.includes("bolt")) net = "Bolt";
+
+          const displayName = element.tags.name 
+            ? `${element.tags.name} (EV Interop Hub)` 
+            : `${element.tags.brand || 'Petrol Pump'} EV Charging Point`;
+
+          const isAC = idx % 3 === 0;
+
+          this.stationsData.push({
+            id: 500 + idx,
+            name: displayName,
+            network: net,
+            lat: element.lat,
+            lng: element.lon,
+            speed: isAC ? "AC 22kW" : "DC 60kW",
+            connector: isAC ? "Type 2" : "CCS2",
+            price: isAC ? 12.50 : 18.00,
+            status: idx % 3 === 0 ? "Occupied" : "Available",
+            guns: isAC 
+              ? [{ id: 'A', type: 'Type 2', status: 'Available' }]
+              : [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }]
+          });
+        });
+      }
+    } catch (e) {
+      console.error("Failed to query real-time petrol pumps from OpenStreetMap", e);
+    }
+
+    this.stationsData.push(...this.userStations);
+  }
+
+  onboardStation(station: Omit<ChargingStation, 'id' | 'status'>) {
+    const all = [...this.stationsData, ...this.userStations];
+    const newId = all.length > 0 ? Math.max(...all.map(s => s.id)) + 1 : 100;
+    const newStation: ChargingStation = {
+      ...station,
+      id: newId,
+      status: 'Available'
+    };
+    this.userStations.push(newStation);
+    this.stationsData.push(newStation);
+    this.showToast('TOAST_ONBOARD_SUCCESS', 'success', { name: newStation.name });
+    this.notifyCharts();
   }
 
   // ISO 15118 Plug & Charge
@@ -214,8 +353,8 @@ export class EcosystemService {
       this.connected = true;
       this.plugStatus = 'Connected';
       this.handshakeSteps.connect = 'completed';
-      this.logOcppMessage('SYSTEM', `Physical cable connection detected. Connector type: ${this.selectedStation?.connector}. Locking connector...`);
-      this.showToast("Connector plugged in successfully.", 'success');
+      this.logOcppMessage('SYSTEM', 'LOG_PHYSICAL_CABLE', { connector: this.selectedStation?.connector || 'CCS2' });
+      this.showToast('TOAST_CABLE_PLUGGED', 'success');
     }, 1000);
 
     setTimeout(() => {
@@ -225,7 +364,7 @@ export class EcosystemService {
       setTimeout(() => {
         this.handshakeSteps.tls = 'completed';
         this.logOcppMessage('RECEIVE', `[3, "msg-auth-cert", "SignCertificateResponse", {"status": "Accepted"}]`);
-        this.logOcppMessage('SYSTEM', `Secure TLS channel established. Contract Certificate Valid.`);
+        this.logOcppMessage('SYSTEM', 'LOG_TLS_SECURE');
       }, 1200);
     }, 2500);
 
@@ -237,14 +376,14 @@ export class EcosystemService {
         if (this.walletBalance < 100) {
           this.handshakeSteps.auth = 'error';
           this.logOcppMessage('RECEIVE', `[3, "msg-auth-id", "AuthorizeResponse", {"idTokenInfo": {"status": "Blocked", "reason": "Insufficient Wallet Funds"}}]`);
-          this.showToast("Unified Wallet balance too low to authorize transaction.", 'danger');
+          this.showToast('TOAST_WALLET_LOW', 'danger');
           this.resetChargingUI();
           return;
         }
         
         this.handshakeSteps.auth = 'completed';
         this.logOcppMessage('RECEIVE', `[3, "msg-auth-id", "AuthorizeResponse", {"idTokenInfo": {"status": "Accepted", "groupIdToken": "VoltStreamUnifiedPay"}}]`);
-        this.logOcppMessage('SYSTEM', `Contract Verified. ISO 15118 authentication successful. Payment pre-authorized.`);
+        this.logOcppMessage('SYSTEM', 'LOG_CONTRACT_VERIFIED');
       }, 1500);
     }, 4500);
 
@@ -257,7 +396,7 @@ export class EcosystemService {
       setTimeout(() => {
         this.handshakeSteps.charge = 'completed';
         this.logOcppMessage('RECEIVE', `[3, "msg-tx-start", "TransactionEventResponse", {"totalCost": 0.0}]`);
-        this.logOcppMessage('SYSTEM', `OCPP Energy Transaction started. Relays closed. Energizing...`);
+        this.logOcppMessage('SYSTEM', 'LOG_TX_STARTED');
         
         this.startChargingTransaction();
       }, 1500);
@@ -282,7 +421,7 @@ export class EcosystemService {
       kwRate: parseFloat((speedkW + (Math.random() * 4 - 2)).toFixed(1))
     };
 
-    this.showToast(`Charging started at ${speedkW} kW.`, 'success');
+    this.showToast('TOAST_CHARGING_STARTED', 'success', { speed: speedkW });
 
     this.chargingInterval = setInterval(() => {
       if (this.vehicleSoc >= 100) {
@@ -307,13 +446,13 @@ export class EcosystemService {
     if (!this.activeSession) return;
     
     clearInterval(this.chargingInterval);
-    this.showToast("Stopping charging transaction...", 'warning');
+    this.showToast('TOAST_CHARGING_STOPPING', 'warning');
 
     this.logOcppMessage('SEND', `[2, "${this.generateOcppId()}", "TransactionEvent", {"eventType": "Ended", "transactionId": "tx-volt-${Date.now()}", "timestamp": "${new Date().toISOString()}", "triggerReason": "StopAuthorize", "seqNo": 1, "meterValue": [{"timestamp": "${new Date().toISOString()}", "sampledValue": [{"value": "${this.activeSession.energyDelivered.toFixed(2)}"}]}]}]`);
     
     setTimeout(() => {
         this.logOcppMessage('RECEIVE', `[3, "msg-tx-stop", "TransactionEventResponse", {"totalCost": ${this.activeSession.cost.toFixed(2)}, "idTokenInfo": {"status": "Accepted"}}]`);
-        this.logOcppMessage('SYSTEM', `Relays open. Charger de-energized. Please unplug the connector.`);
+        this.logOcppMessage('SYSTEM', 'LOG_TX_ENDED');
         
         // Settle wallet
         this.deductUnifiedWallet(this.activeSession.cost);
@@ -324,7 +463,7 @@ export class EcosystemService {
         // Reset UI
         this.resetChargingUI();
         
-        this.showToast("Charging session complete. Transaction settled.", 'success');
+        this.showToast('TOAST_SESSION_COMPLETE', 'success');
     }, 1500);
   }
 
@@ -366,14 +505,21 @@ export class EcosystemService {
     };
   }
 
-  logOcppMessage(direction: string, message: string) {
+  logOcppMessage(direction: string, message: string, params?: any) {
+    let msg = this.ts ? this.ts.translate(message) : message;
+    if (params) {
+      Object.keys(params).forEach(k => {
+        msg = msg.replace(`{{${k}}}`, params[k]);
+      });
+    }
+
     if (!this.isNetworkOnline && direction !== 'SYSTEM') {
-      this.offlineQueue.push({ direction, message });
+      this.offlineQueue.push({ direction, message: msg });
       return;
     }
 
     const time = new Date().toLocaleTimeString();
-    this.ocppLogs.push({ time, direction, message });
+    this.ocppLogs.push({ time, direction, message: msg });
     
     setTimeout(() => {
       const el = document.getElementById("ocpp-logs-output");
@@ -395,18 +541,18 @@ export class EcosystemService {
     this.isNetworkOnline = !this.isNetworkOnline;
 
     if (this.isNetworkOnline) {
-      this.logOcppMessage('SYSTEM', "Network link recovered. Synchronizing cached telemetry with Central Management System...");
+      this.logOcppMessage('SYSTEM', 'LOG_NETWORK_RECOVERED');
       this.flushOfflineQueue();
     } else {
-      this.logOcppMessage('SYSTEM', "WARNING: Web-Socket link disconnected. Local transaction recovery buffer initiated.");
-      this.showToast("Network connection lost. Offline buffer enabled.", 'warning');
+      this.logOcppMessage('SYSTEM', 'LOG_NETWORK_WARNING');
+      this.showToast('TOAST_NETWORK_LOST', 'warning');
     }
   }
 
   flushOfflineQueue() {
     if (this.offlineQueue.length === 0) return;
     
-    this.showToast(`Flushing ${this.offlineQueue.length} cached transaction messages.`, 'success');
+    this.showToast('TOAST_FLUSHING', 'success', { count: this.offlineQueue.length });
     
     const queueToFlush = [...this.offlineQueue];
     this.offlineQueue = [];
@@ -415,19 +561,19 @@ export class EcosystemService {
         setTimeout(() => {
             this.logOcppMessage(item.direction, `[RECOVERY-FLUSH] ${item.message}`);
             if (index === queueToFlush.length - 1) {
-                this.logOcppMessage('SYSTEM', "Offline cache synchronization complete. Network status fully aligned.");
+                this.logOcppMessage('SYSTEM', 'LOG_CACHE_SYNCED');
             }
         }, index * 200);
     });
   }
 
   simulateHardReset() {
-    this.showToast("Sending remote OCPP Hard Reset command...", 'warning');
+    this.showToast('TOAST_RESET_SENT', 'warning');
     this.logOcppMessage('RECEIVE', `[2, "${this.generateOcppId()}", "Reset", {"type": "Hard"}]`);
     
     setTimeout(() => {
         this.logOcppMessage('SEND', `[3, "msg-reboot", "ResetResponse", {"status": "Accepted"}]`);
-        this.logOcppMessage('SYSTEM', "Initiating Charger Hard Reset. Halting transactions...");
+        this.logOcppMessage('SYSTEM', 'LOG_RESET_INIT');
         
         if (this.activeSession) {
             clearInterval(this.chargingInterval);
@@ -435,11 +581,11 @@ export class EcosystemService {
         }
         
         setTimeout(() => {
-            this.logOcppMessage('SYSTEM', "Charger booting up...");
+            this.logOcppMessage('SYSTEM', 'LOG_BOOTING');
             this.logOcppMessage('SEND', `[2, "${this.generateOcppId()}", "BootNotification", {"chargerModel": "VoltStream-DC150", "chargerVendor": "VoltStream Tech"}]`);
             this.logOcppMessage('RECEIVE', `[3, "msg-boot", "BootNotificationResponse", {"status": "Accepted", "currentTime": "${new Date().toISOString()}", "interval": 60}]`);
-            this.logOcppMessage('SYSTEM', "Charger fully booted. Status: Available.");
-            this.showToast("Charger successfully rebooted and online.", 'success');
+            this.logOcppMessage('SYSTEM', 'LOG_BOOTED');
+            this.showToast('TOAST_RESET_SUCCESS', 'success');
         }, 2000);
     }, 1000);
   }

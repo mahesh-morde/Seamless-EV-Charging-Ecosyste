@@ -1,16 +1,18 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EcosystemService } from '../../services/ecosystem.service';
+import { TranslatePipe } from '../../services/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './dashboard.component.html',
   styleUrls: []
 })
 export class DashboardComponent {
-  constructor(public eco: EcosystemService) {}
+  constructor(public eco: EcosystemService, private ts: TranslationService) {}
 
   openMap() {
     this.eco.activeTab = 'map';
@@ -32,13 +34,13 @@ export class DashboardComponent {
   }
 
   get activeTimeRemaining(): string {
-    if (!this.eco.activeSession) return '0 mins';
+    if (!this.eco.activeSession) return `0 ${this.ts.translate('MINS')}`;
     const speed = this.eco.activeSession.station.speed;
     const speedkW = speed.includes("150kW") ? 150 : 
                     speed.includes("120kW") ? 120 : 
                     speed.includes("60kW") ? 60 : 
                     speed.includes("50kW") ? 50 : 22;
     const minLeft = Math.round(((100 - this.eco.vehicleSoc) / (speedkW / 60)) * 0.15);
-    return minLeft > 0 ? `${minLeft} mins` : "Almost done";
+    return minLeft > 0 ? `${minLeft} ${this.ts.translate('MINS')}` : this.ts.translate('ALMOST_DONE');
   }
 }

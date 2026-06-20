@@ -3,52 +3,52 @@
     <div class="wallet-balance-card glass card-wrapper">
         <div class="theme-overlay" [class.show]="eco.showThemeMapping">
             <div class="theme-overlay-content">
-                <h4>Core Objective: EV Ecosystem Scalability &amp; Customer Experience</h4>
-                <p>Eliminates the friction of multi-app balance management to scale the EV ecosystem. Integrates an interoperable payment clearing ledger, settling transactions across distinct charger operators using a single pre-funded wallet balance.</p>
+                <h4>{{ 'PNC_OBJECTIVE_TITLE' | translate }}</h4>
+                <p>{{ 'PNC_OBJECTIVE_DESC' | translate }}</p>
             </div>
         </div>
         <div class="logo-group">
             <i class="fa-solid fa-bolt-lightning wallet-bolt"></i>
-            <strong>VoltStream Pay</strong>
+            <strong>{{ 'VOLTSTREAM_PAY' | translate }}</strong>
         </div>
         <div class="balance-display">
-            <div class="bal-label">Unified Payment Gateway Balance</div>
+            <div class="bal-label">{{ 'UNIFIED_PAY_BAL' | translate }}</div>
             <div class="bal-amt">₹<span>{{ eco.walletBalance | number:'1.2-2' }}</span></div>
         </div>
         <div class="payment-partners">
-            <span class="partner-label">Interoperable Networks:</span>
+            <span class="partner-label">{{ 'INTEROP_NETWORKS' | translate }}</span>
             <div class="partner-logos">
-                <span class="network-pill np-tata">Tata Power</span>
-                <span class="network-pill np-zeon">Zeon</span>
-                <span class="network-pill np-charge">ChargeZone</span>
-                <span class="network-pill np-bolt">Bolt</span>
+                <span class="network-pill np-tata">{{ 'TATA_POWER' | translate }}</span>
+                <span class="network-pill np-zeon">{{ 'ZEON' | translate }}</span>
+                <span class="network-pill np-charge">{{ 'CHARGE_ZONE' | translate }}</span>
+                <span class="network-pill np-bolt">{{ 'BOLT' | translate }}</span>
             </div>
         </div>
     </div>
 
     <!-- Top-up / Credit Card Form -->
     <div class="wallet-topup-card glass">
-        <h3>Add Funds</h3>
-        <p class="sec-text">Fund your unified wallet via simulated UPI or Credit/Debit Card.</p>
+        <h3>{{ 'ADD_FUNDS_TITLE' | translate }}</h3>
+        <p class="sec-text">{{ 'ADD_FUNDS_SUB' | translate }}</p>
         <form (submit)="submitTopup(); $event.preventDefault()" class="topup-form">
             <div class="form-row">
                 <div class="form-group flex-1">
-                    <label for="topup-amount">Amount (INR)</label>
+                    <label for="topup-amount">{{ 'AMOUNT_INR' | translate }}</label>
                     <div class="amount-input-wrapper">
                         <span class="currency-symbol">₹</span>
                         <input type="number" id="topup-amount" [(ngModel)]="topupAmount" name="topupAmount" min="100" max="10000" required>
                     </div>
                 </div>
                 <div class="form-group flex-1">
-                    <label for="payment-method">Payment Method</label>
+                    <label for="payment-method">{{ 'PAYMENT_METHOD' | translate }}</label>
                     <select id="payment-method" [(ngModel)]="paymentMethod" name="paymentMethod">
-                        <option value="upi">UPI (GPay/PhonePe)</option>
-                        <option value="card">Credit / Debit Card</option>
+                        <option value="upi">{{ 'UPI_METHOD' | translate }}</option>
+                        <option value="card">{{ 'CARD_METHOD' | translate }}</option>
                     </select>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary w-full">
-                <i class="fa-solid fa-circle-plus"></i> Load Funds
+                <i class="fa-solid fa-circle-plus"></i> {{ 'LOAD_FUNDS_BTN' | translate }}
             </button>
         </form>
     </div>
@@ -57,20 +57,20 @@
 <!-- Interoperability Log / Transaction History -->
 <div class="transactions-panel glass">
     <div class="panel-header">
-        <h3 class="panel-title"><i class="fa-solid fa-list-check"></i> Unified Session History</h3>
-        <button class="btn btn-secondary btn-sm" (click)="exportLogs()"><i class="fa-solid fa-file-export"></i> Export</button>
+        <h3 class="panel-title"><i class="fa-solid fa-list-check"></i> {{ 'UNIFIED_SESSION_HISTORY' | translate }}</h3>
+        <button class="btn btn-secondary btn-sm" (click)="exportLogs()"><i class="fa-solid fa-file-export"></i> {{ 'EXPORT_BTN' | translate }}</button>
     </div>
     <div class="table-container">
         <table class="transaction-table">
             <thead>
                 <tr>
-                    <th>Date/Time</th>
-                    <th>Station Name</th>
-                    <th>Network</th>
-                    <th>Energy (kWh)</th>
-                    <th>Duration</th>
-                    <th>Cost</th>
-                    <th>Status</th>
+                    <th>{{ 'COL_DATE_TIME' | translate }}</th>
+                    <th>{{ 'COL_STATION_NAME' | translate }}</th>
+                    <th>{{ 'COL_NETWORK' | translate }}</th>
+                    <th>{{ 'COL_ENERGY' | translate }}</th>
+                    <th>{{ 'COL_DURATION' | translate }}</th>
+                    <th>{{ 'COL_COST' | translate }}</th>
+                    <th>{{ 'COL_STATUS' | translate }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -83,10 +83,10 @@
                             'net-zeon': r.network === 'Zeon',
                             'net-charge': r.network === 'ChargeZone',
                             'net-bolt': r.network === 'Bolt'
-                        }">{{ r.network }}</span>
+                        }">{{ (r.network === 'Tata Power' ? 'TATA_POWER' : r.network === 'Zeon' ? 'ZEON' : r.network === 'ChargeZone' ? 'CHARGE_ZONE' : 'BOLT') | translate }}</span>
                     </td>
                     <td>{{ r.energy }} kWh</td>
-                    <td>{{ r.duration }} mins</td>
+                    <td>{{ r.duration }} {{ 'MINS' | translate }}</td>
                     <td>₹{{ r.cost | number:'1.2-2' }}</td>
                     <td><span class="tag-success">{{ r.status }}</span></td>
                 </tr>

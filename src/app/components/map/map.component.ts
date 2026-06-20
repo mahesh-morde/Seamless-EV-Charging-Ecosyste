@@ -2,13 +2,15 @@ import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EcosystemService, ChargingStation } from '../../services/ecosystem.service';
+import { TranslatePipe } from '../../services/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 declare const L: any;
 
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './map.component.html',
   styleUrls: []
 })
@@ -16,6 +18,33 @@ export class MapComponent implements AfterViewInit {
   tileLayerInstance: any = null;
   stationMarkersMap: { [key: number]: any } = {};
   routePolyline: any = null;
+  searchQuery = '';
+  calculatedDistance: number | null = null;
+  calculatedDuration: number | null = null;
+
+  // Onboarding Form State
+  showOnboardForm = false;
+  isPickingLocation = false;
+  tempMarker: any = null;
+  isDragged = false;
+  modalPosition = { x: 0, y: 0 };
+  private dragStartMouse = { x: 0, y: 0 };
+  private dragStartModal = { x: 0, y: 0 };
+  private dragListener: any = null;
+  private dragEndListener: any = null;
+
+  newStation = {
+    name: '',
+    network: 'Tata Power',
+    lat: 0,
+    lng: 0,
+    speed: 'DC 150kW',
+    connector: 'CCS2',
+    price: 18.00,
+    gunsCount: 2,
+    agreeTC: false,
+    certifySpecs: false
+  };
 
   // Filters State
   filterNetworks: { [key: string]: boolean } = {
@@ -33,12 +62,15 @@ export class MapComponent implements AfterViewInit {
     'Occupied': true
   };
 
-  constructor(public eco: EcosystemService) {}
+  constructor(public eco: EcosystemService, public ts: TranslationService) {}
 
   ngAfterViewInit() {
     this.initLeafletMap();
     this.eco.registerThemeCallback(() => {
       this.onThemeChanged();
+    });
+    this.ts.registerLangCallback(() => {
+      this.renderMapMarkers();
     });
     // Automatically retrieve live location on component load
     setTimeout(() => {
@@ -51,7 +83,7 @@ export class MapComponent implements AfterViewInit {
     (window as any).angularMapComponent = this;
 
     if (!this.eco.map) {
-      this.eco.map = L.map("leaflet-map-container").setView([18.5204, 73.8567], 13);
+      this.eco.map = L.map("leaflet-map-container").setView([this.eco.carLocation.lat, this.eco.carLocation.lng], 13);
       
       this.tileLayerInstance = L.tileLayer(this.getMapTileUrl(), {
           attribution: '&copy; OpenStreetMap &copy; CARTO',
@@ -60,6 +92,17 @@ export class MapComponent implements AfterViewInit {
       }).addTo(this.eco.map);
 
       this.eco.markerLayers = L.layerGroup().addTo(this.eco.map);
+
+      // Listen for click on the map to pick coordinates when coordinate picker is active
+      this.eco.map.on('click', (e: any) => {
+        if (this.isPickingLocation) {
+          this.newStation.lat = parseFloat(e.latlng.lat.toFixed(6));
+          this.newStation.lng = parseFloat(e.latlng.lng.toFixed(6));
+          this.isPickingLocation = false;
+          this.eco.showToast('TOAST_COORDS_SELECTED', 'success', { lat: this.newStation.lat, lng: this.newStation.lng });
+          this.drawTempMarker(this.newStation.lat, this.newStation.lng);
+        }
+      });
     } else {
       // If it exists, reposition map view container
       setTimeout(() => this.eco.map.invalidateSize(), 50);
@@ -92,30 +135,149 @@ export class MapComponent implements AfterViewInit {
 
   locateUser() {
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
-      this.eco.showToast("Retrieving your physical coordinates...", "info");
+      this.eco.showToast('TOAST_RETRIEVING_COORDS', 'info');
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          this.eco.carLocation = { lat, lng };
-          this.eco.generateLocalStations(lat, lng);
-          this.eco.showToast("Location synchronized successfully! Real-time petrol pumps updated.", "success");
-          if (this.eco.map) {
-            this.eco.map.setView([lat, lng], 14);
-          }
-          this.renderMapMarkers();
+          this.syncLocation(lat, lng, 'TOAST_LOC_SYNC_SUCCESS');
         },
         (error) => {
-          let errorMsg = "Unable to fetch live location.";
-          if (error.code === error.PERMISSION_DENIED) {
-            errorMsg = "Location access denied. Please enable browser location permissions.";
-          }
-          this.eco.showToast(errorMsg, "warning");
+          console.warn('HTML5 geolocation with high accuracy failed, trying low accuracy...', error);
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const lat = pos.coords.latitude;
+              const lng = pos.coords.longitude;
+              this.syncLocation(lat, lng, 'TOAST_LOC_SYNC_SUCCESS');
+            },
+            async (err) => {
+              console.warn('HTML5 geolocation low-accuracy failed, trying IP-based service...', err);
+              let errorKey = 'TOAST_LOC_FETCH_FAILED';
+              if (error.code === error.PERMISSION_DENIED) {
+                errorKey = 'TOAST_LOC_DENIED';
+                this.eco.showToast(errorKey, 'warning');
+              }
+              await this.fallbackToIpLocation();
+            },
+            { enableHighAccuracy: false, timeout: 4000 }
+          );
         },
-        { enableHighAccuracy: true, timeout: 8000 }
+        { enableHighAccuracy: true, timeout: 5000 }
       );
     } else {
-      this.eco.showToast("HTML5 Geolocation is not supported by your browser.", "danger");
+      this.fallbackToIpLocation();
+    }
+  }
+
+  syncLocation(lat: number, lng: number, toastKey: string) {
+    this.eco.carLocation = { lat, lng };
+    this.eco.generateLocalStations(lat, lng).then(() => {
+      this.eco.showToast(toastKey, 'success');
+      if (this.eco.map) {
+        this.eco.map.setView([lat, lng], 14);
+      }
+      this.renderMapMarkers();
+    });
+  }
+
+  async fallbackToIpLocation() {
+    // 1. Try Geolocation-DB
+    try {
+      console.log('Trying Geolocation-DB...');
+      const res = await fetch('https://geolocation-db.com/json/');
+      const data = await res.json();
+      if (data && data.latitude !== undefined && data.longitude !== undefined) {
+        const lat = parseFloat(data.latitude);
+        const lng = parseFloat(data.longitude);
+        console.log('Resolved via Geolocation-DB:', lat, lng);
+        this.syncLocation(lat, lng, 'TOAST_LOC_SYNC_SUCCESS');
+        return;
+      }
+    } catch (e) {
+      console.warn('Geolocation-DB fallback failed, trying next...', e);
+    }
+
+    // 2. Try FreeIPAPI
+    try {
+      console.log('Trying FreeIPAPI...');
+      const res = await fetch('https://freeipapi.com/api/json');
+      const data = await res.json();
+      if (data && data.latitude !== undefined && data.longitude !== undefined) {
+        const lat = parseFloat(data.latitude);
+        const lng = parseFloat(data.longitude);
+        console.log('Resolved via FreeIPAPI:', lat, lng);
+        this.syncLocation(lat, lng, 'TOAST_LOC_SYNC_SUCCESS');
+        return;
+      }
+    } catch (e) {
+      console.warn('FreeIPAPI fallback failed, trying next...', e);
+    }
+
+    // 3. Try IPWho.is
+    try {
+      console.log('Trying IPWho.is...');
+      const res = await fetch('https://ipwho.is/');
+      const data = await res.json();
+      if (data && data.success && data.latitude !== undefined && data.longitude !== undefined) {
+        const lat = parseFloat(data.latitude);
+        const lng = parseFloat(data.longitude);
+        console.log('Resolved via IPWho.is:', lat, lng);
+        this.syncLocation(lat, lng, 'TOAST_LOC_SYNC_SUCCESS');
+        return;
+      }
+    } catch (e) {
+      console.warn('IPWho.is fallback failed, trying next...', e);
+    }
+
+    // 4. Try IPApi.co
+    try {
+      console.log('Trying IPApi.co...');
+      const res = await fetch('https://ipapi.co/json/');
+      const data = await res.json();
+      if (data && data.latitude !== undefined && data.longitude !== undefined) {
+        const lat = parseFloat(data.latitude);
+        const lng = parseFloat(data.longitude);
+        console.log('Resolved via IPApi.co:', lat, lng);
+        this.syncLocation(lat, lng, 'TOAST_LOC_SYNC_SUCCESS');
+        return;
+      }
+    } catch (e) {
+      console.warn('IPApi.co fallback failed, staying in default (Pune)...', e);
+    }
+
+    // If all fail, fallback to defaults
+    const defaultLat = 18.5204;
+    const defaultLng = 73.8567;
+    this.syncLocation(defaultLat, defaultLng, 'TOAST_LOC_SYNC_SUCCESS');
+  }
+
+  async searchLocation() {
+    if (!this.searchQuery.trim()) return;
+    this.eco.showToast('TOAST_SEARCHING_FOR', 'info', { query: this.searchQuery });
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.searchQuery)}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const result = data[0];
+        const lat = parseFloat(result.lat);
+        const lng = parseFloat(result.lon);
+        
+        this.eco.carLocation = { lat, lng };
+        await this.eco.generateLocalStations(lat, lng);
+        
+        this.eco.showToast('TOAST_FOUND_LOCATION', 'success', { name: result.display_name });
+        
+        if (this.eco.map) {
+          this.eco.map.setView([lat, lng], 14);
+        }
+        this.renderMapMarkers();
+      } else {
+        this.eco.showToast('TOAST_LOCATION_NOT_FOUND', 'warning');
+      }
+    } catch (e) {
+      console.error('Geocoding search failed', e);
+      this.eco.showToast('TOAST_SEARCH_FAILED', 'danger');
     }
   }
 
@@ -142,9 +304,14 @@ export class MapComponent implements AfterViewInit {
     this.filteredStations.forEach((st, i) => {
         const color = this.eco.networkColors[st.network];
         
+        const isPetrolPump = st.id >= 500;
+        const markerHtml = isPetrolPump
+          ? `<i class="fa-solid fa-gas-pump" style="font-size: 10px; color: white;"></i>`
+          : `${i + 1}`;
+
         const customIcon = L.divIcon({
             className: "custom-map-marker",
-            html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 0 10px ${color}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: white;">${i + 1}</div>`,
+            html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 0 10px ${color}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: white;">${markerHtml}</div>`,
             iconSize: [24, 24],
             iconAnchor: [12, 12]
         });
@@ -152,29 +319,9 @@ export class MapComponent implements AfterViewInit {
         const marker = L.marker([st.lat, st.lng], { icon: customIcon }).addTo(this.eco.markerLayers);
         this.stationMarkersMap[st.id] = marker;
         
-        const gunsHtml = st.guns.map(g => `
-          <span style="padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.2); font-size: 10px; border: 1px solid rgba(255,255,255,0.06); color: ${g.status === 'Available' ? 'var(--neon-green)' : 'var(--text-secondary)'}">
-            <i class="fa-solid fa-plug" style="font-size: 8px;"></i> Gun ${g.id}: ${g.status}
-          </span>
-        `).join(' ');
-
-        const popupContent = `
-            <div class="map-popup">
-                <h4 style="display: flex; align-items: center; gap: 6px;">
-                  <span style="background-color: ${color}; width: 18px; height: 18px; border-radius: 50%; color: white; font-size: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold;">${i + 1}</span>
-                  ${st.name}
-                </h4>
-                <p><strong>Provider:</strong> ${st.network}</p>
-                <p><strong>Speed:</strong> ${st.speed} (${st.connector})</p>
-                <p><strong>Price:</strong> ₹${st.price.toFixed(2)}/kWh</p>
-                <div style="margin: 6px 0; display: flex; flex-wrap: wrap; gap: 4px;">
-                  ${gunsHtml}
-                </div>
-                ${st.status === 'Available' ? `<button class="btn btn-primary btn-sm" style="width: 100%; margin-top: 6px;" onclick="window.angularMapComponent.selectStation(${st.id})">Initiate Session</button>` : ''}
-            </div>
-        `;
-        
-        marker.bindPopup(popupContent);
+        marker.on('click', () => {
+            this.selectStation(st.id);
+        });
     });
 
     // 2. Draw Vehicle Location Marker with Pulse Ring
@@ -193,10 +340,10 @@ export class MapComponent implements AfterViewInit {
     const carMarker = L.marker([this.eco.carLocation.lat, this.eco.carLocation.lng], { icon: carIcon }).addTo(this.eco.markerLayers);
     carMarker.bindPopup(`
         <div class="map-popup">
-            <h4 style="color: #3b82f6;"><i class="fa-solid fa-car-side"></i> Connected EV</h4>
-            <p style="margin-bottom: 4px;"><strong>Vehicle:</strong> Mahindra XUV400</p>
-            <p style="margin-bottom: 4px;"><strong>Battery SOC:</strong> ${this.eco.vehicleSoc.toFixed(0)}%</p>
-            <p style="margin-bottom: 0;"><strong>Estimated Range:</strong> ${this.eco.estimatedRange} km</p>
+            <h4 style="color: #3b82f6;"><i class="fa-solid fa-car-side"></i> ${this.ts.translate('CONNECTED_EV')}</h4>
+            <p style="margin-bottom: 4px;"><strong>${this.ts.translate('VEHICLE')}:</strong> Mahindra XUV400</p>
+            <p style="margin-bottom: 4px;"><strong>${this.ts.translate('BATTERY_SOC')}:</strong> ${this.eco.vehicleSoc.toFixed(0)}%</p>
+            <p style="margin-bottom: 0;"><strong>${this.ts.translate('ESTIMATED_RANGE')}:</strong> ${this.eco.estimatedRange} km</p>
         </div>
     `);
 
@@ -206,6 +353,44 @@ export class MapComponent implements AfterViewInit {
       if (selected) {
         this.drawRouteToStation(selected);
       }
+    }
+  }
+
+  get selectedStationDistance(): number | null {
+    if (this.calculatedDistance !== null) return this.calculatedDistance;
+    if (!this.eco.selectedStation) return null;
+    const start = L.latLng(this.eco.carLocation.lat, this.eco.carLocation.lng);
+    const end = L.latLng(this.eco.selectedStation.lat, this.eco.selectedStation.lng);
+    const distanceMeters = start.distanceTo(end);
+    return parseFloat((distanceMeters / 1000).toFixed(2));
+  }
+
+  get selectedStationDuration(): number | null {
+    if (this.calculatedDuration !== null) return this.calculatedDuration;
+    const dist = this.selectedStationDistance;
+    if (dist === null) return null;
+    const averageSpeedKmh = 30;
+    const durationHours = dist / averageSpeedKmh;
+    return Math.round(durationHours * 60);
+  }
+
+  get selectedStationCanReach(): boolean {
+    const dist = this.selectedStationDistance;
+    if (dist === null) return false;
+    return this.eco.estimatedRange >= dist;
+  }
+
+  deselectStation() {
+    this.eco.selectedStation = null;
+    this.calculatedDistance = null;
+    this.calculatedDuration = null;
+    this.renderMapMarkers();
+  }
+
+  startChargingFromRoute() {
+    if (this.eco.selectedStation && this.eco.selectedStation.status === 'Available') {
+      this.eco.startPlugAndChargeSimulation();
+      this.eco.activeTab = 'dashboard';
     }
   }
 
@@ -221,37 +406,246 @@ export class MapComponent implements AfterViewInit {
     if (this.eco.map) {
       this.eco.map.setView([st.lat, st.lng], 14);
     }
-    const marker = this.stationMarkersMap[st.id];
-    if (marker) {
-      setTimeout(() => marker.openPopup(), 100);
-    }
     this.drawRouteToStation(st);
     if (st.status === 'Available') {
       this.eco.selectStation(st.id);
     } else {
-      this.eco.showToast(`Station ${st.name} is currently occupied.`, 'warning');
+      this.eco.showToast('TOAST_STATION_OCCUPIED', 'warning', { name: st.name });
     }
   }
 
-  drawRouteToStation(st: ChargingStation) {
+  async drawRouteToStation(st: ChargingStation) {
     if (this.routePolyline && this.eco.map) {
       this.eco.map.removeLayer(this.routePolyline);
+      this.routePolyline = null;
     }
     
     if (!this.eco.map) return;
 
-    const start = [this.eco.carLocation.lat, this.eco.carLocation.lng];
-    const end = [st.lat, st.lng];
+    const startLat = this.eco.carLocation.lat;
+    const startLng = this.eco.carLocation.lng;
+    const endLat = st.lat;
+    const endLng = st.lng;
 
-    this.routePolyline = L.polyline([start, end], {
-        color: '#3b82f6',
-        weight: 5,
-        opacity: 0.85,
-        className: 'glowing-route-line'
-    }).addTo(this.eco.map);
+    let points: [number, number][] = [[startLat, startLng], [endLat, endLng]];
 
-    // Zoom to bounds showing both car and station
-    const bounds = L.latLngBounds([start, end]);
-    this.eco.map.fitBounds(bounds, { padding: [50, 50] });
+    try {
+      const url = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson`;
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (data && data.code === 'Ok' && data.routes && data.routes.length > 0) {
+        const route = data.routes[0];
+        this.calculatedDistance = parseFloat((route.distance / 1000).toFixed(2));
+        this.calculatedDuration = Math.round(route.duration / 60);
+        
+        const coords = route.geometry.coordinates;
+        points = coords.map((c: any) => [c[1], c[0]]);
+      } else {
+        this.fallbackRouteMetrics(st);
+      }
+    } catch (e) {
+      console.error('Failed to retrieve road route from OSRM, falling back to straight line', e);
+      this.fallbackRouteMetrics(st);
+    }
+
+    if (this.eco.map) {
+      this.routePolyline = L.polyline(points, {
+          color: '#3b82f6',
+          weight: 5,
+          opacity: 0.85,
+          className: 'glowing-route-line'
+      }).addTo(this.eco.map);
+
+      const tooltipText = `${this.calculatedDuration} ${this.ts.translate('MINS')} (${this.calculatedDistance} km)`;
+      this.routePolyline.bindTooltip(tooltipText, {
+          permanent: true,
+          direction: 'center',
+          className: 'route-tooltip-bubble'
+      }).openTooltip();
+
+      const bounds = L.latLngBounds(points);
+      this.eco.map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }
+
+  fallbackRouteMetrics(st: ChargingStation) {
+    const start = L.latLng(this.eco.carLocation.lat, this.eco.carLocation.lng);
+    const end = L.latLng(st.lat, st.lng);
+    const distanceMeters = start.distanceTo(end);
+    this.calculatedDistance = parseFloat((distanceMeters / 1000).toFixed(2));
+    
+    const averageSpeedKmh = 30;
+    const durationHours = this.calculatedDistance / averageSpeedKmh;
+    this.calculatedDuration = Math.round(durationHours * 60);
+  }
+
+  openOnboardForm() {
+    this.showOnboardForm = true;
+    this.isPickingLocation = false;
+    this.isDragged = false; // Reset drag position on open
+    this.newStation.lat = parseFloat(this.eco.carLocation.lat.toFixed(6));
+    this.newStation.lng = parseFloat(this.eco.carLocation.lng.toFixed(6));
+    this.drawTempMarker(this.newStation.lat, this.newStation.lng);
+  }
+
+  closeOnboardForm() {
+    this.showOnboardForm = false;
+    this.isPickingLocation = false;
+    this.removeTempMarker();
+  }
+
+  toggleMapPicker() {
+    this.isPickingLocation = !this.isPickingLocation;
+    if (this.isPickingLocation) {
+      this.eco.showToast('TOAST_CLICK_MAP_COORDS', 'info');
+    }
+  }
+
+  onCoordInput() {
+    if (this.newStation.lat && this.newStation.lng) {
+      this.drawTempMarker(this.newStation.lat, this.newStation.lng);
+    }
+  }
+
+  drawTempMarker(lat: number, lng: number) {
+    this.removeTempMarker();
+    if (!this.eco.map) return;
+
+    const tempIcon = L.divIcon({
+      className: "temp-map-marker",
+      html: `<div style="background-color: var(--neon-purple); width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 0 10px var(--neon-purple); display: flex; align-items: center; justify-content: center; position: relative;">
+               <div style="position: absolute; width: 30px; height: 30px; border-radius: 50%; background-color: rgba(168, 85, 247, 0.45); animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+               <i class="fa-solid fa-plus" style="color: white; font-size: 10px; position: relative; z-index: 5;"></i>
+             </div>`,
+      iconSize: [22, 22],
+      iconAnchor: [11, 11]
+    });
+
+    this.tempMarker = L.marker([lat, lng], { icon: tempIcon }).addTo(this.eco.map);
+    this.eco.map.setView([lat, lng], this.eco.map.getZoom());
+  }
+
+  removeTempMarker() {
+    if (this.tempMarker && this.eco.map) {
+      this.eco.map.removeLayer(this.tempMarker);
+      this.tempMarker = null;
+    }
+  }
+
+  submitOnboardForm(event: Event) {
+    event.preventDefault();
+    if (!this.newStation.name || !this.newStation.name.trim() ||
+        this.newStation.lat === undefined || this.newStation.lat === null || (this.newStation.lat as any) === '' ||
+        this.newStation.lng === undefined || this.newStation.lng === null || (this.newStation.lng as any) === '' ||
+        this.newStation.price === undefined || this.newStation.price === null || (this.newStation.price as any) === '' ||
+        this.newStation.gunsCount === undefined || this.newStation.gunsCount === null || (this.newStation.gunsCount as any) === '' || this.newStation.gunsCount <= 0) {
+      this.eco.showToast('TOAST_FILL_FIELDS_CORRECTLY', 'warning');
+      return;
+    }
+
+    if (!this.newStation.agreeTC || !this.newStation.certifySpecs) {
+      this.eco.showToast('TOAST_ACCEPT_TERMS', 'warning');
+      return;
+    }
+
+    const guns = [];
+    for (let i = 0; i < this.newStation.gunsCount; i++) {
+      guns.push({
+        id: String.fromCharCode(65 + i),
+        type: this.newStation.connector,
+        status: 'Available'
+      });
+    }
+
+    const stationDataToOnboard = {
+      name: this.newStation.name,
+      network: this.newStation.network,
+      lat: this.newStation.lat,
+      lng: this.newStation.lng,
+      speed: this.newStation.speed,
+      connector: this.newStation.connector,
+      price: this.newStation.price,
+      guns: guns
+    };
+
+    this.eco.onboardStation(stationDataToOnboard);
+    
+    this.removeTempMarker();
+    this.showOnboardForm = false;
+    this.isPickingLocation = false;
+    
+    this.newStation = {
+      name: '',
+      network: 'Tata Power',
+      lat: 0,
+      lng: 0,
+      speed: 'DC 150kW',
+      connector: 'CCS2',
+      price: 18.00,
+      gunsCount: 2,
+      agreeTC: false,
+      certifySpecs: false
+    };
+
+    this.renderMapMarkers();
+  }
+
+  onDragStart(event: MouseEvent) {
+    if (event.button !== 0) return;
+    
+    const target = event.target as HTMLElement;
+    if (target.closest('button')) return;
+
+    event.preventDefault();
+
+    const modalEl = document.querySelector('.bottom-middle-modal') as HTMLElement;
+    const parentEl = document.querySelector('.map-wrapper') as HTMLElement;
+    if (!modalEl || !parentEl) return;
+
+    const modalRect = modalEl.getBoundingClientRect();
+    const parentRect = parentEl.getBoundingClientRect();
+
+    if (!this.isDragged) {
+      this.modalPosition.x = modalRect.left - parentRect.left;
+      this.modalPosition.y = modalRect.top - parentRect.top;
+      this.isDragged = true;
+    }
+
+    this.dragStartMouse.x = event.clientX;
+    this.dragStartMouse.y = event.clientY;
+    this.dragStartModal.x = this.modalPosition.x;
+    this.dragStartModal.y = this.modalPosition.y;
+
+    this.dragListener = (moveEvent: MouseEvent) => this.onDragMove(moveEvent, parentRect);
+    this.dragEndListener = () => this.onDragEnd();
+
+    document.addEventListener('mousemove', this.dragListener);
+    document.addEventListener('mouseup', this.dragEndListener);
+  }
+
+  onDragMove(event: MouseEvent, parentRect: DOMRect) {
+    const deltaX = event.clientX - this.dragStartMouse.x;
+    const deltaY = event.clientY - this.dragStartMouse.y;
+
+    let newX = this.dragStartModal.x + deltaX;
+    let newY = this.dragStartModal.y + deltaY;
+
+    const modalEl = document.querySelector('.bottom-middle-modal') as HTMLElement;
+    if (modalEl) {
+      const modalWidth = modalEl.offsetWidth;
+      const modalHeight = modalEl.offsetHeight;
+
+      newX = Math.max(0, Math.min(newX, parentRect.width - modalWidth));
+      newY = Math.max(0, Math.min(newY, parentRect.height - modalHeight));
+    }
+
+    this.modalPosition.x = newX;
+    this.modalPosition.y = newY;
+  }
+
+  onDragEnd() {
+    document.removeEventListener('mousemove', this.dragListener);
+    document.removeEventListener('mouseup', this.dragEndListener);
   }
 }

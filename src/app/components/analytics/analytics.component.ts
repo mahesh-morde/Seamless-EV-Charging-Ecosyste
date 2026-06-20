@@ -1,13 +1,15 @@
 import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EcosystemService } from '../../services/ecosystem.service';
+import { TranslatePipe } from '../../services/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 declare const Chart: any;
 
 @Component({
   selector: 'app-analytics',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './analytics.component.html',
   styleUrls: []
 })
@@ -16,18 +18,21 @@ export class AnalyticsComponent implements AfterViewInit, OnDestroy {
   providerChartInstance: any = null;
   co2ChartInstance: any = null;
 
-  constructor(public eco: EcosystemService) {}
+  constructor(public eco: EcosystemService, private ts: TranslationService) {}
 
   private chartCallback = () => this.updateChartsData();
+  private langCallback = () => this.updateChartLabels();
 
   ngAfterViewInit() {
     this.initCharts();
     // Register change listener to re-render charts when history updates
     this.eco.registerChartCallback(this.chartCallback);
+    this.ts.registerLangCallback(this.langCallback);
   }
 
   ngOnDestroy() {
     this.eco.unregisterChartCallback(this.chartCallback);
+    this.ts.unregisterLangCallback(this.langCallback);
     // Clean up chart instances to prevent canvas memory leaks
     if (this.energyChartInstance) this.energyChartInstance.destroy();
     if (this.providerChartInstance) this.providerChartInstance.destroy();
@@ -129,6 +134,7 @@ export class AnalyticsComponent implements AfterViewInit, OnDestroy {
     });
 
     this.updateChartsData();
+    this.updateChartLabels();
   }
 
   updateChartsData() {
@@ -156,5 +162,42 @@ export class AnalyticsComponent implements AfterViewInit, OnDestroy {
 
     this.co2ChartInstance.data.datasets[0].data[3] = parseFloat(this.eco.co2Saved.toFixed(1));
     this.co2ChartInstance.update();
+  }
+
+  updateChartLabels() {
+    if (this.energyChartInstance) {
+      this.energyChartInstance.data.datasets[0].label = this.ts.translate('WEEKLY_CONSUMPTION_LABEL');
+      this.energyChartInstance.data.labels = [
+        this.ts.translate('MON'),
+        this.ts.translate('TUE'),
+        this.ts.translate('WED'),
+        this.ts.translate('THU'),
+        this.ts.translate('FRI'),
+        this.ts.translate('SAT'),
+        this.ts.translate('SUN')
+      ];
+      this.energyChartInstance.update();
+    }
+
+    if (this.providerChartInstance) {
+      this.providerChartInstance.data.labels = [
+        this.ts.translate('TATA_POWER'),
+        this.ts.translate('ZEON'),
+        this.ts.translate('CHARGE_ZONE'),
+        this.ts.translate('BOLT')
+      ];
+      this.providerChartInstance.update();
+    }
+
+    if (this.co2ChartInstance) {
+      this.co2ChartInstance.data.datasets[0].label = this.ts.translate('CO2_OFFSET_LABEL');
+      this.co2ChartInstance.data.labels = [
+        `${this.ts.translate('WEEK')} 1`,
+        `${this.ts.translate('WEEK')} 2`,
+        `${this.ts.translate('WEEK')} 3`,
+        `${this.ts.translate('WEEK')} 4`
+      ];
+      this.co2ChartInstance.update();
+    }
   }
 }

@@ -1,15 +1,15 @@
 <div class="terminal-layout">
     <div class="terminal-header glass">
         <div class="terminal-title-container">
-            <h3><i class="fa-solid fa-code"></i> Reliable Communication &amp; Load Protocol Monitor</h3>
-            <p class="sec-text">Live Web-Socket messages exchanging between the Charging Point (CP) and Central System (CS)</p>
+            <h3><i class="fa-solid fa-code"></i> {{ 'OCPP_MONITOR_TITLE' | translate }}</h3>
+            <p class="sec-text">{{ 'OCPP_MONITOR_SUB' | translate }}</p>
         </div>
         <div class="terminal-actions">
             <button class="btn btn-secondary" (click)="clearLogs()">
-                <i class="fa-solid fa-trash-can"></i> Clear Terminal
+                <i class="fa-solid fa-trash-can"></i> {{ 'CLEAR_TERMINAL_BTN' | translate }}
             </button>
             <button class="btn btn-secondary" (click)="simulateReboot()">
-                <i class="fa-solid fa-rotate"></i> OCPP Reset Command
+                <i class="fa-solid fa-rotate"></i> {{ 'OCPP_RESET_BTN' | translate }}
             </button>
         </div>
     </div>
@@ -17,14 +17,14 @@
     <div class="terminal-body glass card-wrapper">
         <div class="theme-overlay" [class.show]="eco.showThemeMapping">
             <div class="theme-overlay-content">
-                <h4>Core Objective: Workforce Productivity &amp; Grid Resilience</h4>
-                <p>Boosts workforce and operator productivity through standardized, remote OCPP 2.0.1 diagnostics. Simulates network outage fault recovery with a local memory backup queue and tests grid load throttling during peak demand spikes.</p>
+                <h4>{{ 'OCPP_OBJECTIVE_TITLE' | translate }}</h4>
+                <p>{{ 'OCPP_OBJECTIVE_DESC' | translate }}</p>
             </div>
         </div>
         <div class="log-output" id="ocpp-logs-output">
             <div class="log-line" *ngFor="let log of eco.ocppLogs" 
                  [ngClass]="{'system': log.direction === 'SYSTEM', 'send': log.direction === 'SEND', 'receive': log.direction === 'RECEIVE'}">
-                [{{ log.time }}] [{{ log.direction === 'SYSTEM' ? 'SYSTEM' : (log.direction === 'SEND' ? 'CLIENT -> CENTRAL' : 'CENTRAL -> CLIENT') }}] {{ log.message }}
+                [{{ log.time }}] [{{ (log.direction === 'SYSTEM' ? 'SYSTEM_LABEL' : (log.direction === 'SEND' ? 'CLIENT_TO_CENTRAL' : 'CENTRAL_TO_CLIENT')) | translate }}] {{ log.message }}
             </div>
         </div>
     </div>
@@ -34,11 +34,11 @@
         <div class="queue-header">
             <div class="queue-title-container">
                 <i class="fa-solid fa-database text-yellow"></i>
-                <strong>Offline Messages Cached in Station Memory</strong>
+                <strong>{{ 'OFFLINE_CACHE_TITLE' | translate }}</strong>
             </div>
-            <span class="badge badge-offline">{{ eco.offlineQueue.length }} message(s) queued</span>
+            <span class="badge badge-offline">{{ eco.offlineQueue.length }} {{ 'MESSAGES_QUEUED' | translate }}</span>
         </div>
-        <p class="sec-text">The network link to the central system is down. The charging station is storing transaction updates locally in Flash memory and will sync automatically once network connectivity is restored.</p>
+        <p class="sec-text">{{ 'OFFLINE_CACHE_DESC' | translate }}</p>
         <div class="progress-bar-container mt-10">
             <div class="progress-bar progress-yellow" [style.width.%]="mathMin(100, (eco.offlineQueue.length / 20) * 100)"></div>
         </div>
