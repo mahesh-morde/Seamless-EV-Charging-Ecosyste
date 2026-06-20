@@ -30,6 +30,16 @@ export interface SessionRecord {
   status: string;
 }
 
+export interface WalletTransaction {
+  id: string;
+  date: string;
+  type: 'payment' | 'topup';
+  description: string;
+  amount: number;
+  status: string;
+  method: string;
+}
+
 export interface ToastMessage {
   id: number;
   message: string;
@@ -85,6 +95,15 @@ export class EcosystemService {
     { date: "2026-06-08 18:32", station: "Zeon Fast-Charge Zone A2", network: "Zeon", energy: 35.4, duration: 35, cost: 637.20, status: "Paid (VoltStream)" },
     { date: "2026-06-05 10:14", station: "Tata Power Substation DC03", network: "Tata Power", energy: 18.2, duration: 20, cost: 327.60, status: "Paid (VoltStream)" },
     { date: "2026-06-01 14:02", station: "ChargeZone Highway Hub B1", network: "ChargeZone", energy: 44.5, duration: 48, cost: 845.50, status: "Paid (VoltStream)" }
+  ];
+
+  walletTransactions: WalletTransaction[] = [
+    { id: "TX-1001", date: "2026-06-08 18:32", type: "payment", description: "Zeon Fast-Charge Zone A2", amount: 637.20, status: "Success", method: "Zeon" },
+    { id: "TX-1002", date: "2026-06-07 12:00", type: "topup", description: "Fund Added via UPI", amount: 1000.00, status: "Success", method: "UPI" },
+    { id: "TX-1003", date: "2026-06-05 10:14", type: "payment", description: "Tata Power Substation DC03", amount: 327.60, status: "Success", method: "Tata Power" },
+    { id: "TX-1004", date: "2026-06-03 15:30", type: "topup", description: "Fund Added via Card", amount: 500.00, status: "Success", method: "CARD" },
+    { id: "TX-1005", date: "2026-06-01 14:02", type: "payment", description: "ChargeZone Highway Hub B1", amount: 845.50, status: "Success", method: "ChargeZone" },
+    { id: "TX-1006", date: "2026-05-30 09:00", type: "topup", description: "Fund Added via UPI", amount: 1500.00, status: "Success", method: "UPI" }
   ];
 
   ocppLogs: LogLine[] = [];
@@ -488,6 +507,18 @@ export class EcosystemService {
     };
     
     this.sessionHistory.unshift(newRecord);
+
+    const txId = 'TX-' + Math.floor(100000 + Math.random() * 900000);
+    this.walletTransactions.unshift({
+      id: txId,
+      date: formattedDate,
+      type: 'payment',
+      description: `${this.activeSession.station.name} (${newRecord.energy} kWh in ${newRecord.duration} mins)`,
+      amount: newRecord.cost,
+      status: 'Success',
+      method: newRecord.network
+    });
+
     this.notifyCharts();
   }
 

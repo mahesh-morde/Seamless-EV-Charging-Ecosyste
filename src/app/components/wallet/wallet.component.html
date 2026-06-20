@@ -57,38 +57,102 @@
 <!-- Interoperability Log / Transaction History -->
 <div class="transactions-panel glass">
     <div class="panel-header">
-        <h3 class="panel-title"><i class="fa-solid fa-list-check"></i> {{ 'UNIFIED_SESSION_HISTORY' | translate }}</h3>
+        <h3 class="panel-title"><i class="fa-solid fa-wallet"></i> {{ 'WALLET_TRANSACTIONS_TITLE' | translate }}</h3>
         <button class="btn btn-secondary btn-sm" (click)="exportLogs()"><i class="fa-solid fa-file-export"></i> {{ 'EXPORT_BTN' | translate }}</button>
     </div>
+
+    <!-- Filter Controls Bar -->
+    <div class="filter-controls-bar" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 14px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass); border-radius: var(--border-radius-md);">
+        <!-- Type Filter Toggles (Button Group Style) -->
+        <div class="toggle-group" style="display: flex; background: rgba(0, 0, 0, 0.2); padding: 4px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-glass);">
+            <button type="button" 
+                    [ngStyle]="{'background': selectedType === 'all' ? 'var(--bg-glass-active)' : 'transparent', 'color': selectedType === 'all' ? 'var(--text-primary)' : 'var(--text-muted)'}" 
+                    (click)="selectedType = 'all'" 
+                    style="border: none; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; gap: 6px; outline: none;">
+                <i class="fa-solid fa-receipt"></i>
+                <span>{{ 'FILTER_ALL' | translate }}</span>
+            </button>
+            <button type="button" 
+                    [ngStyle]="{'background': selectedType === 'payment' ? 'rgba(244, 63, 94, 0.15)' : 'transparent', 'color': selectedType === 'payment' ? 'var(--neon-red)' : 'var(--text-muted)'}" 
+                    (click)="selectedType = 'payment'" 
+                    style="border: none; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; gap: 6px; outline: none;">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>{{ 'FILTER_PAYMENTS' | translate }}</span>
+            </button>
+            <button type="button" 
+                    [ngStyle]="{'background': selectedType === 'topup' ? 'rgba(16, 185, 129, 0.15)' : 'transparent', 'color': selectedType === 'topup' ? 'var(--neon-green)' : 'var(--text-muted)'}" 
+                    (click)="selectedType = 'topup'" 
+                    style="border: none; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; gap: 6px; outline: none;">
+                <i class="fa-solid fa-circle-arrow-down"></i>
+                <span>{{ 'FILTER_TOPUPS' | translate }}</span>
+            </button>
+        </div>
+
+        <!-- Date Range Filter Calendars -->
+        <div class="date-filters" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">{{ 'FILTER_START_DATE' | translate }}</span>
+                <input type="date" [(ngModel)]="startDate" style="padding: 6px 10px; background: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm); color: var(--text-primary); font-size: 12px; outline: none; transition: border 0.2s; cursor: pointer;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">{{ 'FILTER_END_DATE' | translate }}</span>
+                <input type="date" [(ngModel)]="endDate" style="padding: 6px 10px; background: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm); color: var(--text-primary); font-size: 12px; outline: none; transition: border 0.2s; cursor: pointer;">
+            </div>
+            <button *ngIf="startDate || endDate" 
+                    type="button" 
+                    (click)="startDate = ''; endDate = ''" 
+                    class="btn btn-secondary btn-sm" 
+                    style="padding: 6px 10px; display: flex; align-items: center; justify-content: center; font-size: 11px; height: auto;">
+                <i class="fa-solid fa-filter-circle-xmark"></i>
+            </button>
+        </div>
+    </div>
+
     <div class="table-container">
         <table class="transaction-table">
             <thead>
                 <tr>
                     <th>{{ 'COL_DATE_TIME' | translate }}</th>
-                    <th>{{ 'COL_STATION_NAME' | translate }}</th>
-                    <th>{{ 'COL_NETWORK' | translate }}</th>
-                    <th>{{ 'COL_ENERGY' | translate }}</th>
-                    <th>{{ 'COL_DURATION' | translate }}</th>
-                    <th>{{ 'COL_COST' | translate }}</th>
+                    <th>{{ 'COL_TYPE' | translate }}</th>
+                    <th>{{ 'COL_DESCRIPTION' | translate }}</th>
+                    <th>{{ 'COL_AMOUNT' | translate }}</th>
+                    <th>{{ 'COL_METHOD' | translate }}</th>
                     <th>{{ 'COL_STATUS' | translate }}</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let r of eco.sessionHistory">
-                    <td>{{ r.date }}</td>
-                    <td>{{ r.station }}</td>
+                <tr *ngFor="let t of filteredTransactions">
+                    <td>{{ t.date }}</td>
+                    <td>
+                        <span class="badge" 
+                              [ngStyle]="{
+                                'background': t.type === 'topup' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)',
+                                'color': t.type === 'topup' ? 'var(--neon-green)' : 'var(--neon-red)',
+                                'border': t.type === 'topup' ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(244, 63, 94, 0.3)'
+                              }" 
+                              style="font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; margin-bottom: 0; line-height: 1;">
+                            {{ (t.type === 'topup' ? 'TX_TYPE_TOPUP' : 'TX_TYPE_PAYMENT') | translate }}
+                        </span>
+                    </td>
+                    <td style="font-weight: 500;">{{ t.description }}</td>
+                    <td [ngStyle]="{'color': t.type === 'topup' ? 'var(--neon-green)' : 'var(--text-primary)', 'font-weight': 'bold'}">
+                        {{ t.type === 'topup' ? '+' : '-' }}₹{{ t.amount | number:'1.2-2' }}
+                    </td>
                     <td>
                         <span class="network-tag" [ngClass]="{
-                            'net-tata': r.network === 'Tata Power',
-                            'net-zeon': r.network === 'Zeon',
-                            'net-charge': r.network === 'ChargeZone',
-                            'net-bolt': r.network === 'Bolt'
-                        }">{{ (r.network === 'Tata Power' ? 'TATA_POWER' : r.network === 'Zeon' ? 'ZEON' : r.network === 'ChargeZone' ? 'CHARGE_ZONE' : 'BOLT') | translate }}</span>
+                            'net-tata': t.method === 'Tata Power',
+                            'net-zeon': t.method === 'Zeon',
+                            'net-charge': t.method === 'ChargeZone',
+                            'net-bolt': t.method === 'Bolt'
+                        }">{{ (t.method === 'Tata Power' ? 'TATA_POWER' : t.method === 'Zeon' ? 'ZEON' : t.method === 'ChargeZone' ? 'CHARGE_ZONE' : t.method === 'Bolt' ? 'BOLT' : (t.method || '')) | translate }}</span>
                     </td>
-                    <td>{{ r.energy }} kWh</td>
-                    <td>{{ r.duration }} {{ 'MINS' | translate }}</td>
-                    <td>₹{{ r.cost | number:'1.2-2' }}</td>
-                    <td><span class="tag-success">{{ r.status }}</span></td>
+                    <td><span class="tag-success">{{ t.status }}</span></td>
+                </tr>
+                <tr *ngIf="filteredTransactions.length === 0">
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                        <i class="fa-solid fa-folder-open" style="font-size: 24px; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
+                        No transactions match the selected criteria.
+                    </td>
                 </tr>
             </tbody>
         </table>

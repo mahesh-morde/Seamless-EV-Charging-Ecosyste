@@ -8,29 +8,78 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   :root {
-    --cyan: #06b6d4; --purple: #a855f7; --green: #10b981;
-    --yellow: #fbbf24; --navy: #0a0f1e; --card: rgba(255,255,255,0.05);
-    --border: rgba(255,255,255,0.1);
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-slide-conclusion: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    --bg-slide-title: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --card-bg: rgba(15, 23, 42, 0.04);
+    --card-border: rgba(15, 23, 42, 0.08);
+    --border-glass-hover: rgba(15, 23, 42, 0.15);
+    --table-header: rgba(6, 182, 212, 0.08);
+    --table-border: rgba(15, 23, 42, 0.05);
+    --table-hover: rgba(15, 23, 42, 0.02);
+    --shadow-slide: 0 8px 32px 0 rgba(15, 23, 42, 0.06);
+    --text-hero-start: #0f172a;
+    --text-hero-end: #0891b2;
+    --radial-glow-1: radial-gradient(ellipse at top right, rgba(147, 51, 234, 0.08) 0%, transparent 60%);
+    --radial-glow-2: radial-gradient(ellipse at bottom left, rgba(8, 145, 178, 0.06) 0%, transparent 60%);
+    
+    --cyan: #0891b2; --purple: #9333ea; --green: #16a34a;
+    --yellow: #ca8a04;
+    
+    --border-radius-lg: 16px;
+    --border-radius-md: 12px;
+    --border-radius-sm: 8px;
+    --transition-speed: 0.3s;
   }
+
+  body.dark-mode {
+    --bg-primary: #070a13;
+    --bg-secondary: #0f1423;
+    --bg-slide-conclusion: linear-gradient(135deg, #050b18 0%, #0d0b2e 100%);
+    --bg-slide-title: #050b18;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --border-glass-hover: rgba(255, 255, 255, 0.15);
+    --table-header: rgba(6, 182, 212, 0.15);
+    --table-border: rgba(255, 255, 255, 0.05);
+    --table-hover: rgba(255, 255, 255, 0.02);
+    --shadow-slide: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+    --text-hero-start: #ffffff;
+    --text-hero-end: #06b6d4;
+    --radial-glow-1: radial-gradient(ellipse at top right, rgba(168, 85, 247, 0.12) 0%, transparent 60%);
+    --radial-glow-2: radial-gradient(ellipse at bottom left, rgba(6, 182, 212, 0.10) 0%, transparent 60%);
+    
+    --cyan: #06b6d4; --purple: #a855f7; --green: #10b981;
+    --yellow: #fbbf24;
+  }
+
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Inter',sans-serif; background:#0a0f1e; color:#fff; }
+  body { font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-secondary); transition: background var(--transition-speed) ease, color var(--transition-speed) ease; }
 
   /* ── SLIDE ENGINE ── */
   .slide {
     width:100%; min-height:100vh; padding:48px 64px;
     display:flex; flex-direction:column; justify-content:center;
     page-break-after:always; position:relative; overflow:hidden;
-    border-bottom:2px solid rgba(6,182,212,0.15);
+    background: var(--bg-primary);
+    border-bottom:2px solid var(--card-border);
+    transition: background var(--transition-speed) ease;
   }
   .slide::before {
     content:''; position:absolute; inset:0;
-    background:radial-gradient(ellipse at top right, rgba(168,85,247,0.12) 0%, transparent 60%),
-               radial-gradient(ellipse at bottom left, rgba(6,182,212,0.10) 0%, transparent 60%);
+    background: var(--radial-glow-1), var(--radial-glow-2);
     pointer-events:none;
   }
   .slide-number {
     position:absolute; top:20px; right:32px;
-    font-size:11px; color:rgba(255,255,255,0.3); letter-spacing:2px;
+    font-size:11px; color:var(--text-muted); letter-spacing:2px;
     font-family:'Outfit',sans-serif;
   }
   .tag {
@@ -38,18 +87,18 @@
     padding:4px 12px; border-radius:20px; font-size:11px;
     font-weight:700; letter-spacing:1px; text-transform:uppercase;
   }
-  .tag-cyan { background:rgba(6,182,212,0.15); color:var(--cyan); border:1px solid rgba(6,182,212,0.3); }
-  .tag-purple { background:rgba(168,85,247,0.15); color:var(--purple); border:1px solid rgba(168,85,247,0.3); }
-  .tag-green { background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.3); }
-  .tag-yellow { background:rgba(251,191,36,0.15); color:var(--yellow); border:1px solid rgba(251,191,36,0.3); }
+  .tag-cyan { background:rgba(6,182,212,0.12); color:var(--cyan); border:1px solid rgba(6,182,212,0.25); }
+  .tag-purple { background:rgba(168,85,247,0.12); color:var(--purple); border:1px solid rgba(168,85,247,0.25); }
+  .tag-green { background:rgba(16,185,129,0.12); color:var(--green); border:1px solid rgba(16,185,129,0.25); }
+  .tag-yellow { background:rgba(251,191,36,0.12); color:var(--yellow); border:1px solid rgba(251,191,36,0.25); }
 
   h1.hero { font-family:'Outfit',sans-serif; font-size:72px; font-weight:900; line-height:1.05;
-            background:linear-gradient(135deg, #fff 30%, var(--cyan) 100%); -webkit-background-clip:text;
+            background:linear-gradient(135deg, var(--text-hero-start) 30%, var(--text-hero-end) 100%); -webkit-background-clip:text;
             -webkit-text-fill-color:transparent; background-clip:text; }
   h2.section-title { font-family:'Outfit',sans-serif; font-size:36px; font-weight:800;
-                     color:#fff; margin-bottom:8px; }
+                     color:var(--text-primary); margin-bottom:8px; transition: color var(--transition-speed) ease; }
   h2.section-title span { color:var(--cyan); }
-  .subtitle { font-size:16px; color:rgba(255,255,255,0.55); line-height:1.6; max-width:720px; }
+  .subtitle { font-size:16px; color:var(--text-secondary); line-height:1.6; max-width:720px; transition: color var(--transition-speed) ease; }
   .divider { width:60px; height:3px; background:linear-gradient(90deg, var(--cyan), var(--purple));
              border-radius:2px; margin:16px 0; }
 
@@ -59,9 +108,9 @@
   .grid-3 { grid-template-columns:1fr 1fr 1fr; }
   .grid-4 { grid-template-columns:1fr 1fr 1fr 1fr; }
   .card {
-    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    background:var(--card-bg); border:1px solid var(--card-border);
     border-radius:16px; padding:24px; backdrop-filter:blur(12px);
-    transition:all 0.3s ease; position:relative; overflow:hidden;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1); position:relative; overflow:hidden;
   }
   .card-accent-cyan { border-left:3px solid var(--cyan); }
   .card-accent-purple { border-left:3px solid var(--purple); }
@@ -69,10 +118,40 @@
   .card-accent-yellow { border-left:3px solid var(--yellow); }
   .card-icon { font-size:28px; margin-bottom:12px; }
   .card h3 { font-family:'Outfit',sans-serif; font-size:16px; font-weight:700;
-             color:#fff; margin-bottom:8px; }
-  .card p { font-size:13px; color:rgba(255,255,255,0.6); line-height:1.6; }
+             color:var(--text-primary); margin-bottom:8px; }
+  .card p { font-size:13px; color:var(--text-secondary); line-height:1.6; }
   .card .highlight { font-size:11px; font-weight:600; color:var(--cyan);
                      margin-top:10px; text-transform:uppercase; letter-spacing:0.5px; }
+
+  .card:hover {
+    transform: translateY(-5px);
+    border-color: var(--cyan);
+    box-shadow: 0 20px 38px rgba(6, 182, 212, 0.08);
+  }
+  body.dark-mode .card:hover {
+    box-shadow: 0 20px 38px rgba(6, 182, 212, 0.15);
+  }
+  .card.card-accent-purple:hover {
+    border-color: var(--purple);
+    box-shadow: 0 20px 38px rgba(168, 85, 247, 0.08);
+  }
+  body.dark-mode .card.card-accent-purple:hover {
+    box-shadow: 0 20px 38px rgba(168, 85, 247, 0.15);
+  }
+  .card.card-accent-green:hover {
+    border-color: var(--green);
+    box-shadow: 0 20px 38px rgba(16, 185, 129, 0.08);
+  }
+  body.dark-mode .card.card-accent-green:hover {
+    box-shadow: 0 20px 38px rgba(16, 185, 129, 0.15);
+  }
+  .card.card-accent-yellow:hover {
+    border-color: var(--yellow);
+    box-shadow: 0 20px 38px rgba(251, 191, 36, 0.08);
+  }
+  body.dark-mode .card.card-accent-yellow:hover {
+    box-shadow: 0 20px 38px rgba(251, 191, 36, 0.15);
+  }
 
   /* ── METRIC STAT ── */
   .stat-row { display:flex; gap:24px; margin-top:24px; flex-wrap:wrap; }
@@ -81,16 +160,16 @@
               background:linear-gradient(135deg, var(--cyan), var(--purple));
               -webkit-background-clip:text; -webkit-text-fill-color:transparent;
               background-clip:text; }
-  .stat-label { font-size:12px; color:rgba(255,255,255,0.5); text-transform:uppercase;
+  .stat-label { font-size:12px; color:var(--text-muted); text-transform:uppercase;
                 letter-spacing:1px; margin-top:4px; }
 
   /* ── TABLE ── */
   table { width:100%; border-collapse:collapse; margin-top:16px; }
-  th { background:rgba(6,182,212,0.1); color:var(--cyan); font-size:12px;
+  th { background:var(--table-header); color:var(--cyan); font-size:12px;
        text-transform:uppercase; letter-spacing:1px; padding:12px 16px; text-align:left; }
-  td { padding:12px 16px; font-size:13px; color:rgba(255,255,255,0.8);
-       border-bottom:1px solid rgba(255,255,255,0.05); }
-  tr:hover td { background:rgba(255,255,255,0.02); }
+  td { padding:12px 16px; font-size:13px; color:var(--text-secondary);
+       border-bottom:1px solid var(--table-border); }
+  tr:hover td { background:var(--table-hover); }
   .weight { font-weight:700; color:var(--green); }
 
   /* ── TIMELINE ── */
@@ -100,18 +179,18 @@
   .timeline-step { flex:1; text-align:center; position:relative; padding-top:40px; }
   .timeline-dot { width:16px; height:16px; background:var(--cyan); border-radius:50%;
                   position:absolute; top:13px; left:50%; transform:translateX(-50%);
-                  box-shadow:0 0 12px var(--cyan); }
-  .timeline-step h4 { font-family:'Outfit',sans-serif; font-size:13px; font-weight:700; color:#fff; }
-  .timeline-step p { font-size:11px; color:rgba(255,255,255,0.5); margin-top:4px; }
+                  box-shadow:0 0 12px var(--cyan); transition: all 0.3s; }
+  .timeline-step h4 { font-family:'Outfit',sans-serif; font-size:13px; font-weight:700; color:var(--text-primary); }
+  .timeline-step p { font-size:11px; color:var(--text-muted); margin-top:4px; }
 
   /* ── ARCHITECTURE FLOW ── */
   .arch-flow { display:flex; align-items:center; gap:8px; flex-wrap:wrap;
                margin-top:24px; justify-content:center; }
-  .arch-box { background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  .arch-box { background:var(--card-bg); border:1px solid var(--card-border);
               border-radius:10px; padding:14px 18px; text-align:center;
-              min-width:130px; }
+              min-width:130px; transition: background var(--transition-speed) ease, border-color var(--transition-speed) ease; }
   .arch-box .ico { font-size:22px; margin-bottom:6px; }
-  .arch-box span { font-size:12px; color:rgba(255,255,255,0.7); display:block; }
+  .arch-box span { font-size:12px; color:var(--text-secondary); display:block; }
   .arch-arrow { color:var(--cyan); font-size:20px; }
 
   /* ── FOOTER BRAND ── */
@@ -123,37 +202,189 @@
            background:linear-gradient(90deg, var(--cyan), var(--purple));
            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
            background-clip:text; }
-  .footer-meta { font-size:11px; color:rgba(255,255,255,0.25); }
+  .footer-meta { font-size:11px; color:var(--text-muted); }
 
   /* ── SLIDE 1: TITLE ── */
-  .slide-title { background:#050b18; min-height:100vh; }
+  .slide-title { background:var(--bg-slide-title); min-height:100vh; }
   .slide-title .tags { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
   .slide-title .tech-row { display:flex; gap:12px; margin-top:32px; flex-wrap:wrap; }
-  .tech-pill { background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  .tech-pill { background:var(--card-bg); border:1px solid var(--card-border);
                padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600;
-               color:rgba(255,255,255,0.8); display:inline-flex; align-items:center; gap:8px; }
+               color:var(--text-secondary); display:inline-flex; align-items:center; gap:8px; transition: all 0.3s; }
+  .tech-pill:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-glass-hover);
+  }
 
   /* ── PROBLEM SLIDE ── */
   .problem-box {
-    background:linear-gradient(135deg, rgba(168,85,247,0.12), rgba(6,182,212,0.08));
-    border:1px solid rgba(168,85,247,0.25); border-radius:16px; padding:28px 32px;
+    background:linear-gradient(135deg, rgba(147, 51, 234, 0.08), rgba(8, 145, 178, 0.05));
+    border:1px solid rgba(147, 51, 234, 0.2); border-radius:16px; padding:28px 32px;
     margin-top:20px;
   }
-  .problem-box p { font-size:18px; line-height:1.7; color:rgba(255,255,255,0.9);
+  body.dark-mode .problem-box {
+    background:linear-gradient(135deg, rgba(168,85,247,0.12), rgba(6,182,212,0.08));
+    border:1px solid rgba(168,85,247,0.25);
+  }
+  .problem-box p { font-size:18px; line-height:1.7; color:var(--text-primary);
                    font-style:italic; }
+
+  /* ── NAV DOTS ── */
+  #nav { position:fixed; right:16px; top:50%; transform:translateY(-50%);
+         display:flex; flex-direction:column; gap:8px; z-index:999; }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--text-muted);
+         cursor:pointer; transition:all 0.3s; opacity: 0.4; }
+  .dot.active, .dot:hover { background:var(--cyan); opacity: 1; transform: scale(1.2); }
+
+  /* ── THEME TOGGLE ── */
+  #theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 120px;
+    z-index: 1001;
+    background: var(--bg-secondary);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow-slide);
+  }
+
+  /* ── SLIDE NAVIGATION CONTROLS ── */
+  .slide-nav-controls {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1001;
+  }
+  .slide-nav-controls button {
+    background: var(--bg-secondary);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-slide);
+    backdrop-filter: blur(8px);
+    transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .slide-nav-controls button:hover {
+    transform: scale(1.1);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+  #theme-toggle:hover {
+    transform: scale(1.05);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  /* ── SLIDE 10: CONCLUSION ── */
+  .slide-conclusion { background: var(--bg-slide-conclusion); }
+
+  /* ── CUSTOM ANIMATIONS ── */
+  @keyframes blurFadeIn {
+    from { opacity: 0; filter: blur(12px); transform: translateY(30px); }
+    to { opacity: 1; filter: blur(0px); transform: translateY(0); }
+  }
+  @keyframes blurFadeLeft {
+    from { opacity: 0; filter: blur(8px); transform: translateX(-30px); }
+    to { opacity: 1; filter: blur(0px); transform: translateX(0); }
+  }
+  @keyframes blurFadeRight {
+    from { opacity: 0; filter: blur(8px); transform: translateX(30px); }
+    to { opacity: 1; filter: blur(0px); transform: translateX(0); }
+  }
+  @keyframes premiumScaleIn {
+    from { opacity: 0; filter: blur(10px); transform: scale(0.92) translateY(15px); }
+    to { opacity: 1; filter: blur(0px); transform: scale(1) translateY(0); }
+  }
+  @keyframes pulseCenter {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.95; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes flowDash {
+    to {
+      stroke-dashoffset: -24;
+    }
+  }
+
+  /* Flowchart rect breathing glows */
+  @keyframes pulseGlowCyan {
+    0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 3px var(--cyan)); }
+    50% { opacity: 0.9; filter: drop-shadow(0 0 3px var(--cyan)); }
+  }
+  @keyframes pulseGlowPurple {
+    0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 3px var(--purple)); }
+    50% { opacity: 0.9; filter: drop-shadow(0 0 3px var(--purple)); }
+  }
+  @keyframes pulseGlowGreen {
+    0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 3px var(--green)); }
+    50% { opacity: 0.9; filter: drop-shadow(0 0 3px var(--green)); }
+  }
+
+  .pulse-glow-cyan { animation: pulseGlowCyan 3s ease-in-out infinite; }
+  .pulse-glow-purple { animation: pulseGlowPurple 3s ease-in-out infinite; }
+  .pulse-glow-green { animation: pulseGlowGreen 3s ease-in-out infinite; }
+
+  .animate-fade-in, .animate-slide-left, .animate-slide-right, .animate-scale-in {
+    opacity: 0;
+  }
+
+  .slide.active .animate-fade-in {
+    animation: blurFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .slide.active .animate-slide-left {
+    animation: blurFadeLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .slide.active .animate-slide-right {
+    animation: blurFadeRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .slide.active .animate-scale-in {
+    animation: premiumScaleIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .delay-1 { animation-delay: 0.1s !important; }
+  .delay-2 { animation-delay: 0.2s !important; }
+  .delay-3 { animation-delay: 0.3s !important; }
+  .delay-4 { animation-delay: 0.4s !important; }
+  .delay-5 { animation-delay: 0.5s !important; }
+  .delay-6 { animation-delay: 0.6s !important; }
+  .delay-7 { animation-delay: 0.7s !important; }
+  .delay-8 { animation-delay: 0.8s !important; }
+
+  /* SVG elements */
+  .svg-text {
+    fill: var(--text-primary);
+    transition: fill var(--transition-speed) ease;
+  }
+  .flow-line {
+    stroke-dasharray: 4, 8;
+    animation: flowDash 1.2s linear infinite;
+  }
 
   /* ── PRINT ── */
   @media print {
     body { background:#fff; }
     .slide { page-break-after:always; min-height:auto; padding:32px 48px; border:none; }
   }
-
-  /* ── NAV DOTS ── */
-  #nav { position:fixed; right:16px; top:50%; transform:translateY(-50%);
-         display:flex; flex-direction:column; gap:8px; z-index:999; }
-  .dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.2);
-         cursor:pointer; transition:all 0.3s; }
-  .dot.active, .dot:hover { background:var(--cyan); }
 
   /* ── RESPONSIVE DESIGN ── */
   .table-container {
@@ -162,8 +393,8 @@
     -webkit-overflow-scrolling: touch;
     margin-top: 16px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
   }
   .table-container table {
     margin-top: 0;
@@ -245,6 +476,12 @@
 </head>
 <body>
 
+<!-- THEME TOGGLE -->
+<button id="theme-toggle" aria-label="Toggle theme">
+  <span id="theme-toggle-icon">🌙</span>
+  <span id="theme-toggle-text">Dark Mode</span>
+</button>
+
 <!-- NAV DOTS -->
 <div id="nav">
   <div class="dot active" onclick="scrollTo(0)"></div>
@@ -264,28 +501,172 @@
 ════════════════════════════════════════════ -->
 <div class="slide slide-title" id="slide-0">
   <div class="slide-number">01 / 10</div>
-  <div class="tags">
+  <div class="tags animate-slide-left">
     <span class="tag tag-purple"><i class="fa-solid fa-award"></i> ET AutoTech Hackathon 2026</span>
     <span class="tag tag-cyan"><i class="fa-solid fa-bolt"></i> Theme 4: Seamless EV Charging Ecosystem</span>
     <span class="tag tag-green"><i class="fa-solid fa-star"></i> Original Solution</span>
   </div>
-  <h1 class="hero">Volt<span style="color:var(--cyan)">Stream</span></h1>
-  <p style="font-family:'Outfit',sans-serif; font-size:22px; font-weight:300; color:rgba(255,255,255,0.7); margin-top:12px;">
-    A Connected, Interoperable & Reliable EV Charging Ecosystem
-  </p>
-  <div class="divider"></div>
-  <p class="subtitle">
-    A dual-perspective interactive dashboard platform integrating <strong>ISO 15118 Plug & Charge</strong>,
-    live <strong>OCPP 2.0.1</strong> protocol monitoring, interoperable multi-network routing, and
-    AI-driven battery lifecycle analytics — built entirely as an original solution.
-  </p>
-  <div class="tech-row">
-    <span class="tech-pill"><i class="fa-brands fa-angular" style="color:#dd0031;"></i> Angular 18</span>
-    <span class="tech-pill"><i class="fa-solid fa-map" style="color:var(--cyan);"></i> Leaflet.js</span>
-    <span class="tech-pill"><i class="fa-solid fa-code" style="color:var(--purple);"></i> OCPP 2.0.1</span>
-    <span class="tech-pill"><i class="fa-solid fa-key" style="color:var(--yellow);"></i> ISO 15118</span>
-    <span class="tech-pill"><i class="fa-solid fa-chart-line" style="color:var(--green);"></i> Chart.js</span>
-    <span class="tech-pill"><i class="fa-solid fa-location-dot" style="color:#f97316;"></i> HTML5 Geolocation</span>
+  <div class="grid grid-2" style="align-items: center; gap: 32px; margin-top: 16px;">
+    <div>
+      <h1 class="hero animate-fade-in delay-1">Volt<span style="color:var(--cyan)">Stream</span></h1>
+      <p class="animate-fade-in delay-2" style="font-family:'Outfit',sans-serif; font-size:22px; font-weight:300; color:var(--text-secondary); margin-top:12px;">
+        A Connected, Interoperable & Reliable EV Charging Ecosystem
+      </p>
+      <div class="divider animate-slide-left delay-3"></div>
+      <p class="subtitle animate-fade-in delay-4">
+        A dual-perspective interactive dashboard platform integrating <strong>ISO 15118 Plug & Charge</strong>,
+        live <strong>OCPP 2.0.1</strong> protocol monitoring, interoperable multi-network routing, and
+        AI-driven battery lifecycle analytics — built entirely as an original solution.
+      </p>
+      <div class="tech-row">
+        <span class="tech-pill animate-scale-in delay-5"><i class="fa-brands fa-angular" style="color:#dd0031;"></i> Angular 18</span>
+        <span class="tech-pill animate-scale-in delay-6"><i class="fa-solid fa-map" style="color:var(--cyan);"></i> Leaflet.js</span>
+        <span class="tech-pill animate-scale-in delay-7"><i class="fa-solid fa-code" style="color:var(--purple);"></i> OCPP 2.0.1</span>
+        <span class="tech-pill animate-scale-in delay-8"><i class="fa-solid fa-key" style="color:var(--yellow);"></i> ISO 15118</span>
+      </div>
+    </div>
+    
+    <!-- Animated SVG Hero Art -->
+    <div class="hero-art glass-panel animate-scale-in delay-5" style="display: flex; align-items: center; justify-content: center; padding: 24px; min-height: 300px;">
+      <svg class="net-art-svg" viewBox="0 0 200 200" style="width: 100%; max-height: 280px;">
+        <defs>
+          <linearGradient id="radar-sweep-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="var(--cyan)" stop-opacity="0.22" />
+            <stop offset="100%" stop-color="var(--cyan)" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+
+        <!-- Core Station Glow with Concentric Ring Rotator -->
+        <circle cx="100" cy="100" r="28" fill="none" stroke="var(--cyan)" stroke-width="1" stroke-dasharray="8,4" opacity="0.6">
+          <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="12s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="100" cy="100" r="21" fill="rgba(6, 182, 212, 0.08)" stroke="var(--cyan)" stroke-width="1.5" style="filter: drop-shadow(0 0 6px var(--cyan));" />
+        <circle cx="100" cy="100" r="13" fill="var(--cyan)" />
+        <text x="100" y="105" font-size="14" font-weight="900" fill="#fff" text-anchor="middle" style="animation: pulseCenter 2s infinite ease-in-out;">⚡</text>
+
+        <!-- Central Energy Ripple Waves -->
+        <circle cx="100" cy="100" r="13" fill="none" stroke="var(--cyan)" stroke-width="1" opacity="0.8">
+          <animate attributeName="r" values="13;95" dur="4s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.8;0" dur="4s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="100" cy="100" r="13" fill="none" stroke="var(--cyan)" stroke-width="1" opacity="0.8">
+          <animate attributeName="r" values="13;95" dur="4s" begin="2s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.8;0" dur="4s" begin="2s" repeatCount="indefinite" />
+        </circle>
+
+        <!-- Connected Nodes representing CPOs -->
+        <!-- Tata Power -->
+        <g>
+          <path id="path-tata" d="M 40 50 L 100 100" fill="none" stroke="var(--cyan)" stroke-width="1.2" stroke-dasharray="3,3" opacity="0.4" class="flow-line" />
+          <circle r="2.5" fill="var(--cyan)" style="filter: drop-shadow(0 0 3px var(--cyan));">
+            <animateMotion dur="2.4s" repeatCount="indefinite" path="M 40 50 L 100 100" />
+          </circle>
+          <circle r="1.8" fill="var(--cyan)" opacity="0.6" style="filter: drop-shadow(0 0 2px var(--cyan));">
+            <animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M 40 50 L 100 100" />
+          </circle>
+          <g>
+            <circle cx="40" cy="50" r="14" fill="rgba(6, 182, 212, 0.05)" />
+            <circle cx="40" cy="50" r="14" fill="none" stroke="var(--cyan)" stroke-width="1.5" opacity="0.6">
+              <animate attributeName="r" values="14;17;14" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="40" cy="50" r="10" fill="var(--bg-secondary)" stroke="var(--cyan)" stroke-width="1" style="filter: drop-shadow(0 0 3px var(--cyan));" />
+            <circle cx="40" cy="50" r="18" fill="none" stroke="var(--cyan)" stroke-width="0.75" stroke-dasharray="8,4" opacity="0.7">
+              <animateTransform attributeName="transform" type="rotate" from="0 40 50" to="360 40 50" dur="6s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="40" cy="50" r="22" fill="none" stroke="var(--cyan)" stroke-width="0.5" stroke-dasharray="4,6" opacity="0.4">
+              <animateTransform attributeName="transform" type="rotate" from="0 40 50" to="-360 40 50" dur="8s" repeatCount="indefinite" />
+            </circle>
+            <text x="40" y="52.5" font-size="7" fill="var(--cyan)" font-weight="900" font-family="'Outfit', sans-serif" text-anchor="middle" class="svg-text">TATA</text>
+          </g>
+        </g>
+
+        <!-- Zeon -->
+        <g>
+          <path id="path-zeon" d="M 160 60 L 100 100" fill="none" stroke="var(--purple)" stroke-width="1.2" stroke-dasharray="3,3" opacity="0.4" class="flow-line" />
+          <circle r="2.5" fill="var(--purple)" style="filter: drop-shadow(0 0 3px var(--purple));">
+            <animateMotion dur="2.8s" repeatCount="indefinite" path="M 160 60 L 100 100" />
+          </circle>
+          <circle r="1.8" fill="var(--purple)" opacity="0.6" style="filter: drop-shadow(0 0 2px var(--purple));">
+            <animateMotion dur="2.8s" begin="1.4s" repeatCount="indefinite" path="M 160 60 L 100 100" />
+          </circle>
+          <g>
+            <circle cx="160" cy="60" r="14" fill="rgba(168, 85, 247, 0.05)" />
+            <circle cx="160" cy="60" r="14" fill="none" stroke="var(--purple)" stroke-width="1.5" opacity="0.6">
+              <animate attributeName="r" values="14;17;14" dur="3.5s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3.5s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="160" cy="60" r="10" fill="var(--bg-secondary)" stroke="var(--purple)" stroke-width="1" style="filter: drop-shadow(0 0 3px var(--purple));" />
+            <circle cx="160" cy="60" r="18" fill="none" stroke="var(--purple)" stroke-width="0.75" stroke-dasharray="8,4" opacity="0.7">
+              <animateTransform attributeName="transform" type="rotate" from="0 160 60" to="-360 160 60" dur="7s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="160" cy="60" r="22" fill="none" stroke="var(--purple)" stroke-width="0.5" stroke-dasharray="4,6" opacity="0.4">
+              <animateTransform attributeName="transform" type="rotate" from="0 160 60" to="360 160 60" dur="9s" repeatCount="indefinite" />
+            </circle>
+            <text x="160" y="62.5" font-size="7" fill="var(--purple)" font-weight="900" font-family="'Outfit', sans-serif" text-anchor="middle" class="svg-text">ZEON</text>
+          </g>
+        </g>
+
+        <!-- ChargeZone -->
+        <g>
+          <path id="path-zone" d="M 50 150 L 100 100" fill="none" stroke="var(--green)" stroke-width="1.2" stroke-dasharray="3,3" opacity="0.4" class="flow-line" />
+          <circle r="2.5" fill="var(--green)" style="filter: drop-shadow(0 0 3px var(--green));">
+            <animateMotion dur="2.1s" repeatCount="indefinite" path="M 50 150 L 100 100" />
+          </circle>
+          <circle r="1.8" fill="var(--green)" opacity="0.6" style="filter: drop-shadow(0 0 2px var(--green));">
+            <animateMotion dur="2.1s" begin="1.05s" repeatCount="indefinite" path="M 50 150 L 100 100" />
+          </circle>
+          <g>
+            <circle cx="50" cy="150" r="14" fill="rgba(16, 185, 129, 0.05)" />
+            <circle cx="50" cy="150" r="14" fill="none" stroke="var(--green)" stroke-width="1.5" opacity="0.6">
+              <animate attributeName="r" values="14;17;14" dur="3.2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3.2s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="50" cy="150" r="10" fill="var(--bg-secondary)" stroke="var(--green)" stroke-width="1" style="filter: drop-shadow(0 0 3px var(--green));" />
+            <circle cx="50" cy="150" r="18" fill="none" stroke="var(--green)" stroke-width="0.75" stroke-dasharray="8,4" opacity="0.7">
+              <animateTransform attributeName="transform" type="rotate" from="0 50 150" to="360 50 150" dur="5.5s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="50" cy="150" r="22" fill="none" stroke="var(--green)" stroke-width="0.5" stroke-dasharray="4,6" opacity="0.4">
+              <animateTransform attributeName="transform" type="rotate" from="0 50 150" to="-360 50 150" dur="7.5s" repeatCount="indefinite" />
+            </circle>
+            <text x="50" y="152.5" font-size="7" fill="var(--green)" font-weight="900" font-family="'Outfit', sans-serif" text-anchor="middle" class="svg-text">ZONE</text>
+          </g>
+        </g>
+
+        <!-- Bolt -->
+        <g>
+          <path id="path-bolt" d="M 150 140 L 100 100" fill="none" stroke="var(--yellow)" stroke-width="1.2" stroke-dasharray="3,3" opacity="0.4" class="flow-line" />
+          <circle r="2.5" fill="var(--yellow)" style="filter: drop-shadow(0 0 3px var(--yellow));">
+            <animateMotion dur="2.6s" repeatCount="indefinite" path="M 150 140 L 100 100" />
+          </circle>
+          <circle r="1.8" fill="var(--yellow)" opacity="0.6" style="filter: drop-shadow(0 0 2px var(--yellow));">
+            <animateMotion dur="2.6s" begin="1.3s" repeatCount="indefinite" path="M 150 140 L 100 100" />
+          </circle>
+          <g>
+            <circle cx="150" cy="140" r="14" fill="rgba(251, 191, 36, 0.05)" />
+            <circle cx="150" cy="140" r="14" fill="none" stroke="var(--yellow)" stroke-width="1.5" opacity="0.6">
+              <animate attributeName="r" values="14;17;14" dur="3.8s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="3.8s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="150" cy="140" r="10" fill="var(--bg-secondary)" stroke="var(--yellow)" stroke-width="1" style="filter: drop-shadow(0 0 3px var(--yellow));" />
+            <circle cx="150" cy="140" r="18" fill="none" stroke="var(--yellow)" stroke-width="0.75" stroke-dasharray="8,4" opacity="0.7">
+              <animateTransform attributeName="transform" type="rotate" from="0 150 140" to="-360 150 140" dur="6.5s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="150" cy="140" r="22" fill="none" stroke="var(--yellow)" stroke-width="0.5" stroke-dasharray="4,6" opacity="0.4">
+              <animateTransform attributeName="transform" type="rotate" from="0 150 140" to="360 150 140" dur="8.5s" repeatCount="indefinite" />
+            </circle>
+            <text x="150" y="142.5" font-size="7" fill="var(--yellow)" font-weight="900" font-family="'Outfit', sans-serif" text-anchor="middle" class="svg-text">BOLT</text>
+          </g>
+        </g>
+
+        <!-- Radar Scanner Sweep Group -->
+        <g>
+          <path d="M 100 100 L 100 5 A 95 95 0 0 1 167.17 32.83 Z" fill="url(#radar-sweep-grad)" />
+          <line x1="100" y1="100" x2="167.17" y2="32.83" stroke="var(--cyan)" stroke-width="1.2" opacity="0.8" style="filter: drop-shadow(0 0 3px var(--cyan));" />
+          <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="6s" repeatCount="indefinite" />
+        </g>
+      </svg>
+    </div>
   </div>
   <div class="slide-footer">
     <span class="brand">⚡ VoltStream</span>
@@ -298,29 +679,29 @@
 ════════════════════════════════════════════ -->
 <div class="slide" id="slide-1">
   <div class="slide-number">02 / 10</div>
-  <span class="tag tag-purple" style="width:fit-content;"><i class="fa-solid fa-triangle-exclamation"></i> Problem Statement</span>
-  <h2 class="section-title" style="margin-top:16px;">The EV Charging <span>Fragmentation</span> Crisis</h2>
-  <div class="divider"></div>
-  <div class="problem-box">
+  <span class="tag tag-purple animate-slide-left" style="width:fit-content;"><i class="fa-solid fa-triangle-exclamation"></i> Problem Statement</span>
+  <h2 class="section-title animate-fade-in delay-1" style="margin-top:16px;">The EV Charging <span>Fragmentation</span> Crisis</h2>
+  <div class="divider animate-slide-left delay-2"></div>
+  <div class="problem-box animate-fade-in delay-3">
     <p>"Design solutions to enable a <strong>connected, interoperable, and reliable</strong> EV charging ecosystem that delivers a <strong>seamless and user-friendly experience</strong> across networks and platforms."</p>
   </div>
   <div class="grid grid-2" style="margin-top:24px; gap:16px;">
-    <div class="card card-accent-purple">
+    <div class="card card-accent-purple animate-scale-in delay-4">
       <div class="card-icon">🔌</div>
       <h3>Network Fragmentation</h3>
       <p>EV drivers need separate apps for Tata Power, Zeon, ChargeZone, and Bolt — each with independent wallets and login flows.</p>
     </div>
-    <div class="card card-accent-cyan">
+    <div class="card card-accent-cyan animate-scale-in delay-5">
       <div class="card-icon">📡</div>
       <h3>Unreliable Communication</h3>
       <p>Charging stations lose billing data during cellular outages. No standardized protocol means vendor lock-in across CPOs.</p>
     </div>
-    <div class="card card-accent-yellow">
+    <div class="card card-accent-yellow animate-scale-in delay-6">
       <div class="card-icon">💳</div>
       <h3>Payment Friction</h3>
       <p>No unified payment system. Each network requires a separate pre-paid wallet, creating financial overhead for users.</p>
     </div>
-    <div class="card card-accent-green">
+    <div class="card card-accent-green animate-scale-in delay-7">
       <div class="card-icon">🗺️</div>
       <h3>No Real-time Navigation</h3>
       <p>Drivers can't find available nearby chargers in real time. No route planning integration from current vehicle location.</p>
@@ -337,11 +718,11 @@
 ════════════════════════════════════════════ -->
 <div class="slide" id="slide-2">
   <div class="slide-number">03 / 10</div>
-  <span class="tag tag-cyan" style="width:fit-content;"><i class="fa-solid fa-lightbulb"></i> Our Solution</span>
-  <h2 class="section-title" style="margin-top:16px;">VoltStream: <span>One Platform</span>, All Networks</h2>
-  <div class="divider"></div>
-  <p class="subtitle">A unified, dual-perspective dashboard that solves all four Focus Areas simultaneously — built as a fully interactive Angular 18 prototype with zero backend dependencies.</p>
-  <div class="arch-flow">
+  <span class="tag tag-cyan animate-slide-left" style="width:fit-content;"><i class="fa-solid fa-lightbulb"></i> Our Solution</span>
+  <h2 class="section-title animate-fade-in delay-1" style="margin-top:16px;">VoltStream: <span>One Platform</span>, All Networks</h2>
+  <div class="divider animate-slide-left delay-2"></div>
+  <p class="subtitle animate-fade-in delay-3">A unified, dual-perspective dashboard that solves all four Focus Areas simultaneously — built as a fully interactive Angular 18 prototype with zero backend dependencies.</p>
+  <div class="arch-flow animate-fade-in delay-4">
     <div class="arch-box">
       <div class="ico">🚗</div>
       <span>Driver</span><span style="font-size:10px;color:var(--cyan);">Companion View</span>
@@ -368,17 +749,17 @@
     </div>
   </div>
   <div class="grid grid-3" style="margin-top:24px;">
-    <div class="card card-accent-cyan">
+    <div class="card card-accent-cyan animate-scale-in delay-5">
       <div class="card-icon">👤</div>
       <h3>Driver Companion Mode</h3>
       <p>Clean consumer-facing view showing SOC gauge, adaptive range, station finder, and wallet balance.</p>
     </div>
-    <div class="card card-accent-purple">
+    <div class="card card-accent-purple animate-scale-in delay-6">
       <div class="card-icon">🖥️</div>
       <h3>Grid Operations Console</h3>
       <p>Operator NOC view with live OCPP logs, grid load simulator, multi-gun port status, and settlement ledger.</p>
     </div>
-    <div class="card card-accent-green">
+    <div class="card card-accent-green animate-scale-in delay-7">
       <div class="card-icon">☀️🌙</div>
       <h3>Light / Dark Themes</h3>
       <p>Full glassmorphic UI with theme switching, Outfit/Inter typography, and micro-animations throughout.</p>
@@ -395,10 +776,10 @@
 ════════════════════════════════════════════ -->
 <div class="slide" id="slide-3">
   <div class="slide-number">04 / 10</div>
-  <span class="tag tag-green" style="width:fit-content;"><i class="fa-solid fa-table-list"></i> Focus Area Coverage</span>
-  <h2 class="section-title" style="margin-top:16px;">All 4 Focus Areas — <span>Fully Covered</span></h2>
-  <div class="divider"></div>
-  <div class="table-container">
+  <span class="tag tag-green animate-slide-left" style="width:fit-content;"><i class="fa-solid fa-table-list"></i> Focus Area Coverage</span>
+  <h2 class="section-title animate-fade-in delay-1" style="margin-top:16px;">All 4 Focus Areas — <span>Fully Covered</span></h2>
+  <div class="divider animate-slide-left delay-2"></div>
+  <div class="table-container animate-fade-in delay-3">
   <table>
     <thead>
       <tr>
@@ -437,11 +818,11 @@
   </table>
   </div>
   <div class="stat-row" style="margin-top:32px; justify-content:center;">
-    <div class="stat"><div class="stat-num">4/4</div><div class="stat-label">Focus Areas</div></div>
-    <div class="stat"><div class="stat-num">2</div><div class="stat-label">User Perspectives</div></div>
-    <div class="stat"><div class="stat-num">5</div><div class="stat-label">Dashboard Modules</div></div>
-    <div class="stat"><div class="stat-num">7+</div><div class="stat-label">Charging Networks</div></div>
-    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Client-side</div></div>
+    <div class="stat animate-scale-in delay-4"><div class="stat-num">4/4</div><div class="stat-label">Focus Areas</div></div>
+    <div class="stat animate-scale-in delay-5"><div class="stat-num">2</div><div class="stat-label">User Perspectives</div></div>
+    <div class="stat animate-scale-in delay-6"><div class="stat-num">5</div><div class="stat-label">Dashboard Modules</div></div>
+    <div class="stat animate-scale-in delay-7"><div class="stat-num">7+</div><div class="stat-label">Charging Networks</div></div>
+    <div class="stat animate-scale-in delay-8"><div class="stat-num">100%</div><div class="stat-label">Client-side</div></div>
   </div>
   <div class="slide-footer">
     <span class="brand">⚡ VoltStream</span>
@@ -454,26 +835,26 @@
 ════════════════════════════════════════════ -->
 <div class="slide" id="slide-4">
   <div class="slide-number">05 / 10</div>
-  <span class="tag tag-purple" style="width:fit-content;"><i class="fa-solid fa-microchip"></i> Technical Depth</span>
-  <h2 class="section-title" style="margin-top:16px;">Engineering <span>Rigor</span></h2>
-  <div class="divider"></div>
+  <span class="tag tag-purple animate-slide-left" style="width:fit-content;"><i class="fa-solid fa-microchip"></i> Technical Depth</span>
+  <h2 class="section-title animate-fade-in delay-1" style="margin-top:16px;">Engineering <span>Rigor</span></h2>
+  <div class="divider animate-slide-left delay-2"></div>
   <div class="grid grid-2" style="gap:16px;">
-    <div class="card card-accent-purple">
+    <div class="card card-accent-purple animate-scale-in delay-3">
       <h3><i class="fa-solid fa-plug" style="color:var(--purple);"></i> &nbsp;ISO 15118 Plug & Charge</h3>
       <p>Simulates the full 4-step cryptographic handshake: physical connection lock → TLS ECDSA certificate exchange → EMAID contract verification → OCPP TransactionEvent. No manual QR/app required.</p>
       <div class="highlight">→ SignCertificate + AuthorizeResponse + TransactionEvent</div>
     </div>
-    <div class="card card-accent-cyan">
+    <div class="card card-accent-cyan animate-scale-in delay-4">
       <h3><i class="fa-solid fa-terminal" style="color:var(--cyan);"></i> &nbsp;OCPP 2.0.1 Protocol</h3>
       <p>Live JSON WebSocket log simulation with BootNotification, Heartbeat, TransactionEvent (Started/Updated/Ended), SetChargingProfile, and Reset commands rendered in real time.</p>
       <div class="highlight">→ Full message lifecycle with offline queue buffering</div>
     </div>
-    <div class="card card-accent-green">
+    <div class="card card-accent-green animate-scale-in delay-5">
       <h3><i class="fa-solid fa-bolt" style="color:var(--green);"></i> &nbsp;Smart Grid Throttling</h3>
       <p>Simulates substation peak load at 92%. Automatically triggers OCPP SetChargingProfile to limit active chargers from 150kW → 70kW. Displays real-time "GRID THROTTLED" badge on driver console.</p>
       <div class="highlight">→ SetChargingProfile + live kW gauge update</div>
     </div>
-    <div class="card card-accent-yellow">
+    <div class="card card-accent-yellow animate-scale-in delay-6">
       <h3><i class="fa-solid fa-location-crosshairs" style="color:var(--yellow);"></i> &nbsp;Dynamic Station Synthesis</h3>
       <p>Uses HTML5 Geolocation to get the driver's real coordinates, then dynamically generates IOCL, HPCL, BPCL, Jio-bp petrol-pump EV hubs around their actual location. Plots glowing route polyline to selected station.</p>
       <div class="highlight">→ GPS + dynamic CPO data synthesis</div>
@@ -490,11 +871,11 @@
 ════════════════════════════════════════════ -->
 <div class="slide" id="slide-5">
   <div class="slide-number">06 / 10</div>
-  <span class="tag tag-cyan" style="width:fit-content;"><i class="fa-solid fa-diagram-project"></i> Architecture</span>
-  <h2 class="section-title" style="margin-top:16px;">Modular Angular 18 <span>Architecture</span></h2>
-  <div class="divider"></div>
+  <span class="tag tag-cyan animate-slide-left" style="width:fit-content;"><i class="fa-solid fa-diagram-project"></i> Architecture</span>
+  <h2 class="section-title animate-fade-in delay-1" style="margin-top:16px;">Modular Angular 18 <span>Architecture</span></h2>
+  <div class="divider animate-slide-left delay-2"></div>
   <div class="grid grid-2" style="gap:16px;">
-    <div>
+    <div class="animate-slide-left delay-3">
       <div class="card" style="margin-bottom:12px; border-color:rgba(6,182,212,0.2);">
         <h3 style="color:var(--cyan);">📁 Standalone Components</h3>
         <p style="line-height:2; font-size:13px;">
@@ -507,7 +888,7 @@
         </p>
       </div>
     </div>
-    <div>
+    <div class="animate-slide-right delay-4">
       <div class="card" style="border-color:rgba(168,85,247,0.2);">
         <h3 style="color:var(--purple);">⚙️ Shared Services & State</h3>
         <p style="line-height:1.8; font-size:13px;">
@@ -516,7 +897,7 @@
         </p>
         <div class="highlight">→ Zero external backend — 100% browser-side</div>
       </div>
-      <div class="card" style="margin-top:12px; border-color:rgba(16,185,129,0.2);">
+      <div class="card animate-slide-right delay-5" style="margin-top:12px; border-color:rgba(16,185,129,0.2);">
         <h3 style="color:var(--green);">🚀 Deployment</h3>
         <p style="font-size:13px;">Angular 18 → NGINX static serve → Render.com / Docker container. Build output: dist/voltstream/browser. Production bundle: ~378 KB.</p>
       </div>
@@ -533,36 +914,36 @@
 ════════════════════════════════════════════ -->
 <div class="slide" id="slide-6">
   <div class="slide-number">07 / 10</div>
-  <span class="tag tag-yellow" style="width:fit-content;"><i class="fa-solid fa-wand-magic-sparkles"></i> Innovation</span>
-  <h2 class="section-title" style="margin-top:16px;">What Makes VoltStream <span>Innovative</span></h2>
-  <div class="divider"></div>
+  <span class="tag tag-yellow animate-slide-left" style="width:fit-content;"><i class="fa-solid fa-wand-magic-sparkles"></i> Innovation</span>
+  <h2 class="section-title animate-fade-in delay-1" style="margin-top:16px;">What Makes VoltStream <span>Innovative</span></h2>
+  <div class="divider animate-slide-left delay-2"></div>
   <div class="grid grid-3" style="gap:16px;">
-    <div class="card card-accent-yellow">
+    <div class="card card-accent-yellow animate-scale-in delay-3">
       <div class="card-icon">🏦</div>
       <h3>Interoperable Settlement Layer</h3>
       <p>A single pre-funded wallet automatically settles billing across 4+ competing CPO networks — like a UPI for EV charging. No per-network app or wallet required.</p>
     </div>
-    <div class="card card-accent-purple">
+    <div class="card card-accent-purple animate-scale-in delay-4">
       <div class="card-icon">⚡</div>
       <h3>Live Liquid Charging Animation</h3>
       <p>Rotating glow ring + rising energy bubbles + pulsing bolt glow on the radial SOC indicator. Physics-accurate visual feedback during active charging — a first for EV dashboards.</p>
     </div>
-    <div class="card card-accent-cyan">
+    <div class="card card-accent-cyan animate-scale-in delay-5">
       <div class="card-icon">🛢️</div>
       <h3>Petrol Pump EV Hub Synthesis</h3>
       <p>Detects real driver GPS coordinates and synthetically generates IOCL, HPCL, BPCL, Jio-bp petrol pump EV charging points around them — matching India's actual fuel network rollout strategy.</p>
     </div>
-    <div class="card card-accent-green">
+    <div class="card card-accent-green animate-scale-in delay-6">
       <div class="card-icon">🔋</div>
       <h3>Battery SoH Digital Passport</h3>
       <p>AI-driven State of Health tracker generates battery lifecycle data qualifying aging cells for second-life grid storage — reducing lithium supply chain dependency.</p>
     </div>
-    <div class="card card-accent-purple">
+    <div class="card card-accent-purple animate-scale-in delay-7">
       <div class="card-icon">🌐</div>
       <h3>Dual-Perspective Role System</h3>
       <p>Single codebase serves two completely different user experiences: EV Driver Companion (consumer UX) and Grid Operations Console (NOC operator), switching instantly with zero page reload.</p>
     </div>
-    <div class="card card-accent-cyan">
+    <div class="card card-accent-cyan animate-scale-in delay-8">
       <div class="card-icon">🛡️</div>
       <h3>Smart Grid Protection</h3>
       <p>Simulates substation overload → OCPP SetChargingProfile → automatic throttling from 150kW → 70kW, protecting grid infrastructure in real time.</p>
@@ -579,10 +960,10 @@
 ════════════════════════════════════════════ -->
 <div class="slide" id="slide-7">
   <div class="slide-number">08 / 10</div>
-  <span class="tag tag-green" style="width:fit-content;"><i class="fa-solid fa-trophy"></i> Judging Criteria</span>
-  <h2 class="section-title" style="margin-top:16px;">Scoring <span>Alignment</span></h2>
-  <div class="divider"></div>
-  <div class="table-container">
+  <span class="tag tag-green animate-slide-left" style="width:fit-content;"><i class="fa-solid fa-trophy"></i> Judging Criteria</span>
+  <h2 class="section-title animate-fade-in delay-1" style="margin-top:16px;">Scoring <span>Alignment</span></h2>
+  <div class="divider animate-slide-left delay-2"></div>
+  <div class="table-container animate-fade-in delay-3">
   <table>
     <thead>
       <tr>
@@ -636,24 +1017,24 @@
 ════════════════════════════════════════════ -->
 <div class="slide" id="slide-8">
   <div class="slide-number">09 / 10</div>
-  <span class="tag tag-cyan" style="width:fit-content;"><i class="fa-solid fa-play"></i> Interactive Demo</span>
-  <h2 class="section-title" style="margin-top:16px;">Live Demo <span>Walkthrough</span></h2>
-  <div class="divider"></div>
+  <span class="tag tag-cyan animate-slide-left" style="width:fit-content;"><i class="fa-solid fa-play"></i> Interactive Demo</span>
+  <h2 class="section-title animate-fade-in delay-1" style="margin-top:16px;">Live Demo <span>Walkthrough</span></h2>
+  <div class="divider animate-slide-left delay-2"></div>
   <div class="timeline">
-    <div class="timeline-step"><div class="timeline-dot"></div><h4>Switch to Operator</h4><p>Grid Operations Console in sidebar</p></div>
-    <div class="timeline-step"><div class="timeline-dot" style="background:var(--purple); box-shadow:0 0 12px var(--purple);"></div><h4>Show Focus Areas</h4><p>Click "Show Mapped Focus Areas" button</p></div>
-    <div class="timeline-step"><div class="timeline-dot" style="background:var(--green); box-shadow:0 0 12px var(--green);"></div><h4>Plug & Charge</h4><p>Click plug → watch ISO 15118 handshake</p></div>
-    <div class="timeline-step"><div class="timeline-dot" style="background:var(--yellow); box-shadow:0 0 12px var(--yellow);"></div><h4>Grid Peak</h4><p>Simulate Grid Peak → watch OCPP throttle</p></div>
-    <div class="timeline-step"><div class="timeline-dot" style="background:#f97316; box-shadow:0 0 12px #f97316;"></div><h4>Network Cut</h4><p>Simulate Connection Cut → offline queue</p></div>
-    <div class="timeline-step"><div class="timeline-dot" style="background:#ec4899; box-shadow:0 0 12px #ec4899;"></div><h4>Locate Me</h4><p>Map tab → crosshair button → GPS stations</p></div>
+    <div class="timeline-step animate-scale-in delay-3"><div class="timeline-dot"></div><h4>Switch to Operator</h4><p>Grid Operations Console in sidebar</p></div>
+    <div class="timeline-step animate-scale-in delay-4"><div class="timeline-dot" style="background:var(--purple); box-shadow:0 0 12px var(--purple);"></div><h4>Show Focus Areas</h4><p>Click "Show Mapped Focus Areas" button</p></div>
+    <div class="timeline-step animate-scale-in delay-5"><div class="timeline-dot" style="background:var(--green); box-shadow:0 0 12px var(--green);"></div><h4>Plug & Charge</h4><p>Click plug → watch ISO 15118 handshake</p></div>
+    <div class="timeline-step animate-scale-in delay-6"><div class="timeline-dot" style="background:var(--yellow); box-shadow:0 0 12px var(--yellow);"></div><h4>Grid Peak</h4><p>Simulate Grid Peak → watch OCPP throttle</p></div>
+    <div class="timeline-step animate-scale-in delay-7"><div class="timeline-dot" style="background:#f97316; box-shadow:0 0 12px #f97316;"></div><h4>Network Cut</h4><p>Simulate Connection Cut → offline queue</p></div>
+    <div class="timeline-step animate-scale-in delay-8"><div class="timeline-dot" style="background:#ec4899; box-shadow:0 0 12px #ec4899;"></div><h4>Locate Me</h4><p>Map tab → crosshair button → GPS stations</p></div>
   </div>
   <div class="grid grid-2" style="margin-top:28px; gap:16px;">
-    <div class="card card-accent-cyan">
+    <div class="card card-accent-cyan animate-slide-left delay-5">
       <h3><i class="fa-solid fa-globe"></i> &nbsp;Interactive Prototype</h3>
       <p>Live deployment available at Render.com. Switch between Driver and Operator perspectives. All simulations run in real-time in the browser.</p>
       <div class="highlight">→ See render.com deployment link</div>
     </div>
-    <div class="card card-accent-green">
+    <div class="card card-accent-green animate-slide-right delay-6">
       <h3><i class="fa-solid fa-code"></i> &nbsp;Source Code</h3>
       <p>Full Angular 18 source available in submission ZIP. Includes Dockerfile, nginx.conf, render.yaml for deployment. Run locally with <code>npm install && npm start</code>.</p>
       <div class="highlight">→ github.com/mahesh-morde/Seamless-EV-Charging-Ecosyste</div>
@@ -668,42 +1049,42 @@
 <!-- ════════════════════════════════════════════
      SLIDE 10 — CONCLUSION
 ════════════════════════════════════════════ -->
-<div class="slide" id="slide-9" style="background:linear-gradient(135deg, #050b18 0%, #0d0b2e 100%);">
+<div class="slide slide-conclusion" id="slide-9">
   <div class="slide-number">10 / 10</div>
-  <span class="tag tag-purple" style="width:fit-content;"><i class="fa-solid fa-flag-checkered"></i> Conclusion</span>
-  <h2 class="section-title" style="margin-top:16px; font-size:42px;">VoltStream — Connecting <span>India's EV Future</span></h2>
-  <div class="divider"></div>
-  <p class="subtitle" style="font-size:16px;">
+  <span class="tag tag-purple animate-slide-left" style="width:fit-content;"><i class="fa-solid fa-flag-checkered"></i> Conclusion</span>
+  <h2 class="section-title animate-fade-in delay-1" style="margin-top:16px; font-size:42px;">VoltStream — Connecting <span>India's EV Future</span></h2>
+  <div class="divider animate-slide-left delay-2"></div>
+  <p class="subtitle animate-fade-in delay-3" style="font-size:16px;">
     VoltStream is a fully original, end-to-end EV charging ecosystem prototype that addresses every dimension of the hackathon challenge — from ISO 15118 cryptographic authentication to AI battery lifecycle passports — built as a clean, modular Angular 18 application deployable via Docker or Render.com.
   </p>
   <div class="grid grid-4" style="margin-top:32px; gap:12px;">
-    <div class="card" style="text-align:center; padding:20px;">
+    <div class="card animate-scale-in delay-4" style="text-align:center; padding:20px;">
       <div style="font-size:36px; margin-bottom:8px;">🔗</div>
       <h3>Connected</h3>
       <p>Unified map across all major Indian CPO networks</p>
     </div>
-    <div class="card" style="text-align:center; padding:20px;">
+    <div class="card animate-scale-in delay-5" style="text-align:center; padding:20px;">
       <div style="font-size:36px; margin-bottom:8px;">🤝</div>
       <h3>Interoperable</h3>
       <p>One wallet, one app, all charging networks</p>
     </div>
-    <div class="card" style="text-align:center; padding:20px;">
+    <div class="card animate-scale-in delay-6" style="text-align:center; padding:20px;">
       <div style="font-size:36px; margin-bottom:8px;">📡</div>
       <h3>Reliable</h3>
       <p>OCPP 2.0.1 with offline recovery & grid protection</p>
     </div>
-    <div class="card" style="text-align:center; padding:20px;">
+    <div class="card animate-scale-in delay-7" style="text-align:center; padding:20px;">
       <div style="font-size:36px; margin-bottom:8px;">✨</div>
       <h3>Seamless</h3>
       <p>ISO 15118 auto-auth & zero-friction user experience</p>
     </div>
   </div>
-  <div style="text-align:center; margin-top:40px;">
+  <div class="animate-fade-in delay-7" style="text-align:center; margin-top:40px;">
     <h1 style="font-family:'Outfit',sans-serif; font-size:48px; font-weight:900;
                background:linear-gradient(135deg, var(--cyan), var(--purple));
                -webkit-background-clip:text; -webkit-text-fill-color:transparent;
                background-clip:text;">⚡ VoltStream</h1>
-    <p style="color:rgba(255,255,255,0.4); margin-top:8px; font-size:13px;">
+    <p style="color:var(--text-muted); margin-top:8px; font-size:13px;">
       ET AutoTech Hackathon 2026 &nbsp;|&nbsp; Theme 4: Seamless EV Charging Ecosystem &nbsp;|&nbsp; Original Solution
     </p>
   </div>
@@ -713,22 +1094,78 @@
   </div>
 </div>
 
+<!-- FLOATING SLIDE NAVIGATION CONTROLS -->
+<div class="slide-nav-controls">
+  <button id="prev-slide-btn" aria-label="Previous Slide"><i class="fa-solid fa-chevron-up"></i></button>
+  <button id="next-slide-btn" aria-label="Next Slide"><i class="fa-solid fa-chevron-down"></i></button>
+</div>
+
 <script>
   const slides = document.querySelectorAll('.slide');
   const dots = document.querySelectorAll('.dot');
+  let currentSlideIndex = 0;
+
   function scrollTo(i) {
     slides[i].scrollIntoView({ behavior: 'smooth' });
   }
+  
+  // Slide Intersection Observer for Nav Dots and Slide Active State Animations
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
+        e.target.classList.add('active');
         const i = Array.from(slides).indexOf(e.target);
+        currentSlideIndex = i;
         dots.forEach(d => d.classList.remove('active'));
         if (dots[i]) dots[i].classList.add('active');
+      } else {
+        // Reset animation states when scrolling away for premium re-entrance
+        e.target.classList.remove('active');
       }
     });
-  }, { threshold: 0.5 });
+  }, { threshold: 0.4 });
   slides.forEach(s => observer.observe(s));
+
+  // Theme Switching Implementation
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-toggle-icon');
+  const themeText = document.getElementById('theme-toggle-text');
+
+  function updateThemeUI(isDark) {
+    themeIcon.textContent = isDark ? '☀️' : '🌙';
+    themeText.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+  }
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    updateThemeUI(isDark);
+    localStorage.setItem('presentation-theme', isDark ? 'dark' : 'light');
+  });
+
+  // Apply default or stored preference on load
+  const storedTheme = localStorage.getItem('presentation-theme');
+  if (storedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    updateThemeUI(true);
+  } else {
+    document.body.classList.remove('dark-mode');
+    updateThemeUI(false);
+  }
+
+  // Floating Slide Navigation Button Handlers
+  const prevBtn = document.getElementById('prev-slide-btn');
+  const nextBtn = document.getElementById('next-slide-btn');
+  
+  prevBtn.addEventListener('click', () => {
+    currentSlideIndex = Math.max(currentSlideIndex - 1, 0);
+    scrollTo(currentSlideIndex);
+  });
+  
+  nextBtn.addEventListener('click', () => {
+    currentSlideIndex = Math.min(currentSlideIndex + 1, slides.length - 1);
+    scrollTo(currentSlideIndex);
+  });
 </script>
 </body>
 </html>
