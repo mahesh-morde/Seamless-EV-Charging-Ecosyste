@@ -787,7 +787,7 @@ export class EcosystemService {
 
     queueToFlush.forEach((item, index) => {
         setTimeout(() => {
-            this.logOcppMessage(item.direction, `[RECOVERY-FLUSH] ${item.message}`);
+            this.logOcppMessage(item.direction, 'LOG_RECOVERY_FLUSH', { message: item.message });
             if (index === queueToFlush.length - 1) {
                 this.logOcppMessage('SYSTEM', 'LOG_CACHE_SYNCED');
             }
@@ -860,98 +860,78 @@ export class EcosystemService {
 
   private generateAgentResponse(agentId: string, prompt: string): string {
     const p = prompt.toLowerCase();
-    
     if (agentId === 'voltadvisor') {
-      if (p.includes('range') || p.includes('distancia') || p.includes('सीमा') || p.includes('miles') || p.includes('km')) {
-        return `Based on your live telemetry, your vehicle's Battery SoC is currently **${this.vehicleSoc}%**, providing an estimated remaining range of **${this.estimatedRange} km**. Pre-conditioning the battery pack and routing through urban streets instead of highways can increase efficiency by up to **8%** (adding roughly **${Math.round(this.estimatedRange * 0.08)} km**).`;
+      if (p.includes('range') || p.includes('distancia') || p.includes('सीमा') || p.includes('miles') || p.includes('km') || p.includes('ವ್ಯಾಪ್ತಿ') || p.includes('ಮಾರ್ಗ')) {
+        return this.ts.translate('AI_RESP_VOLT_RANGE', {
+          vehicleSoc: this.vehicleSoc.toFixed(0),
+          estimatedRange: this.estimatedRange.toString(),
+          addedRange: Math.round(this.estimatedRange * 0.08).toString()
+        });
       }
-      if (p.includes('tips') || p.includes('consejos') || p.includes('युक्तियाँ') || p.includes('health') || p.includes('bateria') || p.includes('battery')) {
-        return `Here are three crucial tips to maximize your EV battery life:
-1. **Rule of 20-80**: Avoid letting your State of Charge (SoC) drop below 20% or sit above 80% for long durations.
-2. **Limit DC Fast Charging**: While convenient, frequent ultra-fast charging creates localized heat stress. Use AC chargers when parking overnight.
-3. **Cooling off**: Avoid charging immediately after aggressive driving; let the thermal management system stabilize the battery cells first.`;
+      if (p.includes('tips') || p.includes('consejos') || p.includes('युक्तियाँ') || p.includes('health') || p.includes('bateria') || p.includes('battery') || p.includes('ಆರೋಗ್ಯ') || p.includes('ಸಲಹೆ')) {
+        return this.ts.translate('AI_RESP_VOLT_TIPS');
       }
-      if (p.includes('charger') || p.includes('near') || p.includes('station') || p.includes('cargador') || p.includes('स्टेशन') || p.includes('whitefield') || p.includes('bengaluru')) {
-        return `We have mapped 5 static stations and dynamic Overpass EV hubs around your current location (centered at Sheraton Grand Bengaluru Whitefield, lat 12.9839, lng 77.7523). 
-The nearest available station is **Shell Recharge (Prestige Shantiniketan)**. It is **Available** and equipped with a **DC 150kW CCS2** connector, with a price of **₹18.00/kWh**. Just tap it on the Map tab to start routing!`;
+      if (p.includes('charger') || p.includes('near') || p.includes('station') || p.includes('cargador') || p.includes('स्टेशन') || p.includes('whitefield') || p.includes('bengaluru') || p.includes('ಚಾರ್ಜರ್') || p.includes('ಸ್ಥಳ')) {
+        return this.ts.translate('AI_RESP_VOLT_CHARGER');
       }
-      return `I am analyzing your live vehicle telemetry. 
-- State of Charge: **${this.vehicleSoc}%**
-- Projected Range: **${this.estimatedRange} km**
-- Current Wallet Pool: **₹${this.walletBalance.toFixed(2)}**
-
-How can I help you optimize your route or charge management today?`;
+      return this.ts.translate('AI_RESP_VOLT_DEFAULT', {
+        vehicleSoc: this.vehicleSoc.toFixed(0),
+        estimatedRange: this.estimatedRange.toString(),
+        walletBalance: this.walletBalance.toFixed(2)
+      });
     }
-
     if (agentId === 'gridguardian') {
-      if (p.includes('load') || p.includes('charge') || p.includes('grid') || p.includes('carga') || p.includes('ग्रिड') || p.includes('overload')) {
-        const statusStr = this.isGridOverloaded ? 'CRITICAL (Peak Overload)' : 'STABLE (Normal Load)';
-        return `Grid operations log for Substation 4 (Bengaluru):
-- Current Load Factor: **${this.gridLoad}%**
-- Status: **${statusStr}**
-- Throttling Simulator: **${this.isGridOverloaded ? 'Active (AC Speed Capped at 50%)' : 'Inactive (Full Speeds Available)'}**
-
-Charging during off-peak hours (between **2:00 AM and 5:00 AM**) is highly recommended to protect local grid nodes.`;
+      if (p.includes('load') || p.includes('charge') || p.includes('grid') || p.includes('carga') || p.includes('ग्रिड') || p.includes('overload') || p.includes('ಲೋಡ್') || p.includes('ಗ್ರಿಡ್')) {
+        const statusStr = this.isGridOverloaded ? this.ts.translate('STATUS_CRITICAL') : this.ts.translate('STATUS_STABLE');
+        const throttlingStr = this.isGridOverloaded ? this.ts.translate('STATUS_THROTTLING_ACTIVE') : this.ts.translate('STATUS_THROTTLING_INACTIVE');
+        return this.ts.translate('AI_RESP_GRID_LOAD', {
+          gridLoad: this.gridLoad.toString(),
+          statusStr: statusStr,
+          throttlingStr: throttlingStr
+        });
       }
-      if (p.includes('cut') || p.includes('offline') || p.includes('connection') || p.includes('conexión') || p.includes('ऑफ़लाइन') || p.includes('ocpp')) {
-        const ocppStatus = this.isNetworkOnline ? 'CONNECTED' : 'DISCONNECTED (Offline Buffer Active)';
-        return `OCPP Connection Status: **${ocppStatus}**. 
-Our local Flash buffer backup is active. If a physical connection cut occurs, charging stations will cache up to **50 OCPP telemetry messages** locally, flushing them automatically to the NOC ledger upon link restoration. currently, there are **${this.offlineQueue.length} messages** in the queue.`;
+      if (p.includes('cut') || p.includes('offline') || p.includes('connection') || p.includes('conexión') || p.includes('ऑफ़लाइन') || p.includes('ocpp') || p.includes('ಸಂಪರ್ಕ') || p.includes('ಆಫ್‌ಲೈನ್')) {
+        const ocppStatus = this.isNetworkOnline ? this.ts.translate('STATUS_CONNECTED') : this.ts.translate('STATUS_DISCONNECTED');
+        return this.ts.translate('AI_RESP_GRID_OFFLINE', {
+          ocppStatus: ocppStatus,
+          count: this.offlineQueue.length.toString()
+        });
       }
-      if (p.includes('whitefield') || p.includes('bengaluru') || p.includes('stations') || p.includes('station') || p.includes('estaciones')) {
-        return `Grid Command monitors 5 primary charging stations in Whitefield:
-1. Shell Recharge (Prestige Shantiniketan)
-2. Jio-bp Fuel Hub (ITPL Main Rd)
-3. Tata Power EZ Charge (VR Mall)
-4. Zeon Charging (Whitefield Main Rd)
-5. Bolt Smart AC (Shantiniketan Residential)
-
-Current total active energy delivery across the network is **${this.activeSession ? this.activeSession.kwRate : '0.0'} kW**.`;
+      if (p.includes('whitefield') || p.includes('bengaluru') || p.includes('stations') || p.includes('station') || p.includes('estaciones') || p.includes('ಸ್ಥಾನಗಳು')) {
+        return this.ts.translate('AI_RESP_GRID_STATIONS', {
+          kwRate: (this.activeSession ? this.activeSession.kwRate : 0.0).toFixed(1)
+        });
       }
-      return `NOC Live Grid Diagnostics:
-- Connection Status: **${this.isNetworkOnline ? 'ONLINE' : 'OFFLINE'}**
-- Local Grid Load: **${this.gridLoad}%**
-- Active Session: **${this.activeSession ? '1 Charging Session' : 'No Active Session'}**
-- Offline Queue Size: **${this.offlineQueue.length} frames**
-
-Do you need help simulating grid peak conditions, connection cuts, or evaluating OCPP logs?`;
+      const status = this.isNetworkOnline ? this.ts.translate('STATUS_ONLINE') : this.ts.translate('STATUS_OFFLINE');
+      const activeSessionStr = this.activeSession ? this.ts.translate('STATUS_ACTIVE_SESSION') : this.ts.translate('STATUS_NO_ACTIVE_SESSION');
+      return this.ts.translate('AI_RESP_GRID_DEFAULT', {
+        status: status,
+        gridLoad: this.gridLoad.toString(),
+        activeSessionStr: activeSessionStr,
+        count: this.offlineQueue.length.toString()
+      });
     }
-
     if (agentId === 'bms_doctor') {
-      if (p.includes('stress') || p.includes('diagnostics') || p.includes('test') || p.includes('prueba') || p.includes('तनाव') || p.includes('run')) {
-        const tempVal = parseFloat((37.2 + Math.random() * 2).toFixed(1));
-        const varianceVal = Math.round(8 + Math.random() * 6);
-        return `Diagnostic test initiated... Running cell stress profiling...
-- Cell Temperature: **${tempVal}°C** (Optimal range: 25-45°C)
-- Voltage Balance Variance: **${varianceVal} mV** (Max limit: 50mV)
-- Swelling/Expansion Sensor: **0% (Normal)**
-- Coolant Flow Rate: **12.4 L/min**
-
-**Result**: BMS diagnostics **PASS**. All lithium-ion cells are operating within their nominal electrochemical performance envelope.`;
+      if (p.includes('stress') || p.includes('diagnostics') || p.includes('test') || p.includes('prueba') || p.includes('तनाव') || p.includes('run') || p.includes('ಪರೀಕ್ಷೆ') || p.includes('ಒತ್ತಡ')) {
+        const tempVal = (37.2 + Math.random() * 2).toFixed(1);
+        const varianceVal = Math.round(8 + Math.random() * 6).toString();
+        return this.ts.translate('AI_RESP_BMS_STRESS', {
+          temp: tempVal,
+          variance: varianceVal
+        });
       }
-      if (p.includes('soh') || p.includes('health') || p.includes('salud') || p.includes('स्वास्थ्य') || p.includes('degradation')) {
-        const cycles = 124;
-        return `Battery Lifecycle Digital Passport:
-- Estimated State of Health (SOH): **94.2%**
-- Completed Charge Cycles: **${cycles} cycles**
-- Annualized Degradation Rate: **1.45% / year**
-- Expected Battery Longevity: **7.5 years remaining** before hitting the 80% degradation threshold.
-
-No cell imbalances or capacity retention anomalies have been recorded in the session history.`;
+      if (p.includes('soh') || p.includes('health') || p.includes('salud') || p.includes('स्वास्थ्य') || p.includes('degradation') || p.includes('ಆರೋಗ್ಯ') || p.includes('ಕ್ಷೀಣತೆ')) {
+        return this.ts.translate('AI_RESP_BMS_SOH', {
+          cycles: '124'
+        });
       }
-      if (p.includes('temperature') || p.includes('temp') || p.includes('degradation') || p.includes('temperatura') || p.includes('तापमान') || p.includes('heat')) {
-        return `High battery temperatures (>45°C) during ultra-fast DC charging can speed up solid electrolyte interphase (SEI) layer growth. 
-VoltStream BMS dynamically throttles charging rate when temperature exceeds **42°C**. Safety trip occurs at **50°C**. Currently cell temperature is normal at **38.5°C**.`;
+      if (p.includes('temperature') || p.includes('temp') || p.includes('degradation') || p.includes('temperatura') || p.includes('तापमान') || p.includes('heat') || p.includes('ತಾಪಮಾನ')) {
+        return this.ts.translate('AI_RESP_BMS_TEMP');
       }
-      return `BMS diagnostics interface active.
-- Battery State of Charge (SoC): **${this.vehicleSoc}%**
-- Projected SOH: **94.2%**
-- Electrochemical Status: **NOMINAL**
-- Thermal State: **38.5°C**
-
-Ask me to run a cell stress test, explain temperature degradation risks, or view your Battery Lifecycle Digital Passport.`;
+      return this.ts.translate('AI_RESP_BMS_DEFAULT', {
+        vehicleSoc: this.vehicleSoc.toFixed(0)
+      });
     }
-
-    return `I am available to answer your queries regarding the VoltStream EV ecosystem.`;
+    return this.ts.translate('AI_RESP_GENERIC_DEFAULT');
   }
 }

@@ -158,4 +158,10 @@ export class WalletComponent implements OnInit {
       document.body.removeChild(link);
     }
   }
+  getTranslatedDescription(desc: string, method?: string): string {
+    if (desc && desc.startsWith('Fund Added via')) {
+      return this.ts.translate('FUND_ADDED_VIA', { method: method || 'UPI' });
+    }
+    return desc;
+  }
 }

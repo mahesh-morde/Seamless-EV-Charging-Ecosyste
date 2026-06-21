@@ -391,7 +391,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     carMarker.bindPopup(`
         <div class="map-popup">
             <h4 style="color: #3b82f6;"><i class="fa-solid fa-car-side"></i> ${this.ts.translate('CONNECTED_EV')}</h4>
-            <p style="margin-bottom: 4px;"><strong>${this.ts.translate('VEHICLE')}:</strong> Mahindra XUV400</p>
+            <p style="margin-bottom: 4px;"><strong>${this.ts.translate('VEHICLE')}:</strong> ${this.ts.translate('VEHICLE_NAME')}</p>
             <p style="margin-bottom: 4px;"><strong>${this.ts.translate('BATTERY_SOC')}:</strong> ${this.eco.vehicleSoc.toFixed(0)}%</p>
             <p style="margin-bottom: 0;"><strong>${this.ts.translate('ESTIMATED_RANGE')}:</strong> ${this.eco.estimatedRange} km</p>
         </div>

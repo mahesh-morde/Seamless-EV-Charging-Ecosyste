@@ -22,8 +22,14 @@ export class TranslationService {
     }
   }
 
-  translate(key: string): string {
-    return this.translations[key] || key;
+  translate(key: string, params?: any): string {
+    let val = this.translations[key] || key;
+    if (params) {
+      Object.keys(params).forEach(k => {
+        val = val.split(`{{${k}}}`).join(params[k]);
+      });
+    }
+    return val;
   }
 
   setLanguage(lang: 'en' | 'es' | 'hi' | 'kn') {

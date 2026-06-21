@@ -44,7 +44,7 @@
         </div>
 
         <div class="station-list-container">
-            <h3>{{ 'STATIONS_NEAR_YOU' | translate }}</h3>
+            <h3>{{ 'STATIONS_NEAR_YOU' | translate:{count: filteredStations.length} }}</h3>
             <div class="station-list">
                 <div class="station-item" *ngFor="let st of filteredStations; let i = index" [class.active]="eco.selectedStation?.id === st.id" (click)="onStationItemClick(st)">
                     <div class="st-header" style="align-items: center;">

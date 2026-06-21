@@ -134,7 +134,7 @@
                             {{ (t.type === 'topup' ? 'TX_TYPE_TOPUP' : 'TX_TYPE_PAYMENT') | translate }}
                         </span>
                     </td>
-                    <td style="font-weight: 500;">{{ t.description }}</td>
+                    <td style="font-weight: 500;">{{ getTranslatedDescription(t.description, t.method) }}</td>
                     <td [ngStyle]="{'color': t.type === 'topup' ? 'var(--neon-green)' : 'var(--text-primary)', 'font-weight': 'bold'}">
                         {{ t.type === 'topup' ? '+' : '-' }}₹{{ t.amount | number:'1.2-2' }}
                     </td>
@@ -146,7 +146,7 @@
                             'net-bolt': t.method === 'Bolt'
                         }">{{ (t.method === 'Tata Power' ? 'TATA_POWER' : t.method === 'Zeon' ? 'ZEON' : t.method === 'ChargeZone' ? 'CHARGE_ZONE' : t.method === 'Bolt' ? 'BOLT' : (t.method || '')) | translate }}</span>
                     </td>
-                    <td><span class="tag-success">{{ t.status }}</span></td>
+                    <td><span class="tag-success">{{ ('STATUS_' + t.status.toUpperCase()) | translate }}</span></td>
                 </tr>
                 <tr *ngIf="filteredTransactions.length === 0">
                     <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">

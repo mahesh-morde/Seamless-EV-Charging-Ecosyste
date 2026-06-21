@@ -9,7 +9,7 @@ import { TranslationService } from './translation.service';
 export class TranslatePipe implements PipeTransform {
   constructor(private translationService: TranslationService) {}
 
-  transform(key: string): string {
-    return this.translationService.translate(key);
+  transform(key: string, params?: any): string {
+    return this.translationService.translate(key, params);
   }
 }

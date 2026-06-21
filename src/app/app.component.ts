@@ -66,7 +66,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   changeLang(event: Event) {
     const selectEl = event.target as HTMLSelectElement;
-    this.ts.setLanguage(selectEl.value as 'en' | 'es' | 'hi');
+    this.ts.setLanguage(selectEl.value as 'en' | 'es' | 'hi' | 'kn');
   }
 
   switchTab(tabId: string) {
@@ -76,9 +76,9 @@ export class AppComponent implements OnInit, OnDestroy {
   toggleThemeMapping() {
     this.eco.showThemeMapping = !this.eco.showThemeMapping;
     if (this.eco.showThemeMapping) {
-      this.eco.showToast("Hackathon theme mapping overlays visible.", 'info');
+      this.eco.showToast('TOAST_OVERLAYS_VISIBLE', 'info');
     } else {
-      this.eco.showToast("Returning to active dashboard.", 'info');
+      this.eco.showToast('TOAST_RETURN_DASHBOARD', 'info');
     }
   }
 

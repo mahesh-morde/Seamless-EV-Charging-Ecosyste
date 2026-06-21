@@ -523,13 +523,14 @@ h1 {
 .toast-container {
     position: fixed;
     bottom: 24px;
-    right: 24px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 10px;
     z-index: 9999;
 }
-
 .toast {
     min-width: 280px;
     background-color: var(--bg-secondary);
