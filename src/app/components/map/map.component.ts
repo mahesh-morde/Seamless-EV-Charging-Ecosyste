@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { EcosystemService, ChargingStation } from '../../services/ecosystem.service';
 import { TranslatePipe } from '../../services/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { switchMap, takeUntil } from 'rxjs/operators';
 
@@ -70,7 +71,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     'Occupied': true
   };
 
-  constructor(public eco: EcosystemService, public ts: TranslationService) {}
+  constructor(public eco: EcosystemService, public ts: TranslationService, private router: Router) {}
 
   ngAfterViewInit() {
     this.eco.registerThemeCallback(this.themeCallback);
@@ -439,7 +440,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   startChargingFromRoute() {
     if (this.eco.selectedStation && this.eco.selectedStation.status === 'Available') {
       this.eco.startPlugAndChargeSimulation();
-      this.eco.activeTab = 'dashboard';
+      this.router.navigate(['/dashboard']);
     }
   }
 
