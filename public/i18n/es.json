@@ -45,7 +45,6 @@
   "CHARGE_ZONE": "ChargeZone",
   "BOLT": "Bolt",
   "NETWORK_PROVIDER_LABEL": "Proveedor de Red",
-
   "DRIVER_DASHBOARD": "Panel del Conductor",
   "ECOSYSTEM_OVERVIEW": "Resumen del Ecosistema",
   "STATION_FINDER_NAV": "Buscador de Estaciones y Navegación",
@@ -82,7 +81,6 @@
   "NOC_OFFLINE": "NOC FUERA DE LÍNEA (Búfer Local Activo)",
   "SIMULATE_CONN_CUT": "Simular Corte de Conexión",
   "RESTORE_CONN": "Restablecer Conexión",
-
   "HACKATHON_TITLE": "ET AUTOTECH HACKATHON 2026",
   "THEME_TITLE": "TEMA 4: ECOSISTEMA DE CARGA DE EV SEAMLESS",
   "EVALUATOR_CONSOLE_TITLE": "Consola de Evaluador y Matriz de Áreas de Enfoque",
@@ -132,7 +130,6 @@
   "PNC_STEP_4": "Inicio de Transacción de Energía OCPP",
   "MINS": "min",
   "ALMOST_DONE": "Casi listo",
-
   "OCPP_MONITOR_TITLE": "Monitor de Protocolo de Carga y Comunicación Confiable",
   "OCPP_MONITOR_SUB": "Mensajes de socket web en vivo intercambiados entre el Punto de Carga (CP) y el Sistema Central (CS)",
   "CLEAR_TERMINAL_BTN": "Limpiar Terminal",
@@ -145,7 +142,6 @@
   "CLIENT_TO_CENTRAL": "CLIENTE -> CENTRAL",
   "CENTRAL_TO_CLIENT": "CENTRAL -> CLIENTE",
   "SYSTEM_LABEL": "SISTEMA",
-
   "VOLTSTREAM_PAY": "VoltStream Pay",
   "UNIFIED_PAY_BAL": "Saldo de Pasarela de Pago Unificada",
   "INTEROP_NETWORKS": "Redes Interoperables:",
@@ -177,7 +173,6 @@
   "TX_TYPE_PAYMENT": "Débito (Pago)",
   "TX_TYPE_TOPUP": "Crédito (Añadido)",
   "WALLET_TRANSACTIONS_TITLE": "Transacciones de Billetera Unificadas",
-
   "ANALYTICS_OBJECTIVE_TITLE": "Objetivo Principal: Resiliencia de Cadena de Suministro y Eficiencia de Manufactura",
   "ANALYTICS_OBJECTIVE_DESC": "Mejora la resiliencia de la cadena de suministro y la eficiencia de fabricación mediante el seguimiento de la salud de la batería (SOH). Los modelos de IA evalúan patrones de degradación de electrodos, generando pasaportes digitales de batería que califican a las celdas para su reutilización en almacenamiento de red de segunda vida.",
   "SOH_TRACKER_TITLE": "Estado de Salud (SoH) y Seguidor de Ciclo de Vida de Batería",
@@ -192,7 +187,6 @@
   "AVG_CHARGING_PRICE": "Precio Promedio de Carga",
   "ACTIVE_POINTS_VISITED": "Puntos de Carga Activos Visitados",
   "STATIONS_COUNT_VALUE": "12 Estaciones",
-
   "ERR_VALID_AMOUNT": "Por favor, introduzca un monto válido.",
   "FUNDS_LOADED_SUCCESS": "₹{{amount}} agregados a la Billetera Unificada a través de {{method}}. (ID: {{paymentId}})",
   "TOAST_PAYMENT_CANCELLED": "El pago fue cancelado por el usuario.",
@@ -236,7 +230,6 @@
   "LOG_BOOTING": "Cargador arrancando...",
   "LOG_BOOTED": "Cargador arrancado. Estado: Disponible.",
   "TOAST_RESET_SUCCESS": "Cargador reiniciado con éxito y en línea.",
-
   "WEEKLY_CONSUMPTION_LABEL": "Consumo de Energía (kWh)",
   "CO2_OFFSET_LABEL": "Compensación de CO2 (kg)",
   "WEEK": "Semana",
@@ -295,6 +288,8 @@
   "USERNAME_PLACEHOLDER": "ej. user o admin",
   "DC_ULTRA_FAST": "DC Ultra-Rápido CCS2",
   "NO_TX_MATCH": "Ninguna transacción coincide con los criterios seleccionados.",
+  "VOLTSTREAM_USER": "Usuario VoltStream",
+  "TOGGLE_THEME": "Cambiar tema",
   "TOAST_ADMIN_ONLY": "Solo los usuarios Administradores están autorizados a cambiar de perspectiva activa.",
   "AI_COPILOT_NAV": "Copiloto IA e Información",
   "AI_COPILOT_HEADER_DRIVER": "Copiloto de EV con IA e Información",

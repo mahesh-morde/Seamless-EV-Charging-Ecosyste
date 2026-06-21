@@ -289,6 +289,7 @@
   "DC_ULTRA_FAST": "DC Ultra-Fast CCS2",
   "NO_TX_MATCH": "No transactions match the selected criteria.",
   "VOLTSTREAM_USER": "VoltStream User",
+  "TOGGLE_THEME": "Toggle Theme",
   "TOAST_ADMIN_ONLY": "Only Admin users are authorized to switch active perspectives.",
   "AI_COPILOT_NAV": "AI Copilot & Insights",
   "AI_COPILOT_HEADER_DRIVER": "AI EV Copilot & Insights",

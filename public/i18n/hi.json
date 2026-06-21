@@ -45,7 +45,6 @@
   "CHARGE_ZONE": "चार्जज़ोन (ChargeZone)",
   "BOLT": "बोल्ट (Bolt)",
   "NETWORK_PROVIDER_LABEL": "नेटवर्क प्रदाता",
-
   "DRIVER_DASHBOARD": "ड्राइवर डैशबोर्ड",
   "ECOSYSTEM_OVERVIEW": "पारिस्थितिकी तंत्र अवलोकन",
   "STATION_FINDER_NAV": "स्टेशन खोजक और नेविगेशन",
@@ -82,7 +81,6 @@
   "NOC_OFFLINE": "NOC ऑफ़लाइन (स्थानीय बफ़र सक्रिय)",
   "SIMULATE_CONN_CUT": "कनेक्शन कट का अनुकरण करें",
   "RESTORE_CONN": "कनेक्शन पुनर्स्थापित करें",
-
   "HACKATHON_TITLE": "ET AUTOTECH हैकाथॉन 2026",
   "THEME_TITLE": "थीम 4: निर्बाध ईवी चार्जिंग पारिस्थितिकी तंत्र",
   "EVALUATOR_CONSOLE_TITLE": "मूल्यांकनकर्ता कंसोल और फोकस क्षेत्र मैट्रिक्स",
@@ -132,7 +130,6 @@
   "PNC_STEP_4": "OCPP ऊर्जा लेनदेन प्रारंभ",
   "MINS": "मिनट",
   "ALMOST_DONE": "लगभग पूरा",
-
   "OCPP_MONITOR_TITLE": "विश्वसनीय संचार और लोड प्रोटोकॉल मॉनिटर",
   "OCPP_MONITOR_SUB": "चार्जिंग पॉइंट (CP) और सेंट्रल सिस्टम (CS) के बीच लाइव वेब-सॉकेट संदेशों का आदान-प्रदान",
   "CLEAR_TERMINAL_BTN": "टर्मिनल साफ़ करें",
@@ -145,7 +142,6 @@
   "CLIENT_TO_CENTRAL": "क्लाइंट -> सेंट्रल",
   "CENTRAL_TO_CLIENT": "सेंट्रल -> क्लाइंट",
   "SYSTEM_LABEL": "सिस्टम",
-
   "VOLTSTREAM_PAY": "VoltStream Pay",
   "UNIFIED_PAY_BAL": "एकीकृत भुगतान गेटवे बैलेंस",
   "INTEROP_NETWORKS": "इंटरऑपरेबल नेटवर्क:",
@@ -177,7 +173,6 @@
   "TX_TYPE_PAYMENT": "डेबिट (भुगतान)",
   "TX_TYPE_TOPUP": "क्रेडिट (जोड़ा गया)",
   "WALLET_TRANSACTIONS_TITLE": "एकीकृत वॉलेट लेनदेन",
-
   "ANALYTICS_OBJECTIVE_TITLE": "मुख्य उद्देश्य: आपूर्ति श्रृंखला लचीलापन और विनिर्माण दक्षता",
   "ANALYTICS_OBJECTIVE_DESC": "बैटरी स्वास्थ्य (SOH) को ट्रैक करके आपूर्ति श्रृंखला लचीलापन और विनिर्माण दक्षता को बढ़ाता है।",
   "SOH_TRACKER_TITLE": "स्वास्थ्य की स्थिति (SoH) और बैटरी लाइफसाइकिल ट्रैकर",
@@ -192,7 +187,6 @@
   "AVG_CHARGING_PRICE": "औसत चार्जिंग मूल्य",
   "ACTIVE_POINTS_VISITED": "देखे गए सक्रिय चार्ज पॉइंट",
   "STATIONS_COUNT_VALUE": "12 स्टेशन",
-
   "ERR_VALID_AMOUNT": "कृपया एक वैध राशि दर्ज करें।",
   "FUNDS_LOADED_SUCCESS": "₹{{amount}} एकीकृत वॉलेट में {{method}} के माध्यम से जोड़े गए। (ID: {{paymentId}})",
   "TOAST_PAYMENT_CANCELLED": "उपयोगकर्ता द्वारा भुगतान रद्द कर दिया गया था।",
@@ -236,7 +230,6 @@
   "LOG_BOOTING": "चार्जर बूट हो रहा है...",
   "LOG_BOOTED": "चार्जर पूरी तरह बूट हो गया। स्थिति: उपलब्ध।",
   "TOAST_RESET_SUCCESS": "चार्जर सफलतापूर्वक रीबूट और ऑनलाइन हो गया।",
-
   "WEEKLY_CONSUMPTION_LABEL": "ऊर्जा खपत (kWh)",
   "CO2_OFFSET_LABEL": "CO2 ऑफसेट (kg)",
   "WEEK": "सप्ताह",
@@ -295,6 +288,8 @@
   "USERNAME_PLACEHOLDER": "उदा. user या admin",
   "DC_ULTRA_FAST": "डीसी अल्ट्रा-फास्ट CCS2",
   "NO_TX_MATCH": "चयनित मानदंडों से कोई भी लेनदेन मेल नहीं खाता है।",
+  "VOLTSTREAM_USER": "वोल्टस्ट्रीम उपयोगकर्ता",
+  "TOGGLE_THEME": "विषय बदलें",
   "TOAST_ADMIN_ONLY": "केवल एडमिन उपयोगकर्ताओं को ही सक्रिय परिप्रेक्ष्य बदलने का अधिकार है।",
   "AI_COPILOT_NAV": "एआई कोपायलट और अंतर्दृष्टि",
   "AI_COPILOT_HEADER_DRIVER": "एआई ईवी कोपायलट और अंतर्दृष्टि",
