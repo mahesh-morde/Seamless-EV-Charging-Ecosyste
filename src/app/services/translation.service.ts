@@ -26,7 +26,7 @@ export class TranslationService {
     return this.translations[key] || key;
   }
 
-  setLanguage(lang: 'en' | 'es' | 'hi') {
+  setLanguage(lang: 'en' | 'es' | 'hi' | 'kn') {
     this.currentLang = lang;
     this.loadTranslations();
   }
