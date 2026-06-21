@@ -51,7 +51,7 @@
                              [class.user-bubble]="msg.sender === 'user'" 
                              [class.ai-bubble]="msg.sender === 'ai'"
                              [style.border-left-color]="msg.sender === 'ai' ? activeAgent.color : null">
-                            <div class="message-text" [innerHTML]="formatMessage(msg.text)"></div>
+                            <div class="message-text" [innerHTML]="formatMessage(msg.text | translate)"></div>
                             <div class="message-time">{{ msg.timestamp }}</div>
                         </div>
                     </div>

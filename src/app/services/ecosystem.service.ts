@@ -827,7 +827,7 @@ export class EcosystemService {
       this.chatHistories[agentId].push({
         id: 'welcome-' + agentId + '-' + Date.now(),
         sender: 'ai',
-        text: this.ts.translate(welcomeKey),
+        text: welcomeKey,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
     }
