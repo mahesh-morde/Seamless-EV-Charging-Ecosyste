@@ -48,6 +48,24 @@ export interface ToastMessage {
   type: string;
 }
 
+export interface ChatMessage {
+  id: string;
+  sender: 'user' | 'ai';
+  text: string;
+  timestamp: string;
+}
+
+export interface AiAgent {
+  id: string;
+  nameKey: string;
+  descKey: string;
+  specialtyKey: string;
+  welcomeKey: string;
+  icon: string;
+  color: string;
+  suggestions: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -74,6 +92,46 @@ export class EcosystemService {
   gridLoad = APP_CONSTANTS.DEFAULTS.GRID_LOAD;
   isGridOverloaded = false;
   userStations: ChargingStation[] = [];
+
+  // AI Agents & Chat State
+  aiAgents: AiAgent[] = [
+    {
+      id: 'voltadvisor',
+      nameKey: 'AGENT_VOLTADVISOR_NAME',
+      descKey: 'AGENT_VOLTADVISOR_DESC',
+      specialtyKey: 'AGENT_VOLTADVISOR_SPECIALTY',
+      welcomeKey: 'AGENT_VOLTADVISOR_WELCOME',
+      icon: 'fa-user-astronaut',
+      color: 'var(--neon-cyan)',
+      suggestions: ['SUGGESTION_VOLT_1', 'SUGGESTION_VOLT_2', 'SUGGESTION_VOLT_3']
+    },
+    {
+      id: 'gridguardian',
+      nameKey: 'AGENT_GRIDGUARDIAN_NAME',
+      descKey: 'AGENT_GRIDGUARDIAN_DESC',
+      specialtyKey: 'AGENT_GRIDGUARDIAN_SPECIALTY',
+      welcomeKey: 'AGENT_GRIDGUARDIAN_WELCOME',
+      icon: 'fa-shield-halved',
+      color: 'var(--neon-yellow)',
+      suggestions: ['SUGGESTION_GRID_1', 'SUGGESTION_GRID_2', 'SUGGESTION_GRID_3']
+    },
+    {
+      id: 'bms_doctor',
+      nameKey: 'AGENT_BMS_NAME',
+      descKey: 'AGENT_BMS_DESC',
+      specialtyKey: 'AGENT_BMS_SPECIALTY',
+      welcomeKey: 'AGENT_BMS_WELCOME',
+      icon: 'fa-heart-pulse',
+      color: 'var(--neon-green)',
+      suggestions: ['SUGGESTION_BMS_1', 'SUGGESTION_BMS_2', 'SUGGESTION_BMS_3']
+    }
+  ];
+
+  chatHistories: { [agentId: string]: ChatMessage[] } = {
+    voltadvisor: [],
+    gridguardian: [],
+    bms_doctor: []
+  };
 
   // Mock Stations Data
   stationsData: ChargingStation[] = [];
@@ -758,5 +816,142 @@ export class EcosystemService {
             this.showToast('TOAST_RESET_SUCCESS', 'success');
         }, 2000);
     }, 1000);
+  }
+
+  getChatHistory(agentId: string): ChatMessage[] {
+    if (!this.chatHistories[agentId]) {
+      this.chatHistories[agentId] = [];
+    }
+    if (this.chatHistories[agentId].length === 0) {
+      const welcomeKey = this.aiAgents.find(a => a.id === agentId)?.welcomeKey || '';
+      this.chatHistories[agentId].push({
+        id: 'welcome-' + agentId + '-' + Date.now(),
+        sender: 'ai',
+        text: this.ts.translate(welcomeKey),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+    }
+    return this.chatHistories[agentId];
+  }
+
+  sendChatMessage(agentId: string, text: string, onResponse: () => void) {
+    if (!this.chatHistories[agentId]) {
+      this.chatHistories[agentId] = [];
+    }
+    
+    this.chatHistories[agentId].push({
+      id: 'user-' + Date.now(),
+      sender: 'user',
+      text: text,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+
+    setTimeout(() => {
+      const responseText = this.generateAgentResponse(agentId, text);
+      this.chatHistories[agentId].push({
+        id: 'ai-' + Date.now(),
+        sender: 'ai',
+        text: responseText,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      onResponse();
+    }, 1200);
+  }
+
+  private generateAgentResponse(agentId: string, prompt: string): string {
+    const p = prompt.toLowerCase();
+    
+    if (agentId === 'voltadvisor') {
+      if (p.includes('range') || p.includes('distancia') || p.includes('सीमा') || p.includes('miles') || p.includes('km')) {
+        return `Based on your live telemetry, your vehicle's Battery SoC is currently **${this.vehicleSoc}%**, providing an estimated remaining range of **${this.estimatedRange} km**. Pre-conditioning the battery pack and routing through urban streets instead of highways can increase efficiency by up to **8%** (adding roughly **${Math.round(this.estimatedRange * 0.08)} km**).`;
+      }
+      if (p.includes('tips') || p.includes('consejos') || p.includes('युक्तियाँ') || p.includes('health') || p.includes('bateria') || p.includes('battery')) {
+        return `Here are three crucial tips to maximize your EV battery life:
+1. **Rule of 20-80**: Avoid letting your State of Charge (SoC) drop below 20% or sit above 80% for long durations.
+2. **Limit DC Fast Charging**: While convenient, frequent ultra-fast charging creates localized heat stress. Use AC chargers when parking overnight.
+3. **Cooling off**: Avoid charging immediately after aggressive driving; let the thermal management system stabilize the battery cells first.`;
+      }
+      if (p.includes('charger') || p.includes('near') || p.includes('station') || p.includes('cargador') || p.includes('स्टेशन') || p.includes('whitefield') || p.includes('bengaluru')) {
+        return `We have mapped 5 static stations and dynamic Overpass EV hubs around your current location (centered at Sheraton Grand Bengaluru Whitefield, lat 12.9839, lng 77.7523). 
+The nearest available station is **Shell Recharge (Prestige Shantiniketan)**. It is **Available** and equipped with a **DC 150kW CCS2** connector, with a price of **₹18.00/kWh**. Just tap it on the Map tab to start routing!`;
+      }
+      return `I am analyzing your live vehicle telemetry. 
+- State of Charge: **${this.vehicleSoc}%**
+- Projected Range: **${this.estimatedRange} km**
+- Current Wallet Pool: **₹${this.walletBalance.toFixed(2)}**
+
+How can I help you optimize your route or charge management today?`;
+    }
+
+    if (agentId === 'gridguardian') {
+      if (p.includes('load') || p.includes('charge') || p.includes('grid') || p.includes('carga') || p.includes('ग्रिड') || p.includes('overload')) {
+        const statusStr = this.isGridOverloaded ? 'CRITICAL (Peak Overload)' : 'STABLE (Normal Load)';
+        return `Grid operations log for Substation 4 (Bengaluru):
+- Current Load Factor: **${this.gridLoad}%**
+- Status: **${statusStr}**
+- Throttling Simulator: **${this.isGridOverloaded ? 'Active (AC Speed Capped at 50%)' : 'Inactive (Full Speeds Available)'}**
+
+Charging during off-peak hours (between **2:00 AM and 5:00 AM**) is highly recommended to protect local grid nodes.`;
+      }
+      if (p.includes('cut') || p.includes('offline') || p.includes('connection') || p.includes('conexión') || p.includes('ऑफ़लाइन') || p.includes('ocpp')) {
+        const ocppStatus = this.isNetworkOnline ? 'CONNECTED' : 'DISCONNECTED (Offline Buffer Active)';
+        return `OCPP Connection Status: **${ocppStatus}**. 
+Our local Flash buffer backup is active. If a physical connection cut occurs, charging stations will cache up to **50 OCPP telemetry messages** locally, flushing them automatically to the NOC ledger upon link restoration. currently, there are **${this.offlineQueue.length} messages** in the queue.`;
+      }
+      if (p.includes('whitefield') || p.includes('bengaluru') || p.includes('stations') || p.includes('station') || p.includes('estaciones')) {
+        return `Grid Command monitors 5 primary charging stations in Whitefield:
+1. Shell Recharge (Prestige Shantiniketan)
+2. Jio-bp Fuel Hub (ITPL Main Rd)
+3. Tata Power EZ Charge (VR Mall)
+4. Zeon Charging (Whitefield Main Rd)
+5. Bolt Smart AC (Shantiniketan Residential)
+
+Current total active energy delivery across the network is **${this.activeSession ? this.activeSession.kwRate : '0.0'} kW**.`;
+      }
+      return `NOC Live Grid Diagnostics:
+- Connection Status: **${this.isNetworkOnline ? 'ONLINE' : 'OFFLINE'}**
+- Local Grid Load: **${this.gridLoad}%**
+- Active Session: **${this.activeSession ? '1 Charging Session' : 'No Active Session'}**
+- Offline Queue Size: **${this.offlineQueue.length} frames**
+
+Do you need help simulating grid peak conditions, connection cuts, or evaluating OCPP logs?`;
+    }
+
+    if (agentId === 'bms_doctor') {
+      if (p.includes('stress') || p.includes('diagnostics') || p.includes('test') || p.includes('prueba') || p.includes('तनाव') || p.includes('run')) {
+        const tempVal = parseFloat((37.2 + Math.random() * 2).toFixed(1));
+        const varianceVal = Math.round(8 + Math.random() * 6);
+        return `Diagnostic test initiated... Running cell stress profiling...
+- Cell Temperature: **${tempVal}°C** (Optimal range: 25-45°C)
+- Voltage Balance Variance: **${varianceVal} mV** (Max limit: 50mV)
+- Swelling/Expansion Sensor: **0% (Normal)**
+- Coolant Flow Rate: **12.4 L/min**
+
+**Result**: BMS diagnostics **PASS**. All lithium-ion cells are operating within their nominal electrochemical performance envelope.`;
+      }
+      if (p.includes('soh') || p.includes('health') || p.includes('salud') || p.includes('स्वास्थ्य') || p.includes('degradation')) {
+        const cycles = 124;
+        return `Battery Lifecycle Digital Passport:
+- Estimated State of Health (SOH): **94.2%**
+- Completed Charge Cycles: **${cycles} cycles**
+- Annualized Degradation Rate: **1.45% / year**
+- Expected Battery Longevity: **7.5 years remaining** before hitting the 80% degradation threshold.
+
+No cell imbalances or capacity retention anomalies have been recorded in the session history.`;
+      }
+      if (p.includes('temperature') || p.includes('temp') || p.includes('degradation') || p.includes('temperatura') || p.includes('तापमान') || p.includes('heat')) {
+        return `High battery temperatures (>45°C) during ultra-fast DC charging can speed up solid electrolyte interphase (SEI) layer growth. 
+VoltStream BMS dynamically throttles charging rate when temperature exceeds **42°C**. Safety trip occurs at **50°C**. Currently cell temperature is normal at **38.5°C**.`;
+      }
+      return `BMS diagnostics interface active.
+- Battery State of Charge (SoC): **${this.vehicleSoc}%**
+- Projected SOH: **94.2%**
+- Electrochemical Status: **NOMINAL**
+- Thermal State: **38.5°C**
+
+Ask me to run a cell stress test, explain temperature degradation risks, or view your Battery Lifecycle Digital Passport.`;
+    }
+
+    return `I am available to answer your queries regarding the VoltStream EV ecosystem.`;
   }
 }

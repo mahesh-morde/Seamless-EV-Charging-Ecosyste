@@ -45,7 +45,7 @@ export class AppComponent implements OnInit, OnDestroy {
     ).subscribe((event: any) => {
       const url = event.urlAfterRedirects || event.url;
       const path = url.split('/')[1] || 'dashboard';
-      if (['dashboard', 'map', 'ocpp', 'wallet', 'analytics'].includes(path)) {
+      if (['dashboard', 'map', 'ocpp', 'wallet', 'analytics', 'ai-insights'].includes(path)) {
         this.eco.activeTab = path;
       }
     });

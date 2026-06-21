@@ -37,6 +37,11 @@
                 <i class="fa-solid fa-chart-line"></i>
                 <span *ngIf="!isSidebarCollapsed">{{ (eco.currentRole === 'driver' ? 'MY_EV_ANALYTICS' : 'BATTERY_LIFECYCLE_ANALYTICS') | translate }}</span>
             </a>
+            <!-- AI Insights -->
+            <a href="#" class="nav-item" [class.active]="eco.activeTab === 'ai-insights'" (click)="switchTab('ai-insights'); $event.preventDefault()" [title]="'AI_COPILOT_NAV' | translate">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span *ngIf="!isSidebarCollapsed">{{ 'AI_COPILOT_NAV' | translate }}</span>
+            </a>
         </nav>
 
         <div class="vehicle-card glass" *ngIf="!isSidebarCollapsed">
@@ -97,11 +102,13 @@
                     <h1 *ngIf="eco.activeTab === 'map'">{{ 'CHARGER_FINDER_NAV_HEADER' | translate }}</h1>
                     <h1 *ngIf="eco.activeTab === 'wallet'">{{ 'UNIFIED_WALLET_PORTAL' | translate }}</h1>
                     <h1 *ngIf="eco.activeTab === 'analytics'">{{ 'ECO_BATTERY_ANALYTICS' | translate }}</h1>
+                    <h1 *ngIf="eco.activeTab === 'ai-insights'">{{ 'AI_COPILOT_HEADER_DRIVER' | translate }}</h1>
                     
                     <p class="subtitle" *ngIf="eco.activeTab === 'dashboard'">{{ 'DRIVER_DASHBOARD_SUBTITLE' | translate }}</p>
                     <p class="subtitle" *ngIf="eco.activeTab === 'map'">{{ 'CHARGER_FINDER_SUBTITLE' | translate }}</p>
                     <p class="subtitle" *ngIf="eco.activeTab === 'wallet'">{{ 'UNIFIED_WALLET_SUBTITLE' | translate }}</p>
                     <p class="subtitle" *ngIf="eco.activeTab === 'analytics'">{{ 'ECO_BATTERY_SUBTITLE' | translate }}</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'ai-insights'">{{ 'AI_COPILOT_SUBTITLE_DRIVER' | translate }}</p>
                 </ng-container>
 
                 <!-- Operator Headers -->
@@ -111,12 +118,14 @@
                     <h1 *ngIf="eco.activeTab === 'ocpp'">{{ 'OCPP_CENTRAL_MONITOR' | translate }}</h1>
                     <h1 *ngIf="eco.activeTab === 'wallet'">{{ 'UNIFIED_CLEARING_LEDGER' | translate }}</h1>
                     <h1 *ngIf="eco.activeTab === 'analytics'">{{ 'CELL_STRESS_ANALYTICS' | translate }}</h1>
+                    <h1 *ngIf="eco.activeTab === 'ai-insights'">{{ 'AI_COPILOT_HEADER_OPERATOR' | translate }}</h1>
                     
                     <p class="subtitle" *ngIf="eco.activeTab === 'dashboard'">{{ 'GRID_OPS_SUBTITLE' | translate }}</p>
                     <p class="subtitle" *ngIf="eco.activeTab === 'map'">{{ 'INTEROP_MAP_SUBTITLE' | translate }}</p>
                     <p class="subtitle" *ngIf="eco.activeTab === 'ocpp'">{{ 'OCPP_TERMINAL_SUBTITLE' | translate }}</p>
                     <p class="subtitle" *ngIf="eco.activeTab === 'wallet'">{{ 'WALLET_LEDGER_SUBTITLE' | translate }}</p>
                     <p class="subtitle" *ngIf="eco.activeTab === 'analytics'">{{ 'BATTERY_ANALYTICS_SUBTITLE' | translate }}</p>
+                    <p class="subtitle" *ngIf="eco.activeTab === 'ai-insights'">{{ 'AI_COPILOT_SUBTITLE_OPERATOR' | translate }}</p>
                 </ng-container>
             </div>
             

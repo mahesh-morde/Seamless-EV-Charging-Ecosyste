@@ -5,6 +5,7 @@ import { MapComponent } from './components/map/map.component';
 import { OcppTerminalComponent } from './components/ocpp-terminal/ocpp-terminal.component';
 import { WalletComponent } from './components/wallet/wallet.component';
 import { AnalyticsComponent } from './components/analytics/analytics.component';
+import { AiInsightsComponent } from './components/ai-insights/ai-insights.component';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { EcosystemService } from './services/ecosystem.service';
@@ -37,5 +38,6 @@ export const routes: Routes = [
   { path: 'ocpp', component: OcppTerminalComponent, canActivate: [authGuard] },
   { path: 'wallet', component: WalletComponent, canActivate: [authGuard] },
   { path: 'analytics', component: AnalyticsComponent, canActivate: [authGuard] },
+  { path: 'ai-insights', component: AiInsightsComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'dashboard' }
 ];

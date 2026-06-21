@@ -1,0 +1,161 @@
+<div class="ai-insights-container">
+    <div class="ai-insights-grid">
+        <!-- Left Column: Real-time Chat -->
+        <div class="chat-wrapper glass card-wrapper">
+            <!-- Agent Switcher Sidebar -->
+            <div class="agents-sidebar">
+                <div class="sidebar-header">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span>{{ 'AI_AGENTS_SIDEBAR' | translate }}</span>
+                </div>
+                <div class="agents-list">
+                    <button *ngFor="let agent of eco.aiAgents" 
+                            class="agent-select-btn" 
+                            [class.active]="activeAgentId === agent.id"
+                            (click)="selectAgent(agent.id)"
+                            [style.border-left-color]="agent.color">
+                        <div class="agent-avatar" [style.background-color]="agent.color + '15'" [style.color]="agent.color">
+                            <i class="fa-solid" [ngClass]="agent.icon"></i>
+                        </div>
+                        <div class="agent-meta">
+                            <div class="agent-name">{{ agent.nameKey | translate }}</div>
+                            <div class="agent-specialty">{{ agent.descKey | translate }}</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Window -->
+            <div class="chat-window">
+                <!-- Chat Window Header -->
+                <div class="chat-header" [style.border-bottom-color]="activeAgent.color + '30'">
+                    <div class="active-agent-info">
+                        <div class="agent-avatar" [style.background-color]="activeAgent.color + '15'" [style.color]="activeAgent.color">
+                            <i class="fa-solid" [ngClass]="activeAgent.icon"></i>
+                        </div>
+                        <div class="agent-title-meta">
+                            <div class="agent-title-name">{{ activeAgent.nameKey | translate }}</div>
+                            <div class="agent-title-spec">{{ activeAgent.specialtyKey | translate }}</div>
+                        </div>
+                    </div>
+                    <div class="agent-status">
+                        <span class="status-dot"></span>
+                        <span class="status-text">ONLINE</span>
+                    </div>
+                </div>
+
+                <!-- Chat Messages Area -->
+                <div class="chat-messages" #messageContainer>
+                    <div *ngFor="let msg of chatMessages" class="message-bubble-wrapper" [class.user-message]="msg.sender === 'user'">
+                        <div class="message-bubble" 
+                             [class.user-bubble]="msg.sender === 'user'" 
+                             [class.ai-bubble]="msg.sender === 'ai'"
+                             [style.border-left-color]="msg.sender === 'ai' ? activeAgent.color : null">
+                            <div class="message-text" [innerHTML]="formatMessage(msg.text)"></div>
+                            <div class="message-time">{{ msg.timestamp }}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Typing Indicator -->
+                    <div *ngIf="isTyping" class="message-bubble-wrapper">
+                        <div class="message-bubble ai-bubble typing-bubble" [style.border-left-color]="activeAgent.color">
+                            <div class="typing-indicator">
+                                <span [style.background-color]="activeAgent.color"></span>
+                                <span [style.background-color]="activeAgent.color"></span>
+                                <span [style.background-color]="activeAgent.color"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suggestion Chips -->
+                <div class="suggestion-chips-area">
+                    <div class="suggestion-title">{{ 'AI_CHAT_SUGGESTION_TITLE' | translate }}</div>
+                    <div class="chips-list">
+                        <button *ngFor="let suggestion of activeAgent.suggestions" 
+                                class="suggestion-chip" 
+                                (click)="useSuggestion(suggestion)"
+                                [disabled]="isTyping">
+                            {{ suggestion | translate }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Panel -->
+                <form class="chat-input-panel" (submit)="sendMessage(); $event.preventDefault()">
+                    <input type="text" 
+                           [(ngModel)]="userInput" 
+                           name="chatInput"
+                           [placeholder]="'AI_CHAT_INPUT_PLACEHOLDER' | translate" 
+                           [disabled]="isTyping"
+                           class="chat-input-field" />
+                    <button type="submit" 
+                            class="chat-send-btn" 
+                            [disabled]="!userInput.trim() || isTyping"
+                            [style.background]="activeAgent.color">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Column: AI Insights Dashboard -->
+        <div class="insights-dashboard-wrapper">
+            <h3 class="insights-sidebar-title"><i class="fa-solid fa-brain-circuit text-cyan"></i> {{ 'AI_INSIGHTS_TITLE' | translate }}</h3>
+            
+            <div class="insights-cards-list">
+                <!-- Card 1: Range Optimization (Driver Specific) -->
+                <div class="insight-card glass card-wrapper border-cyan">
+                    <div class="insight-card-header">
+                        <div class="insight-icon bg-cyan-alpha text-cyan">
+                            <i class="fa-solid fa-location-arrow"></i>
+                        </div>
+                        <h4>{{ 'INSIGHT_CARD_RANGE_TITLE' | translate }}</h4>
+                    </div>
+                    <div class="insight-card-body">
+                        <p>{{ localizedRangeText }}</p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Battery diagnostics -->
+                <div class="insight-card glass card-wrapper border-green">
+                    <div class="insight-card-header">
+                        <div class="insight-icon bg-green-alpha text-green">
+                            <i class="fa-solid fa-battery-three-quarters"></i>
+                        </div>
+                        <h4>{{ 'INSIGHT_CARD_BATTERY_TITLE' | translate }}</h4>
+                    </div>
+                    <div class="insight-card-body">
+                        <p>{{ 'INSIGHT_CARD_BATTERY_DESC' | translate }}</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: Wallet status (changes border color to red if low!) -->
+                <div class="insight-card glass card-wrapper" [class.border-red]="eco.walletBalance < 100" [class.border-purple]="eco.walletBalance >= 100">
+                    <div class="insight-card-header">
+                        <div class="insight-icon" [class.bg-red-alpha]="eco.walletBalance < 100" [class.text-red]="eco.walletBalance < 100" [class.bg-purple-alpha]="eco.walletBalance >= 100" [class.text-purple]="eco.walletBalance >= 100">
+                            <i class="fa-solid" [class.fa-triangle-exclamation]="eco.walletBalance < 100" [class.fa-credit-card]="eco.walletBalance >= 100"></i>
+                        </div>
+                        <h4>{{ (eco.walletBalance < 100 ? 'INSIGHT_CARD_LOW_FUNDS_TITLE' : 'INSIGHT_CARD_WALLET_TITLE') | translate }}</h4>
+                    </div>
+                    <div class="insight-card-body">
+                        <p>{{ localizedWalletText }}</p>
+                    </div>
+                </div>
+
+                <!-- Card 4: Grid Load Advisor (Visible for operator role or generally helpful) -->
+                <div class="insight-card glass card-wrapper border-yellow">
+                    <div class="insight-card-header">
+                        <div class="insight-icon bg-yellow-alpha text-yellow">
+                            <i class="fa-solid fa-tower-broadcast"></i>
+                        </div>
+                        <h4>{{ 'INSIGHT_CARD_GRID_TITLE' | translate }}</h4>
+                    </div>
+                    <div class="insight-card-body">
+                        <p>{{ localizedGridText }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
