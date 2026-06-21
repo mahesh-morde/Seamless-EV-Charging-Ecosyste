@@ -14,16 +14,16 @@
                 <!-- Holographic Telemetry Simulation for Sci-Fi Vibe -->
                 <div class="hologram-telemetry glass animate-float">
                     <div class="hologram-row">
-                        <span class="holo-label">GRID STATUS:</span>
-                        <span class="holo-value text-cyan">OPTIMIZED (OCPP 2.0.1)</span>
+                        <span class="holo-label">{{ 'GRID_STATUS_LABEL' | translate }}:</span>
+                        <span class="holo-value text-cyan">{{ 'GRID_STATUS_VAL' | translate }}</span>
                     </div>
                     <div class="hologram-row">
-                        <span class="holo-label">ISO 15118 AUTH:</span>
-                        <span class="holo-value text-purple">SECURE HANDSHAKE</span>
+                        <span class="holo-label">{{ 'ISO_AUTH_LABEL' | translate }}:</span>
+                        <span class="holo-value text-purple">{{ 'ISO_AUTH_VAL' | translate }}</span>
                     </div>
                     <div class="hologram-row">
-                        <span class="holo-label">ACTIVE NODE:</span>
-                        <span class="holo-value text-green">PUNE_SUBSTATION_4</span>
+                        <span class="holo-label">{{ 'ACTIVE_NODE_LABEL' | translate }}:</span>
+                        <span class="holo-value text-green">{{ 'ACTIVE_NODE_VAL' | translate }}</span>
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 <form (submit)="onSubmit(); $event.preventDefault()" class="login-form">
                     <div class="form-group">
                         <label for="username"><i class="fa-solid fa-user-astronaut"></i> {{ 'USERNAME' | translate }}</label>
-                        <input type="text" id="username" [(ngModel)]="username" name="username" placeholder="e.g. user or admin" required autocomplete="off" class="cyber-input">
+                        <input type="text" id="username" [(ngModel)]="username" name="username" [placeholder]="'USERNAME_PLACEHOLDER' | translate" required autocomplete="off" class="cyber-input">
                     </div>
 
                     <div class="form-group">

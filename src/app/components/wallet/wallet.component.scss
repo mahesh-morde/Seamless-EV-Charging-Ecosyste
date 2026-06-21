@@ -1,0 +1,188 @@
+/* Unified Wallet tab styles */
+.wallet-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.wallet-balance-card {
+    padding: 30px;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 220px;
+}
+
+.logo-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.wallet-bolt {
+    color: var(--neon-cyan);
+    font-size: 22px;
+}
+
+.balance-display {
+    margin: 20px 0;
+}
+
+.bal-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.bal-amt {
+    font-size: 36px;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
+    margin-top: 6px;
+}
+
+.payment-partners {
+    border-top: 1px solid var(--border-glass);
+    padding-top: 14px;
+}
+
+.partner-label {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.partner-logos {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.network-pill {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.np-tata { background-color: rgba(6, 182, 212, 0.15); color: var(--neon-cyan); }
+.np-zeon { background-color: rgba(16, 185, 129, 0.15); color: var(--neon-green); }
+.np-charge { background-color: rgba(168, 85, 247, 0.15); color: var(--neon-purple); }
+.np-bolt { background-color: rgba(251, 191, 36, 0.15); color: var(--neon-yellow); }
+
+.wallet-topup-card {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.wallet-topup-card h3 {
+    font-size: 18px;
+}
+
+.topup-form {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.amount-input-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-sm);
+    padding-left: 14px;
+    overflow: hidden;
+}
+
+.currency-symbol {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.amount-input-wrapper input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    padding: 12px;
+    font-size: 16px;
+    width: 100%;
+    font-weight: 600;
+}
+
+select {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-primary);
+    padding: 12px;
+    outline: none;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+}
+
+.transactions-panel {
+    padding: 24px;
+    margin-top: 24px;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 16px;
+}
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.transaction-table th {
+    padding: 14px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.transaction-table td {
+    padding: 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.transaction-table tr:last-child td {
+    border-bottom: none;
+}
+
+.net-tata { background-color: rgba(6, 182, 212, 0.1); color: var(--neon-cyan); }
+.net-zeon { background-color: rgba(16, 185, 129, 0.1); color: var(--neon-green); }
+.net-charge { background-color: rgba(168, 85, 247, 0.1); color: var(--neon-purple); }
+.net-bolt { background-color: rgba(251, 191, 36, 0.1); color: var(--neon-yellow); }
+
+.tag-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--neon-green);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+}

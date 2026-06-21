@@ -1,9 +1,11 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EcosystemService, ChargingStation } from '../../services/ecosystem.service';
 import { TranslatePipe } from '../../services/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { Subject } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 
 declare const L: any;
 
@@ -12,15 +14,21 @@ declare const L: any;
   standalone: true,
   imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './map.component.html',
-  styleUrls: []
+  styleUrls: ['./map.component.scss']
 })
-export class MapComponent implements AfterViewInit {
+export class MapComponent implements AfterViewInit, OnDestroy {
   tileLayerInstance: any = null;
   stationMarkersMap: { [key: number]: any } = {};
   routePolyline: any = null;
   searchQuery = '';
   calculatedDistance: number | null = null;
   calculatedDuration: number | null = null;
+
+  private themeCallback = () => this.onThemeChanged();
+  private langCallback = () => this.renderMapMarkers();
+
+  private zoomSubject = new Subject<{ lat: number; lng: number; zoom: number }>();
+  private destroy$ = new Subject<void>();
 
   // Onboarding Form State
   showOnboardForm = false;
@@ -65,13 +73,41 @@ export class MapComponent implements AfterViewInit {
   constructor(public eco: EcosystemService, public ts: TranslationService) {}
 
   ngAfterViewInit() {
-    this.initLeafletMap();
-    this.eco.registerThemeCallback(() => {
-      this.onThemeChanged();
-    });
-    this.ts.registerLangCallback(() => {
+    this.eco.registerThemeCallback(this.themeCallback);
+    this.ts.registerLangCallback(this.langCallback);
+
+    // Dynamic zoom updating using RxJS switchMap to ensure only the latest API call resolves
+    this.zoomSubject.pipe(
+      switchMap(({ lat, lng, zoom }) => {
+        const radius = Math.max(1000, Math.min(15000, Math.round(4000 * Math.pow(2, 14 - zoom))));
+        return this.eco.fetchStationsObservable(lat, lng, radius);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
       this.renderMapMarkers();
     });
+
+    this.loadDataAndInitMap();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.eco.unregisterThemeCallback(this.themeCallback);
+    this.ts.unregisterLangCallback(this.langCallback);
+    if (this.eco.map) {
+      this.eco.map.remove();
+      this.eco.map = null;
+    }
+    this.eco.markerLayers = null;
+  }
+
+  async loadDataAndInitMap() {
+    await Promise.all([
+      this.eco.ensureStationsLoaded(),
+      this.eco.ensureNetworkColorsLoaded()
+    ]);
+    this.initLeafletMap();
     // Automatically retrieve live location on component load
     setTimeout(() => {
       this.locateUser();
@@ -102,6 +138,13 @@ export class MapComponent implements AfterViewInit {
           this.eco.showToast('TOAST_COORDS_SELECTED', 'success', { lat: this.newStation.lat, lng: this.newStation.lng });
           this.drawTempMarker(this.newStation.lat, this.newStation.lng);
         }
+      });
+
+      // Listen for zoom events to update stations dynamically
+      this.eco.map.on('zoomend', () => {
+        const center = this.eco.map.getCenter();
+        const zoom = this.eco.map.getZoom();
+        this.zoomSubject.next({ lat: center.lat, lng: center.lng, zoom });
       });
     } else {
       // If it exists, reposition map view container
@@ -150,14 +193,14 @@ export class MapComponent implements AfterViewInit {
               const lng = pos.coords.longitude;
               this.syncLocation(lat, lng, 'TOAST_LOC_SYNC_SUCCESS');
             },
-            async (err) => {
-              console.warn('HTML5 geolocation low-accuracy failed, trying IP-based service...', err);
+            (err) => {
+              console.warn('HTML5 geolocation failed or disabled, using Sheraton Grand Bengaluru Whitefield fallback...', err);
               let errorKey = 'TOAST_LOC_FETCH_FAILED';
               if (error.code === error.PERMISSION_DENIED) {
                 errorKey = 'TOAST_LOC_DENIED';
                 this.eco.showToast(errorKey, 'warning');
               }
-              await this.fallbackToIpLocation();
+              this.useDefaultLocation();
             },
             { enableHighAccuracy: false, timeout: 4000 }
           );
@@ -165,8 +208,14 @@ export class MapComponent implements AfterViewInit {
         { enableHighAccuracy: true, timeout: 5000 }
       );
     } else {
-      this.fallbackToIpLocation();
+      this.useDefaultLocation();
     }
+  }
+
+  useDefaultLocation() {
+    const lat = 12.9839;
+    const lng = 77.7523;
+    this.syncLocation(lat, lng, 'TOAST_LOC_SYNC_SUCCESS');
   }
 
   syncLocation(lat: number, lng: number, toastKey: string) {
@@ -242,12 +291,12 @@ export class MapComponent implements AfterViewInit {
         return;
       }
     } catch (e) {
-      console.warn('IPApi.co fallback failed, staying in default (Pune)...', e);
+      console.warn('IPApi.co fallback failed, staying in default (Sheraton Grand Bengaluru Whitefield)...', e);
     }
 
-    // If all fail, fallback to defaults
-    const defaultLat = 18.5204;
-    const defaultLng = 73.8567;
+    // If all fail, fallback to defaults (Sheraton Grand Bengaluru Whitefield)
+    const defaultLat = 12.9839;
+    const defaultLng = 77.7523;
     this.syncLocation(defaultLat, defaultLng, 'TOAST_LOC_SYNC_SUCCESS');
   }
 

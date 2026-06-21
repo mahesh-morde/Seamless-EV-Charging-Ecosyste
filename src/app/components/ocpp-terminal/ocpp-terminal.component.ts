@@ -8,7 +8,7 @@ import { TranslatePipe } from '../../services/translate.pipe';
   standalone: true,
   imports: [CommonModule, TranslatePipe],
   templateUrl: './ocpp-terminal.component.html',
-  styleUrls: []
+  styleUrls: ['./ocpp-terminal.component.scss']
 })
 export class OcppTerminalComponent {
   constructor(public eco: EcosystemService) {}

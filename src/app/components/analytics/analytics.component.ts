@@ -11,7 +11,7 @@ declare const Chart: any;
   standalone: true,
   imports: [CommonModule, TranslatePipe],
   templateUrl: './analytics.component.html',
-  styleUrls: []
+  styleUrls: ['./analytics.component.scss']
 })
 export class AnalyticsComponent implements AfterViewInit, OnDestroy {
   energyChartInstance: any = null;
@@ -23,7 +23,8 @@ export class AnalyticsComponent implements AfterViewInit, OnDestroy {
   private chartCallback = () => this.updateChartsData();
   private langCallback = () => this.updateChartLabels();
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
+    await this.eco.ensureSessionHistoryLoaded();
     this.initCharts();
     // Register change listener to re-render charts when history updates
     this.eco.registerChartCallback(this.chartCallback);

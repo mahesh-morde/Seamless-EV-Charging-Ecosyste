@@ -1,0 +1,104 @@
+[
+  {
+    "id": 1,
+    "name": "Shell Recharge - Prestige Shantiniketan Ground Level",
+    "network": "Zeon",
+    "lat": 12.9835,
+    "lng": 77.7520,
+    "speed": "DC 30kW",
+    "connector": "CCS2",
+    "price": 19.50,
+    "status": "Available",
+    "guns": [
+      { "id": "A", "type": "CCS2", "status": "Available" },
+      { "id": "B", "type": "CCS2", "status": "Occupied" }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Glida DC Fast Charger - Nexus Shantiniketan Mall B1",
+    "network": "ChargeZone",
+    "lat": 12.9830,
+    "lng": 77.7512,
+    "speed": "DC 60kW",
+    "connector": "CCS2",
+    "price": 18.00,
+    "status": "Available",
+    "guns": [
+      { "id": "A", "type": "CCS2", "status": "Available" }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Jio-bp pulse Charging Zone - Prestige Shantiniketan",
+    "network": "Tata Power",
+    "lat": 12.9825,
+    "lng": 77.7530,
+    "speed": "DC 120kW",
+    "connector": "CCS2",
+    "price": 17.50,
+    "status": "Available",
+    "guns": [
+      { "id": "A", "type": "CCS2", "status": "Available" },
+      { "id": "B", "type": "CCS2", "status": "Available" }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "ChargeZone Hub - Sheraton Grand Bengaluru Whitefield",
+    "network": "ChargeZone",
+    "lat": 12.9842,
+    "lng": 77.7521,
+    "speed": "DC 60kW",
+    "connector": "CCS2",
+    "price": 18.50,
+    "status": "Available",
+    "guns": [
+      { "id": "A", "type": "CCS2", "status": "Available" },
+      { "id": "B", "type": "CCS2", "status": "Available" }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Bolt Smart AC Charger - Shantiniketan Block C",
+    "network": "Bolt",
+    "lat": 12.9850,
+    "lng": 77.7540,
+    "speed": "AC 7.4kW",
+    "connector": "Type 2",
+    "price": 12.00,
+    "status": "Available",
+    "guns": [
+      { "id": "A", "type": "Type 2", "status": "Available" }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Zeon Charging Station - ITPL Main Road Whitefield",
+    "network": "Zeon",
+    "lat": 12.9880,
+    "lng": 77.7470,
+    "speed": "DC 50kW",
+    "connector": "CCS2",
+    "price": 17.00,
+    "status": "Occupied",
+    "guns": [
+      { "id": "A", "type": "CCS2", "status": "Occupied" }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Tata Power Fast Charger - Whitefield Main Road",
+    "network": "Tata Power",
+    "lat": 12.9790,
+    "lng": 77.7570,
+    "speed": "DC 150kW",
+    "connector": "CCS2",
+    "price": 18.50,
+    "status": "Available",
+    "guns": [
+      { "id": "A", "type": "CCS2", "status": "Available" },
+      { "id": "B", "type": "CCS2", "status": "Available" }
+    ]
+  }
+]

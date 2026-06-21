@@ -1,0 +1,90 @@
+/* OCPP Protocol Terminal tab styles */
+.terminal-layout {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 170px);
+    gap: 16px;
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.terminal-title-container h3 {
+    font-size: 18px;
+}
+
+.terminal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.terminal-body {
+    flex-grow: 1;
+    padding: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    overflow-y: auto;
+    position: relative;
+    background: #02040a;
+}
+
+.log-output {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.log-line {
+    font-size: 13px;
+    line-height: 1.5;
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+
+.log-line.system {
+    color: #4b5563;
+}
+
+.log-line.send {
+    color: var(--neon-cyan);
+}
+
+.log-line.receive {
+    color: var(--neon-green);
+}
+
+.log-line.warning {
+    color: var(--neon-yellow);
+}
+
+.log-line.error {
+    color: var(--neon-red);
+}
+
+.offline-queue-card {
+    padding: 20px;
+    background: rgba(251, 191, 36, 0.05);
+    border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+.queue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.queue-title-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.progress-yellow {
+    background: linear-gradient(90deg, var(--neon-yellow), #d97706);
+}
+

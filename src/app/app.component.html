@@ -64,24 +64,24 @@
         <!-- User Profile Section / Perspective Switcher -->
         <div class="user-profile-section" 
              (click)="toggleRole()"
-             [style.cursor]="'pointer'"
+             [style.cursor]="eco.loggedInUser === 'admin' ? 'pointer' : 'default'"
              [style.margin-top]="isSidebarCollapsed ? '16px' : '24px'" 
              [style.border-top]="'1px solid var(--border-glass)'" 
              [style.padding-top]="'16px'" 
-             [title]="((eco.currentRole === 'driver' ? 'GRID_OPERATIONS' : 'DRIVER_COMPANION') | translate)"
+             [title]="eco.loggedInUser === 'admin' ? ((eco.currentRole === 'driver' ? 'GRID_OPERATIONS' : 'DRIVER_COMPANION') | translate) : ''"
              style="display: flex; align-items: center; gap: 12px; width: 100%; justify-content: center; transition: background var(--transition-speed) ease; border-radius: 8px;">
             <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px rgba(6, 182, 212, 0.4); flex-shrink: 0; position: relative;">
                 <i class="fa-solid fa-user" style="color: white; font-size: 14px;"></i>
-                <div style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg-secondary); border: 1.5px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 8px; color: var(--neon-cyan);">
+                <div *ngIf="eco.loggedInUser === 'admin'" style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg-secondary); border: 1.5px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 8px; color: var(--neon-cyan);">
                     <i class="fa-solid fa-right-left"></i>
                 </div>
             </div>
             <div *ngIf="!isSidebarCollapsed" style="flex: 1; text-align: left; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                 <div style="overflow: hidden;">
-                    <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">VoltStream User</div>
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ 'VOLTSTREAM_USER' | translate }}</div>
                     <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">{{ (eco.currentRole === 'driver' ? 'DRIVER_COMPANION' : 'GRID_OPERATIONS') | translate }}</div>
                 </div>
-                <i class="fa-solid fa-right-left" style="font-size: 11px; color: var(--text-muted); flex-shrink: 0;"></i>
+                <i *ngIf="eco.loggedInUser === 'admin'" class="fa-solid fa-right-left" style="font-size: 11px; color: var(--text-muted); flex-shrink: 0;"></i>
             </div>
         </div>
     </aside>
@@ -129,7 +129,7 @@
                 </select>
 
                 <!-- Theme Mode Toggle -->
-                <button class="btn btn-secondary" (click)="toggleTheme()" title="Toggle Theme" style="padding: 10px 14px;">
+                <button class="btn btn-secondary" (click)="toggleTheme()" [title]="'TOGGLE_THEME' | translate" style="padding: 10px 14px;">
                     <i class="fa-solid" [ngClass]="eco.currentTheme === 'dark' ? 'fa-sun text-yellow' : 'fa-moon text-cyan'"></i>
                 </button>
 
@@ -166,17 +166,13 @@
 
         <!-- Container for pages (tabs) -->
         <div class="content-body">
-            <app-dashboard *ngIf="eco.activeTab === 'dashboard'"></app-dashboard>
-            <app-map [hidden]="eco.activeTab !== 'map'"></app-map>
-            <app-ocpp-terminal *ngIf="eco.activeTab === 'ocpp'"></app-ocpp-terminal>
-            <app-wallet *ngIf="eco.activeTab === 'wallet'"></app-wallet>
-            <app-analytics *ngIf="eco.activeTab === 'analytics'"></app-analytics>
+            <router-outlet></router-outlet>
         </div>
     </main>
 </div>
 
 <ng-template #loginTemplate>
-    <app-login></app-login>
+    <router-outlet></router-outlet>
 </ng-template>
 
 <!-- Notification Toast Element -->

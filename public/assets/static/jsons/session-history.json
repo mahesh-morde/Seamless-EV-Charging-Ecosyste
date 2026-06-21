@@ -1,0 +1,29 @@
+[
+  {
+    "date": "2026-06-08 18:32",
+    "station": "Zeon Fast-Charge Zone A2",
+    "network": "Zeon",
+    "energy": 35.4,
+    "duration": 35,
+    "cost": 637.20,
+    "status": "Paid (VoltStream)"
+  },
+  {
+    "date": "2026-06-05 10:14",
+    "station": "Tata Power Substation DC03",
+    "network": "Tata Power",
+    "energy": 18.2,
+    "duration": 20,
+    "cost": 327.60,
+    "status": "Paid (VoltStream)"
+  },
+  {
+    "date": "2026-06-01 14:02",
+    "station": "ChargeZone Highway Hub B1",
+    "network": "ChargeZone",
+    "energy": 44.5,
+    "duration": 48,
+    "cost": 845.50,
+    "status": "Paid (VoltStream)"
+  }
+]

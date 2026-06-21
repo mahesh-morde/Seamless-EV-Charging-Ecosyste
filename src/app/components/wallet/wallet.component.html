@@ -151,7 +151,7 @@
                 <tr *ngIf="filteredTransactions.length === 0">
                     <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
                         <i class="fa-solid fa-folder-open" style="font-size: 24px; margin-bottom: 8px; display: block; opacity: 0.5;"></i>
-                        No transactions match the selected criteria.
+                        {{ 'NO_TX_MATCH' | translate }}
                     </td>
                 </tr>
             </tbody>

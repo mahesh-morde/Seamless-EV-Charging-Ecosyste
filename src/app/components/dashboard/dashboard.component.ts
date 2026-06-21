@@ -3,22 +3,20 @@ import { CommonModule } from '@angular/common';
 import { EcosystemService } from '../../services/ecosystem.service';
 import { TranslatePipe } from '../../services/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, TranslatePipe],
   templateUrl: './dashboard.component.html',
-  styleUrls: []
+  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
-  constructor(public eco: EcosystemService, private ts: TranslationService) {}
+  constructor(public eco: EcosystemService, private ts: TranslationService, private router: Router) {}
 
   openMap() {
-    this.eco.activeTab = 'map';
-    if (this.eco.map) {
-      setTimeout(() => this.eco.map.invalidateSize(), 100);
-    }
+    this.router.navigate(['/map']);
   }
 
   startPlugAndCharge() {

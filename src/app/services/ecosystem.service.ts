@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { TranslationService } from './translation.service';
+import { APP_CONSTANTS } from '../app.constants';
 
 export interface ChargingStation {
   id: number;
@@ -53,10 +55,10 @@ export class EcosystemService {
   // Global State
   isLoggedIn = false;
   loggedInUser: 'user' | 'admin' | null = null;
-  walletBalance = 1250.00;
-  co2Saved = 184.5;
-  vehicleSoc = 71;
-  estimatedRange = 245;
+  walletBalance = APP_CONSTANTS.DEFAULTS.WALLET_BALANCE;
+  co2Saved = APP_CONSTANTS.DEFAULTS.CO2_SAVED;
+  vehicleSoc = APP_CONSTANTS.DEFAULTS.VEHICLE_SOC;
+  estimatedRange = APP_CONSTANTS.DEFAULTS.ESTIMATED_RANGE;
   isNetworkOnline = true;
   activeSession: any = null;
   offlineQueue: any[] = [];
@@ -66,45 +68,21 @@ export class EcosystemService {
   chargingInterval: any = null;
   map: any = null;
   markerLayers: any = null;
-  currentRole: 'driver' | 'operator' = 'driver';
-  currentTheme: 'dark' | 'light' = 'light';
-  carLocation = { lat: 18.5220, lng: 73.8480 };
-  gridLoad = 72;
+  currentRole: 'driver' | 'operator' = APP_CONSTANTS.ROLES.DRIVER;
+  currentTheme: 'dark' | 'light' = APP_CONSTANTS.THEMES.LIGHT;
+  carLocation = { ...APP_CONSTANTS.MAP.DEFAULT_CAR_LOCATION };
+  gridLoad = APP_CONSTANTS.DEFAULTS.GRID_LOAD;
   isGridOverloaded = false;
   userStations: ChargingStation[] = [];
 
   // Mock Stations Data
-  stationsData: ChargingStation[] = [
-    { id: 1, name: "Tata Power Fast-Charger - JW Marriott Hotel, SB Road", network: "Tata Power", lat: 18.5327, lng: 73.8300, speed: "DC 60kW", connector: "CCS2", price: 19.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
-    { id: 2, name: "Zeon Charging - Sayaji Hotel, Wakad", network: "Zeon", lat: 18.5960, lng: 73.7600, speed: "DC 50kW", connector: "CCS2", price: 17.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }] },
-    { id: 3, name: "ChargeZone Station - Courtyard by Marriott, Hinjewadi", network: "ChargeZone", lat: 18.5912, lng: 73.7388, speed: "DC 120kW", connector: "CCS2", price: 18.00, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
-    { id: 4, name: "Tata Power Charging - Amanora Mall, Hadapsar", network: "Tata Power", lat: 18.5204, lng: 73.9358, speed: "DC 150kW", connector: "CCS2", price: 18.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Available' }] },
-    { id: 5, name: "Bolt Smart AC Charger - Phoenix Marketcity, Viman Nagar", network: "Bolt", lat: 18.5624, lng: 73.9168, speed: "AC 7.4kW", connector: "Type 2", price: 12.00, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] },
-    { id: 6, name: "ChargeZone Hub - Hyatt Regency, Weikfield IT Park", network: "ChargeZone", lat: 18.5615, lng: 73.9090, speed: "DC 60kW", connector: "CCS2", price: 17.00, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }] },
-    { id: 7, name: "Bolt Smart AC Point - Season's Mall, Hadapsar", network: "Bolt", lat: 18.5200, lng: 73.9320, speed: "AC 22kW", connector: "Type 2", price: 11.50, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] }
-  ];
+  stationsData: ChargingStation[] = [];
 
-  networkColors: { [key: string]: string } = {
-    "Tata Power": "#06b6d4",
-    "Zeon": "#10b981",
-    "ChargeZone": "#a855f7",
-    "Bolt": "#fbbf24"
-  };
+  networkColors: { [key: string]: string } = {};
 
-  sessionHistory: SessionRecord[] = [
-    { date: "2026-06-08 18:32", station: "Zeon Fast-Charge Zone A2", network: "Zeon", energy: 35.4, duration: 35, cost: 637.20, status: "Paid (VoltStream)" },
-    { date: "2026-06-05 10:14", station: "Tata Power Substation DC03", network: "Tata Power", energy: 18.2, duration: 20, cost: 327.60, status: "Paid (VoltStream)" },
-    { date: "2026-06-01 14:02", station: "ChargeZone Highway Hub B1", network: "ChargeZone", energy: 44.5, duration: 48, cost: 845.50, status: "Paid (VoltStream)" }
-  ];
+  sessionHistory: SessionRecord[] = [];
 
-  walletTransactions: WalletTransaction[] = [
-    { id: "TX-1001", date: "2026-06-08 18:32", type: "payment", description: "Zeon Fast-Charge Zone A2", amount: 637.20, status: "Success", method: "Zeon" },
-    { id: "TX-1002", date: "2026-06-07 12:00", type: "topup", description: "Fund Added via UPI", amount: 1000.00, status: "Success", method: "UPI" },
-    { id: "TX-1003", date: "2026-06-05 10:14", type: "payment", description: "Tata Power Substation DC03", amount: 327.60, status: "Success", method: "Tata Power" },
-    { id: "TX-1004", date: "2026-06-03 15:30", type: "topup", description: "Fund Added via Card", amount: 500.00, status: "Success", method: "CARD" },
-    { id: "TX-1005", date: "2026-06-01 14:02", type: "payment", description: "ChargeZone Highway Hub B1", amount: 845.50, status: "Success", method: "ChargeZone" },
-    { id: "TX-1006", date: "2026-05-30 09:00", type: "topup", description: "Fund Added via UPI", amount: 1500.00, status: "Success", method: "UPI" }
-  ];
+  walletTransactions: WalletTransaction[] = [];
 
   ocppLogs: LogLine[] = [];
 
@@ -130,6 +108,53 @@ export class EcosystemService {
     this.loadImages();
     this.checkSession();
     this.logOcppMessage('SYSTEM', 'LOG_TERMINAL_INIT');
+  }
+
+  async ensureStationsLoaded() {
+    if (this.stationsData.length === 0) {
+      try {
+        const res = await fetch('./assets/static/jsons/stations.json');
+        this.stationsData = await res.json();
+        this.notifyCharts();
+      } catch (e) {
+        console.error('Failed to load stations data', e);
+      }
+    }
+  }
+
+  async ensureNetworkColorsLoaded() {
+    if (Object.keys(this.networkColors).length === 0) {
+      try {
+        const res = await fetch('./assets/static/jsons/network-colors.json');
+        this.networkColors = await res.json();
+      } catch (e) {
+        console.error('Failed to load network colors', e);
+      }
+    }
+  }
+
+  async ensureSessionHistoryLoaded() {
+    if (this.sessionHistory.length === 0) {
+      try {
+        const res = await fetch('./assets/static/jsons/session-history.json');
+        this.sessionHistory = await res.json();
+        this.notifyCharts();
+      } catch (e) {
+        console.error('Failed to load session history', e);
+      }
+    }
+  }
+
+  async ensureWalletTransactionsLoaded() {
+    if (this.walletTransactions.length === 0) {
+      try {
+        const res = await fetch('./assets/static/jsons/wallet-transactions.json');
+        this.walletTransactions = await res.json();
+        this.notifyCharts();
+      } catch (e) {
+        console.error('Failed to load wallet transactions', e);
+      }
+    }
   }
 
   checkSession() {
@@ -182,6 +207,10 @@ export class EcosystemService {
 
   registerThemeCallback(cb: () => void) {
     this.themeCallbacks.push(cb);
+  }
+
+  unregisterThemeCallback(cb: () => void) {
+    this.themeCallbacks = this.themeCallbacks.filter(c => c !== cb);
   }
 
   notifyThemeChange() {
@@ -289,18 +318,37 @@ export class EcosystemService {
     }
   }
 
-  async generateLocalStations(lat: number, lng: number) {
+  async generateLocalStations(lat: number, lng: number, radius = 4000) {
+    await this.ensureStationsLoaded();
+    const carLat = this.carLocation.lat;
+    const carLng = this.carLocation.lng;
+
+    const staticStations = this.stationsData
+      .filter(s => s.id <= 10)
+      .map(s => {
+        const originalBaseLat = 12.9839;
+        const originalBaseLng = 77.7523;
+        const offsetLat = s.lat - originalBaseLat;
+        const offsetLng = s.lng - originalBaseLng;
+        return {
+          ...s,
+          lat: parseFloat((carLat + offsetLat).toFixed(6)),
+          lng: parseFloat((carLng + offsetLng).toFixed(6))
+        };
+      });
+
     this.stationsData = [
-      { id: 11, name: "Tata Power - Westin Hotel EV Zone", network: "Tata Power", lat: lat + 0.0035, lng: lng + 0.0041, speed: "DC 150kW", connector: "CCS2", price: 18.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
-      { id: 12, name: "Zeon Charging Hub - Shell Fuel Hub", network: "Zeon", lat: lat - 0.0042, lng: lng + 0.0053, speed: "DC 120kW", connector: "CCS2", price: 17.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Available' }] },
-      { id: 13, name: "ChargeZone Hub - Vivanta Hotel EV Point", network: "ChargeZone", lat: lat + 0.0063, lng: lng - 0.0032, speed: "DC 60kW", connector: "CCS2", price: 16.50, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }] },
-      { id: 14, name: "Tata Power - Radisson EV Station", network: "Tata Power", lat: lat - 0.0024, lng: lng - 0.0051, speed: "DC 120kW", connector: "CCS2", price: 18.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
-      { id: 15, name: "Bolt Smart AC - Decathlon Sports Hub", network: "Bolt", lat: lat + 0.0012, lng: lng - 0.0019, speed: "AC 7.4kW", connector: "Type 2", price: 12.00, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] },
-      { id: 16, name: "Zeon Charging - Express Highway Station", network: "Zeon", lat: lat + 0.0085, lng: lng + 0.0091, speed: "DC 50kW", connector: "CCS2", price: 17.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }] }
+      ...staticStations,
+      { id: 11, name: "Tata Power - Whitefield Crossing Hub", network: "Tata Power", lat: carLat + 0.0035, lng: carLng + 0.0041, speed: "DC 150kW", connector: "CCS2", price: 18.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
+      { id: 12, name: "Zeon Charging - ITPL Main Road Hub", network: "Zeon", lat: carLat - 0.0042, lng: carLng + 0.0053, speed: "DC 120kW", connector: "CCS2", price: 17.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Available' }] },
+      { id: 13, name: "ChargeZone Hub - Vivanta Whitefield Point", network: "ChargeZone", lat: carLat + 0.0063, lng: carLng - 0.0032, speed: "DC 60kW", connector: "CCS2", price: 16.50, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }] },
+      { id: 14, name: "Tata Power - Radisson Blu ORR Station", network: "Tata Power", lat: carLat - 0.0024, lng: carLng - 0.0051, speed: "DC 120kW", connector: "CCS2", price: 18.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
+      { id: 15, name: "Bolt Smart AC - Decathlon Whitefield Sports Zone", network: "Bolt", lat: carLat + 0.0012, lng: carLng - 0.0019, speed: "AC 7.4kW", connector: "Type 2", price: 12.00, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] },
+      { id: 16, name: "Zeon Charging - Varthur Main Road Point", network: "Zeon", lat: carLat + 0.0085, lng: carLng + 0.0091, speed: "DC 50kW", connector: "CCS2", price: 17.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }] }
     ];
 
     try {
-      const url = `https://overpass-api.de/api/interpreter?data=[out:json][timeout:15];node["amenity"="fuel"](around:4000,${lat},${lng});out;`;
+      const url = `https://overpass-api.de/api/interpreter?data=[out:json][timeout:15];node["amenity"="fuel"](around:${radius},${lat},${lng});out;`;
       const response = await fetch(url);
       const data = await response.json();
       
@@ -342,6 +390,97 @@ export class EcosystemService {
     }
 
     this.stationsData.push(...this.userStations);
+  }
+
+  fetchStationsObservable(lat: number, lng: number, radius = 4000): Observable<any> {
+    return new Observable(observer => {
+      const controller = new AbortController();
+      const signal = controller.signal;
+
+      const carLat = this.carLocation.lat;
+      const carLng = this.carLocation.lng;
+
+      const staticStations = this.stationsData
+        .filter(s => s.id <= 10)
+        .map(s => {
+          const originalBaseLat = 12.9839;
+          const originalBaseLng = 77.7523;
+          const offsetLat = s.lat - originalBaseLat;
+          const offsetLng = s.lng - originalBaseLng;
+          return {
+            ...s,
+            lat: parseFloat((carLat + offsetLat).toFixed(6)),
+            lng: parseFloat((carLng + offsetLng).toFixed(6))
+          };
+        });
+
+      this.stationsData = [
+        ...staticStations,
+        { id: 11, name: "Tata Power - Whitefield Crossing Hub", network: "Tata Power", lat: carLat + 0.0035, lng: carLng + 0.0041, speed: "DC 150kW", connector: "CCS2", price: 18.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
+        { id: 12, name: "Zeon Charging - ITPL Main Road Hub", network: "Zeon", lat: carLat - 0.0042, lng: carLng + 0.0053, speed: "DC 120kW", connector: "CCS2", price: 17.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Available' }] },
+        { id: 13, name: "ChargeZone Hub - Vivanta Whitefield Point", network: "ChargeZone", lat: carLat + 0.0063, lng: carLng - 0.0032, speed: "DC 60kW", connector: "CCS2", price: 16.50, status: "Occupied", guns: [{ id: 'A', type: 'CCS2', status: 'Occupied' }] },
+        { id: 14, name: "Tata Power - Radisson Blu ORR Station", network: "Tata Power", lat: carLat - 0.0024, lng: carLng - 0.0051, speed: "DC 120kW", connector: "CCS2", price: 18.00, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }] },
+        { id: 15, name: "Bolt Smart AC - Decathlon Whitefield Sports Zone", network: "Bolt", lat: carLat + 0.0012, lng: carLng - 0.0019, speed: "AC 7.4kW", connector: "Type 2", price: 12.00, status: "Available", guns: [{ id: 'A', type: 'Type 2', status: 'Available' }] },
+        { id: 16, name: "Zeon Charging - Varthur Main Road Point", network: "Zeon", lat: carLat + 0.0085, lng: carLng + 0.0091, speed: "DC 50kW", connector: "CCS2", price: 17.50, status: "Available", guns: [{ id: 'A', type: 'CCS2', status: 'Available' }] }
+      ];
+
+      const url = `https://overpass-api.de/api/interpreter?data=[out:json][timeout:15];node["amenity"="fuel"](around:${radius},${lat},${lng});out;`;
+
+      fetch(url, { signal })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.elements) {
+            data.elements.forEach((element: any, idx: number) => {
+              const name = element.tags.name || element.tags.brand || "Petrol Pump Charging Hub";
+              const networks = ["Tata Power", "Zeon", "ChargeZone", "Bolt"];
+              const brand = element.tags.brand ? element.tags.brand.toLowerCase() : "";
+              let net = networks[idx % networks.length];
+              if (brand.includes("tata")) net = "Tata Power";
+              else if (brand.includes("zeon")) net = "Zeon";
+              else if (brand.includes("charge")) net = "ChargeZone";
+              else if (brand.includes("bolt")) net = "Bolt";
+
+              const displayName = element.tags.name 
+                ? `${element.tags.name} (EV Interop Hub)` 
+                : `${element.tags.brand || 'Petrol Pump'} EV Charging Point`;
+
+              const isAC = idx % 3 === 0;
+
+              this.stationsData.push({
+                id: 500 + idx,
+                name: displayName,
+                network: net,
+                lat: element.lat,
+                lng: element.lon,
+                speed: isAC ? "AC 22kW" : "DC 60kW",
+                connector: isAC ? "Type 2" : "CCS2",
+                price: isAC ? 12.50 : 18.00,
+                status: idx % 3 === 0 ? "Occupied" : "Available",
+                guns: isAC 
+                  ? [{ id: 'A', type: 'Type 2', status: 'Available' }]
+                  : [{ id: 'A', type: 'CCS2', status: 'Available' }, { id: 'B', type: 'CCS2', status: 'Occupied' }]
+              });
+            });
+          }
+          this.stationsData.push(...this.userStations);
+          observer.next(this.stationsData);
+          observer.complete();
+        })
+        .catch(err => {
+          if (err.name === 'AbortError') {
+            console.log('Fetch aborted for lat:', lat, 'lng:', lng);
+          } else {
+            console.error('OSM Query failed', err);
+            this.stationsData.push(...this.userStations);
+            observer.next(this.stationsData);
+            observer.complete();
+          }
+        });
+
+      return () => {
+        controller.abort();
+      };
+    });
   }
 
   onboardStation(station: Omit<ChargingStation, 'id' | 'status'>) {

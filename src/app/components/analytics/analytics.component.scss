@@ -1,0 +1,70 @@
+/* Analytics tab styles */
+.analytics-grid {
+    display: flex;
+    gap: 20px;
+}
+
+.analytics-chart-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.analytics-chart-card h3 {
+    font-size: 16px;
+}
+
+.chart-container {
+    position: relative;
+    height: 250px;
+    width: 100%;
+    margin-top: 16px;
+}
+
+.chart-container-radial {
+    position: relative;
+    height: 250px;
+    width: 100%;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-container-small {
+    position: relative;
+    height: 180px;
+    width: 100%;
+    margin-top: 16px;
+}
+
+.grid-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.stat-item {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-glass);
+    padding: 16px;
+    border-radius: var(--border-radius-md);
+    position: relative;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: 800;
+    margin-top: 6px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.text-green { color: var(--neon-green); }
+.text-cyan { color: var(--neon-cyan); }
+.text-yellow { color: var(--neon-yellow); }

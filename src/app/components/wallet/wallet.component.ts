@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EcosystemService } from '../../services/ecosystem.service';
@@ -10,9 +10,9 @@ import { TranslationService } from '../../services/translation.service';
   standalone: true,
   imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './wallet.component.html',
-  styleUrls: []
+  styleUrls: ['./wallet.component.scss']
 })
-export class WalletComponent {
+export class WalletComponent implements OnInit {
   topupAmount = 500;
   paymentMethod = 'upi';
   private readonly razorpayKeyId = 'rzp_test_T3Tv709mDxmDRd';
@@ -22,6 +22,10 @@ export class WalletComponent {
   endDate = '';
 
   constructor(public eco: EcosystemService, private ts: TranslationService, private ngZone: NgZone) {}
+
+  ngOnInit() {
+    this.eco.ensureWalletTransactionsLoaded();
+  }
 
   get filteredTransactions() {
     return this.eco.walletTransactions.filter(tx => {
