@@ -74,48 +74,6 @@
     margin: 0 auto;
     line-height: 1.6;
   }
-  .credentials-card {
-    background: rgba(6, 182, 212, 0.02);
-    border: 1px dashed rgba(6, 182, 212, 0.2);
-    border-radius: var(--border-radius-md);
-    padding: 16px 20px;
-    margin-bottom: 30px;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-  }
-  .credentials-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--cyan);
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .credentials-row {
-    font-size: 14px;
-    color: var(--text-primary);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-  }
-  .credentials-item { font-weight: 600; }
-  .credentials-item span {
-    color: var(--text-secondary);
-    font-weight: 400;
-    font-family: monospace;
-    background: rgba(255,255,255,0.06);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 12px;
-    margin-left: 4px;
-  }
   .links-grid {
     display: flex;
     flex-direction: column;
@@ -203,6 +161,27 @@
   }
   footer a { color: var(--cyan); text-decoration: none; font-weight: 500; }
   footer a:hover { text-decoration: underline; }
+  @media (max-width: 600px) {
+    h1.brand-title { font-size: 32px; }
+    header p.subtitle { font-size: 14px; }
+    .link-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 20px;
+    }
+    .icon-wrapper {
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+    }
+    .card-header-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      width: 100%;
+    }
+  }
 </style>
 </head>
 <body>
@@ -211,15 +190,6 @@
     <h1 class="brand-title">⚡ <span>VoltStream</span></h1>
     <p class="subtitle">Seamless EV Charging Ecosystem Portal. Explore our system prototype, walkthrough video, pitch deck, and codebase.</p>
   </header>
-  <div class="credentials-card">
-    <div class="credentials-title">
-      <i class="fa-solid fa-circle-info"></i> Interactive Prototype Login Credentials
-    </div>
-    <div class="credentials-row">
-      <div class="credentials-item">Driver Role: <span>Username: user | Password: password</span></div>
-      <div class="credentials-item">Operator Role: <span>Username: admin | Password: password</span></div>
-    </div>
-  </div>
   <div class="links-grid">
     <a href="https://seamless-ev-charging-ecosyste.onrender.com" target="_blank" class="link-card prototype">
       <div class="icon-wrapper"><i class="fa-solid fa-globe"></i></div>
@@ -228,7 +198,10 @@
           <span class="card-title">Interactive Prototype (Live)</span>
           <span class="badge">Live App</span>
         </div>
-        <p class="card-desc">Try out the interoperable EV Charging Map, driver dashboard, live OCPP protocol monitor, and dynamic AI assistant.</p>
+        <p class="card-desc" style="margin-bottom: 6px;">Try out the interoperable EV Charging Map, driver dashboard, live OCPP protocol monitor, and dynamic AI assistant.</p>
+        <p style="color:var(--yellow); font-size:11px; font-weight:600; display:flex; align-items:center; gap:5px;">
+          <i class="fa-solid fa-desktop"></i> Desktop Viewport Required (Optimized for desktop, not configured for mobile screens)
+        </p>
       </div>
     </a>
     <a href="https://mahesh-morde.github.io/Seamless-EV-Charging-Ecosyste/" target="_blank" class="link-card slides">
