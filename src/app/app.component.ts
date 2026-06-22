@@ -36,8 +36,15 @@ import { TranslatePipe } from './services/translate.pipe';
 export class AppComponent implements OnInit, OnDestroy {
   isSidebarCollapsed = false;
   isMobileSidebarOpen = false;
+  isMobileToolsOpen = false;
   private routerSub!: Subscription;
   constructor(public eco: EcosystemService, public ts: TranslationService, private router: Router) {}
+  toggleMobileToolsModal() {
+    this.isMobileToolsOpen = !this.isMobileToolsOpen;
+  }
+  closeMobileToolsModal() {
+    this.isMobileToolsOpen = false;
+  }
 
   ngOnInit() {
     this.routerSub = this.router.events.pipe(
@@ -72,6 +79,7 @@ export class AppComponent implements OnInit, OnDestroy {
   switchTab(tabId: string) {
     this.router.navigate([`/${tabId}`]);
     this.closeMobileSidebar();
+    this.closeMobileToolsModal();
   }
   toggleMobileSidebar() {
     this.isMobileSidebarOpen = !this.isMobileSidebarOpen;

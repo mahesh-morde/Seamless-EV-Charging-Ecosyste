@@ -90,86 +90,79 @@
         <button class="locate-me-btn glass" (click)="locateUser()" [title]="'LOCATE_ME_TITLE' | translate">
             <i class="fa-solid fa-crosshairs"></i>
         </button>
-
         <div id="leaflet-map-container" style="height: 100%; width: 100%;"></div>
-
-        <!-- Floating Route Details Card -->
-        <div *ngIf="eco.selectedStation" class="route-details-card glass animate-fade-in">
-            <!-- Card Header -->
-            <div class="route-details-header">
-                <h4>
-                    <i class="fa-solid fa-route" style="color: var(--neon-cyan);"></i>
-                    <span>{{ 'ROUTE_PLANNING_NAV' | translate }}</span>
-                </h4>
-                <button type="button" (click)="deselectStation()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 14px;">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    </div>
+    <!-- Floating Route Details Card -->
+    <div *ngIf="eco.selectedStation" class="route-details-card glass animate-fade-in">
+        <!-- Card Header -->
+        <div class="route-details-header">
+            <h4>
+                <i class="fa-solid fa-route" style="color: var(--neon-cyan);"></i>
+                <span>{{ 'ROUTE_PLANNING_NAV' | translate }}</span>
+            </h4>
+            <button type="button" (click)="deselectStation()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 14px;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <!-- Station Info -->
+        <div style="margin-bottom: 4px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">{{ eco.selectedStation.name }}</div>
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <span class="badge" style="padding: 2px 6px; font-size: 9px; font-weight: 600; background: rgba(6, 182, 212, 0.15); color: var(--neon-cyan); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 4px; text-transform: uppercase; margin-bottom: 0;">{{ eco.selectedStation.network }}</span>
+                <span style="font-size: 11px; color: var(--text-muted);">{{ eco.selectedStation.speed }} • {{ eco.selectedStation.connector }}</span>
             </div>
-
-            <!-- Station Info -->
-            <div style="margin-bottom: 4px; display: flex; flex-direction: column; gap: 6px;">
-                <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">{{ eco.selectedStation.name }}</div>
-                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                    <span class="badge" style="padding: 2px 6px; font-size: 9px; font-weight: 600; background: rgba(6, 182, 212, 0.15); color: var(--neon-cyan); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 4px; text-transform: uppercase; margin-bottom: 0;">{{ eco.selectedStation.network }}</span>
-                    <span style="font-size: 11px; color: var(--text-muted);">{{ eco.selectedStation.speed }} • {{ eco.selectedStation.connector }}</span>
-                </div>
-                <!-- Price and Status -->
-                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 2px; border-top: 1px dashed var(--border-glass); padding-top: 6px;">
-                    <span>{{ 'PRICE_LABEL' | translate }}: <strong style="color: var(--text-primary);">₹{{ eco.selectedStation.price.toFixed(2) }}/kWh</strong></span>
-                    <span class="badge" style="font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;" [ngClass]="eco.selectedStation.status === 'Available' ? 'badge-success' : 'badge-offline'">
-                        {{ (eco.selectedStation.status === 'Available' ? 'AVAILABLE' : 'OCCUPIED') | translate }}
-                    </span>
-                </div>
-                <!-- Gun-level Status Feeds -->
-                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px;">
-                    <span *ngFor="let gun of eco.selectedStation.guns" style="padding: 2px 6px; border-radius: 4px; font-size: 9px; display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); font-weight: 500;" [ngClass]="gun.status === 'Available' ? 'text-green' : 'text-muted'">
-                        <i class="fa-solid fa-plug" style="font-size: 8px;"></i> {{ 'GUN' | translate }} {{ gun.id }}: {{ (gun.status === 'Available' ? 'AVAILABLE' : 'OCCUPIED') | translate }}
-                    </span>
-                </div>
+            <!-- Price and Status -->
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-top: 2px; border-top: 1px dashed var(--border-glass); padding-top: 6px;">
+                <span>{{ 'PRICE_LABEL' | translate }}: <strong style="color: var(--text-primary);">₹{{ eco.selectedStation.price.toFixed(2) }}/kWh</strong></span>
+                <span class="badge" style="font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;" [ngClass]="eco.selectedStation.status === 'Available' ? 'badge-success' : 'badge-offline'">
+                    {{ (eco.selectedStation.status === 'Available' ? 'AVAILABLE' : 'OCCUPIED') | translate }}
+                </span>
             </div>
-
-            <!-- Route Metrics -->
-            <div class="route-metrics">
-                <div>
-                    <div class="route-metric-label">{{ 'DISTANCE_LABEL' | translate }}</div>
-                    <div class="route-metric-value">{{ selectedStationDistance }} <span class="route-metric-unit">km</span></div>
-                </div>
-                <div>
-                    <div class="route-metric-label">{{ 'EST_TRAVEL_TIME' | translate }}</div>
-                    <div class="route-metric-value">{{ selectedStationDuration }} <span class="route-metric-unit">{{ 'MINS' | translate }}</span></div>
-                </div>
-            </div>
-
-            <!-- Range Check Badge -->
-            <div>
-                <div *ngIf="selectedStationCanReach" class="range-status-badge within-range">
-                    <i class="fa-solid fa-circle-check" style="font-size: 14px;"></i>
-                    <div style="flex: 1; text-align: left;">
-                        <div style="font-weight: 600; line-height: 1.2;">{{ 'WITHIN_RANGE' | translate }}</div>
-                        <div style="font-size: 10px; opacity: 0.85; margin-top: 1px;">{{ 'REMAINING_RANGE_LABEL' | translate }}: {{ eco.estimatedRange }} km</div>
-                    </div>
-                </div>
-                <div *ngIf="!selectedStationCanReach" class="range-status-badge out-of-range">
-                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 14px;"></i>
-                    <div style="flex: 1; text-align: left;">
-                        <div style="font-weight: 600; line-height: 1.2;">{{ 'OUT_OF_RANGE' | translate }}</div>
-                        <div style="font-size: 10px; opacity: 0.85; margin-top: 1px;">{{ 'REMAINING_RANGE_LABEL' | translate }}: {{ eco.estimatedRange }} km</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div style="display: flex; gap: 8px;">
-                <button type="button" class="btn btn-secondary" (click)="deselectStation()" style="flex: 1; padding: 10px; font-size: 11px; font-weight: 600; justify-content: center; height: 38px;">
-                    {{ 'CANCEL_ROUTE' | translate }}
-                </button>
-                <button type="button" class="btn btn-primary" (click)="startChargingFromRoute()" [disabled]="!selectedStationCanReach || eco.selectedStation.status !== 'Available'" style="flex: 2; padding: 10px; font-size: 11px; font-weight: 600; justify-content: center; height: 38px; display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); border: none; box-shadow: 0 4px 10px rgba(6, 182, 212, 0.25);">
-                    <i class="fa-solid fa-bolt-lightning" style="color: white; font-size: 10px;"></i>
-                    <span>{{ 'START_CHARGING_SESSION_BTN' | translate }}</span>
-                </button>
+            <!-- Gun-level Status Feeds -->
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px;">
+                <span *ngFor="let gun of eco.selectedStation.guns" style="padding: 2px 6px; border-radius: 4px; font-size: 9px; display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); font-weight: 500;" [ngClass]="gun.status === 'Available' ? 'text-green' : 'text-muted'">
+                    <i class="fa-solid fa-plug" style="font-size: 8px;"></i> {{ 'GUN' | translate }} {{ gun.id }}: {{ (gun.status === 'Available' ? 'AVAILABLE' : 'OCCUPIED') | translate }}
+                </span>
             </div>
         </div>
-
+        <!-- Route Metrics -->
+        <div class="route-metrics">
+            <div>
+                <div class="route-metric-label">{{ 'DISTANCE_LABEL' | translate }}</div>
+                <div class="route-metric-value">{{ selectedStationDistance }} <span class="route-metric-unit">km</span></div>
+            </div>
+            <div>
+                <div class="route-metric-label">{{ 'EST_TRAVEL_TIME' | translate }}</div>
+                <div class="route-metric-value">{{ selectedStationDuration }} <span class="route-metric-unit">{{ 'MINS' | translate }}</span></div>
+            </div>
+        </div>
+        <!-- Range Check Badge -->
+        <div>
+            <div *ngIf="selectedStationCanReach" class="range-status-badge within-range">
+                <i class="fa-solid fa-circle-check" style="font-size: 14px;"></i>
+                <div style="flex: 1; text-align: left;">
+                    <div style="font-weight: 600; line-height: 1.2;">{{ 'WITHIN_RANGE' | translate }}</div>
+                    <div style="font-size: 10px; opacity: 0.85; margin-top: 1px;">{{ 'REMAINING_RANGE_LABEL' | translate }}: {{ eco.estimatedRange }} km</div>
+                </div>
+            </div>
+            <div *ngIf="!selectedStationCanReach" class="range-status-badge out-of-range">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 14px;"></i>
+                <div style="flex: 1; text-align: left;">
+                    <div style="font-weight: 600; line-height: 1.2;">{{ 'OUT_OF_RANGE' | translate }}</div>
+                    <div style="font-size: 10px; opacity: 0.85; margin-top: 1px;">{{ 'REMAINING_RANGE_LABEL' | translate }}: {{ eco.estimatedRange }} km</div>
+                </div>
+            </div>
+        </div>
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-secondary" (click)="deselectStation()" style="flex: 1; padding: 10px; font-size: 11px; font-weight: 600; justify-content: center; height: 38px;">
+                {{ 'CANCEL_ROUTE' | translate }}
+            </button>
+            <button type="button" class="btn btn-primary" (click)="startChargingFromRoute()" [disabled]="!selectedStationCanReach || eco.selectedStation.status !== 'Available'" style="flex: 2; padding: 10px; font-size: 11px; font-weight: 600; justify-content: center; height: 38px; display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); border: none; box-shadow: 0 4px 10px rgba(6, 182, 212, 0.25);">
+                <i class="fa-solid fa-bolt-lightning" style="color: white; font-size: 10px;"></i>
+                <span>{{ 'START_CHARGING_SESSION_BTN' | translate }}</span>
+            </button>
+        </div>
     </div>
     <div *ngIf="showOnboardForm" class="bottom-middle-modal glass" [ngStyle]="isDragged ? {'left.px': modalPosition.x, 'top.px': modalPosition.y, 'bottom': 'auto', 'transform': 'none'} : {}">
         <div (mousedown)="onDragStart($event)" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid var(--border-glass); padding-bottom: 8px; cursor: move; user-select: none;">

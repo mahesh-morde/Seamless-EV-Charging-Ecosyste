@@ -639,3 +639,30 @@ body.light-mode {
         padding: 12px !important;
     }
 }
+.mobile-hackathon-drawer-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1040;
+}
+.mobile-hackathon-drawer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 32px);
+    max-width: 500px;
+    border-radius: var(--border-radius-lg);
+    max-height: 85vh;
+    z-index: 1050;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    padding: 24px;
+    overflow-y: auto;
+    animation: centerModalShow 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

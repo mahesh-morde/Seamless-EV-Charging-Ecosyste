@@ -13,8 +13,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
+  isMobileHackathonDrawerOpen = false;
   constructor(public eco: EcosystemService, private ts: TranslationService, private router: Router) {}
-
+  toggleMobileHackathonDrawer() {
+    this.isMobileHackathonDrawerOpen = !this.isMobileHackathonDrawerOpen;
+  }
   openMap() {
     this.router.navigate(['/map']);
   }

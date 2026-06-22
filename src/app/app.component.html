@@ -79,10 +79,13 @@
         </div>
 
         <!-- Logout Action -->
-        <div class="logout-card" [style.margin-top]="isSidebarCollapsed ? 'auto' : '16px'">
-            <button class="btn btn-secondary" [class.w-full]="!isSidebarCollapsed" (click)="logout(); $event.stopPropagation()" [title]="'LOGOUT_BTN' | translate" [style.padding]="isSidebarCollapsed ? '10px' : '10px 14px'" [style.width]="isSidebarCollapsed ? '44px' : 'auto'" [style.height]="isSidebarCollapsed ? '44px' : 'auto'" style="display: flex; justify-content: center; align-items: center; border-color: rgba(244,63,94,0.25); background: rgba(244,63,94,0.05); color: var(--neon-red); font-weight: 600; border-radius: 10px; outline: none;">
+        <div class="logout-card" [style.margin-top]="isSidebarCollapsed ? 'auto' : '16px'" style="display: flex; gap: 8px; justify-content: center; width: 100%;" [style.flex-direction]="isSidebarCollapsed ? 'column' : 'row'" [style.align-items]="isSidebarCollapsed ? 'center' : 'stretch'">
+            <button class="btn btn-secondary" [class.w-full]="!isSidebarCollapsed" (click)="logout(); $event.stopPropagation()" [title]="'LOGOUT_BTN' | translate" [style.padding]="isSidebarCollapsed ? '10px' : '10px 14px'" [style.width]="isSidebarCollapsed ? '44px' : 'auto'" [style.height]="isSidebarCollapsed ? '44px' : 'auto'" style="display: flex; justify-content: center; align-items: center; border-color: rgba(244,63,94,0.25); background: rgba(244,63,94,0.05); color: var(--neon-red); font-weight: 600; border-radius: 10px; outline: none; flex: 1;">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span *ngIf="!isSidebarCollapsed" style="margin-left: 8px;">{{ 'LOGOUT_BTN' | translate }}</span>
+            </button>
+            <button *ngIf="eco.currentRole === 'operator'" class="btn btn-primary" (click)="toggleMobileToolsModal(); $event.stopPropagation()" [title]="'NOC_SIMULATION_TOOLS' | translate" [style.width]="'44px'" [style.height]="'44px'" style="display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); color: white; border-radius: 10px; outline: none; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4); flex-shrink: 0; padding: 0; border: none; cursor: pointer;">
+                <i class="fa-solid fa-sliders"></i>
             </button>
         </div>
 
@@ -161,35 +164,6 @@
                 <button class="btn btn-secondary desktop-only" (click)="toggleTheme()" [title]="'TOGGLE_THEME' | translate" style="padding: 10px 14px;">
                     <i class="fa-solid" [ngClass]="eco.currentTheme === 'dark' ? 'fa-sun text-yellow' : 'fa-moon text-cyan'"></i>
                 </button>
-
-                <!-- Hackathon Insights Overlay Toggle (Operator Only) -->
-                <button *ngIf="eco.currentRole === 'operator'" class="btn btn-primary" (click)="toggleThemeMapping()" style="background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); color: white; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);">
-                    <i class="fa-solid" [ngClass]="eco.showThemeMapping ? 'fa-eye-slash' : 'fa-eye'"></i>
-                    <span>{{ (eco.showThemeMapping ? 'HIDE_FOCUS_AREAS' : 'SHOW_FOCUS_AREAS') | translate }}</span>
-                </button>
-
-                <!-- Operator-only Network & Grid Simulation Tools -->
-                <ng-container *ngIf="eco.currentRole === 'operator'">
-                    <!-- Substation Grid Load -->
-                    <div class="system-status-indicator" [ngClass]="eco.isGridOverloaded ? 'offline' : 'online'" style="background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.2); color: var(--neon-purple); display: inline-flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-bolt-lightning" [style.color]="'var(--neon-purple)'"></i>
-                        <span>{{ 'GRID_LOAD_LABEL' | translate }}: {{ eco.gridLoad }}%</span>
-                    </div>
-                    <!-- Simulate Overload -->
-                    <button class="btn btn-secondary" (click)="toggleGridOverload()" style="border-color: rgba(168, 85, 247, 0.25);">
-                        <i class="fa-solid" [ngClass]="eco.isGridOverloaded ? 'fa-square-check text-green' : 'fa-triangle-exclamation text-purple'"></i>
-                        <span>{{ (eco.isGridOverloaded ? 'NORMALIZE_GRID' : 'SIMULATE_GRID_PEAK') | translate }}</span>
-                    </button>
-                    <!-- NOC / OCPP Link -->
-                    <div class="system-status-indicator" [ngClass]="eco.isNetworkOnline ? 'online' : 'offline'">
-                        <span class="status-dot"></span>
-                        <span>{{ (eco.isNetworkOnline ? 'NOC_ONLINE' : 'NOC_OFFLINE') | translate }}</span>
-                    </div>
-                    <button class="btn btn-secondary" (click)="toggleNetworkConnection()">
-                        <i class="fa-solid" [ngClass]="eco.isNetworkOnline ? 'fa-wifi-slash' : 'fa-wifi'"></i>
-                        <span>{{ (eco.isNetworkOnline ? 'SIMULATE_CONN_CUT' : 'RESTORE_CONN') | translate }}</span>
-                    </button>
-                </ng-container>
             </div>
         </header>
 
@@ -214,5 +188,53 @@
             'fa-triangle-exclamation': toast.type === 'danger'
         }"></i>
         <span class="toast-msg">{{ toast.message }}</span>
+    </div>
+</div>
+<!-- Mobile Grid/NOC Simulator Modal Drawer -->
+<div class="mobile-tools-modal-backdrop" *ngIf="isMobileToolsOpen" (click)="toggleMobileToolsModal()"></div>
+<div class="mobile-tools-modal glass" *ngIf="isMobileToolsOpen">
+    <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-glass); padding-bottom: 10px;">
+        <h3 style="margin: 0; font-size: 16px;"><i class="fa-solid fa-sliders text-cyan"></i> {{ 'NOC_SIMULATION_TOOLS' | translate }}</h3>
+        <button (click)="toggleMobileToolsModal()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; font-size: 16px;">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">{{ 'EVALUATOR_CONSOLE_TITLE' | translate }}</label>
+            <button class="btn btn-primary" (click)="toggleThemeMapping(); toggleMobileToolsModal()" style="background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); color: white; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4); justify-content: center; width: 100%;">
+                <i class="fa-solid" [ngClass]="eco.showThemeMapping ? 'fa-eye-slash' : 'fa-eye'"></i>
+                <span>{{ (eco.showThemeMapping ? 'HIDE_FOCUS_AREAS' : 'SHOW_FOCUS_AREAS') | translate }}</span>
+            </button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">{{ 'GRID_LOAD_LABEL' | translate }}</label>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm);">
+                <div style="display: inline-flex; align-items: center; gap: 8px; color: var(--neon-purple); font-weight: 600;">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <span>{{ eco.gridLoad }}%</span>
+                </div>
+                <span class="badge" [ngClass]="eco.isGridOverloaded ? 'badge-offline' : 'badge-success'">
+                    {{ (eco.isGridOverloaded ? 'GRID_THROTTLED' : 'AVAILABLE') | translate }}
+                </span>
+            </div>
+            <button class="btn btn-secondary" (click)="toggleGridOverload()" style="border-color: rgba(168, 85, 247, 0.25); justify-content: center;">
+                <i class="fa-solid" [ngClass]="eco.isGridOverloaded ? 'fa-square-check text-green' : 'fa-triangle-exclamation text-purple'"></i>
+                <span>{{ (eco.isGridOverloaded ? 'NORMALIZE_GRID' : 'SIMULATE_GRID_PEAK') | translate }}</span>
+            </button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">{{ 'OCPP_MONITOR_TITLE' | translate }}</label>
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm);">
+                <div style="display: inline-flex; align-items: center; gap: 8px; font-weight: 600;" [ngClass]="eco.isNetworkOnline ? 'text-green' : 'text-red'">
+                    <span class="status-dot" style="margin-right: 2px;" [style.background-color]="eco.isNetworkOnline ? 'var(--neon-green)' : 'var(--neon-red)'"></span>
+                    <span>{{ (eco.isNetworkOnline ? 'NOC_ONLINE' : 'NOC_OFFLINE') | translate }}</span>
+                </div>
+            </div>
+            <button class="btn btn-secondary" (click)="toggleNetworkConnection()" style="justify-content: center;">
+                <i class="fa-solid" [ngClass]="eco.isNetworkOnline ? 'fa-wifi-slash' : 'fa-wifi'"></i>
+                <span>{{ (eco.isNetworkOnline ? 'SIMULATE_CONN_CUT' : 'RESTORE_CONN') | translate }}</span>
+            </button>
+        </div>
     </div>
 </div>
