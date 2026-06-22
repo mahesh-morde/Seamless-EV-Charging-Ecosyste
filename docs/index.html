@@ -379,6 +379,30 @@
     stroke-dasharray: 4, 8;
     animation: flowDash 1.2s linear infinite;
   }
+  .quick-links-slide-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 64px;
+    margin-top: 32px;
+  }
+  .qr-card-slide {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 280px;
+    text-align: center;
+    border: 1px solid var(--card-border);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+  }
+  .quick-links-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
 
   /* ── PRINT ── */
   @media print {
@@ -465,6 +489,34 @@
     /* Overrides for specific inline styles on mobile */
     .slide-title p[style*="font-size:22px"] { font-size: 16px !important; }
     #slide-9 h1[style*="font-size:48px"] { font-size: 32px !important; }
+    .quick-links-slide-container {
+      flex-direction: column !important;
+      gap: 24px !important;
+      margin-top: 16px !important;
+      align-items: center !important;
+    }
+    .quick-links-slide-container .qr-card-slide {
+      width: 100% !important;
+      max-width: 260px !important;
+      margin: 0 auto !important;
+      padding: 16px !important;
+    }
+    .quick-links-slide-container .qr-card-slide div[id="slide-qr-code"] {
+      width: 180px !important;
+      height: 180px !important;
+      padding: 10px !important;
+    }
+    .quick-links-slide-container .qr-card-slide img {
+      width: 160px !important;
+      height: 160px !important;
+    }
+    .quick-links-slide-container > div:last-child {
+      text-align: center !important;
+    }
+    .quick-links-grid {
+      grid-template-columns: 1fr !important;
+      text-align: left !important;
+    }
   }
 
   @media (max-width: 480px) {
@@ -505,8 +557,8 @@
   <span class="tag tag-cyan animate-slide-left" style="width:fit-content;"><i class="fa-solid fa-qrcode"></i> Scan to Access Resources</span>
   <h2 class="section-title animate-fade-in delay-1" style="margin-top:16px; font-size:42px;">VoltStream — <span>Quick Links Hub</span></h2>
   <div class="divider animate-slide-left delay-2"></div>
-  <div class="quick-links-slide-container animate-fade-in delay-3" style="display:flex; align-items:center; justify-content:center; gap:64px; margin-top:32px;">
-    <div class="qr-card glass card-wrapper" style="padding:24px; display:flex; flex-direction:column; align-items:center; gap:16px; width:280px; text-align:center; border: 1px solid var(--card-border); background: var(--bg-secondary); border-radius: var(--border-radius-lg);">
+  <div class="quick-links-slide-container animate-fade-in delay-3">
+    <div class="qr-card-slide glass card-wrapper">
       <div id="slide-qr-code" style="background:#ffffff; padding:16px; border-radius:12px; width:220px; height:220px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
         <img src="qr-code.png" alt="VoltStream QR Code Hub" style="width:188px; height:188px; display:block;">
       </div>
@@ -517,7 +569,7 @@
       <p style="font-size:15px; line-height:1.6; margin-bottom:24px; color:var(--text-secondary);">
         Scan the QR code to open our unified links portal. From there, you can explore the live prototype, review the presentation slides, watch the walk-through video, and inspect the source code.
       </p>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div class="quick-links-grid">
         <div style="display:flex; align-items:center; gap:12px; font-size:14px; font-weight:600; color:var(--text-primary);">
           <i class="fa-solid fa-globe" style="color:var(--cyan); font-size:18px;"></i> Interactive Prototype (Live) <span style="font-size:11px; color:var(--yellow); font-weight:500; margin-left:6px;"><i class="fa-solid fa-desktop"></i> Desktop Only</span>
         </div>
