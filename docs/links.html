@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltStream — Quick Links Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --bg-primary: #070a13;
+    --bg-secondary: #0f1423;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --border-glass-hover: rgba(255, 255, 255, 0.15);
+    --cyan: #06b6d4;
+    --purple: #a855f7;
+    --green: #10b981;
+    --yellow: #fbbf24;
+    --radial-glow-1: radial-gradient(ellipse at top right, rgba(168, 85, 247, 0.12) 0%, transparent 60%);
+    --radial-glow-2: radial-gradient(ellipse at bottom left, rgba(6, 182, 212, 0.10) 0%, transparent 60%);
+    --border-radius-lg: 16px;
+    --border-radius-md: 12px;
+    --transition-speed: 0.3s;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Inter',sans-serif;
+    background:var(--bg-primary);
+    color:var(--text-secondary);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    padding:40px 20px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  body::before {
+    content:''; position:absolute; inset:0;
+    background: var(--radial-glow-1), var(--radial-glow-2);
+    pointer-events:none;
+    z-index: 1;
+  }
+  .container {
+    max-width: 680px;
+    width: 100%;
+    z-index: 2;
+    text-align: center;
+  }
+  header { margin-bottom: 40px; }
+  h1.brand-title {
+    font-family:'Outfit',sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  h1.brand-title span {
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  header p.subtitle {
+    font-size: 16px;
+    color: var(--text-secondary);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  .links-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .link-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 24px;
+    border-radius: var(--border-radius-lg);
+    text-decoration: none;
+    text-align: left;
+    transition: all var(--transition-speed) ease;
+  }
+  .link-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--border-glass-hover);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+  .icon-wrapper {
+    width: 54px;
+    height: 54px;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .link-card.prototype .icon-wrapper { color: var(--cyan); box-shadow: 0 0 15px rgba(6, 182, 212, 0.15); }
+  .link-card.slides .icon-wrapper { color: var(--purple); box-shadow: 0 0 15px rgba(168, 85, 247, 0.15); }
+  .link-card.video .icon-wrapper { color: var(--green); box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); }
+  .link-card.code .icon-wrapper { color: var(--yellow); box-shadow: 0 0 15px rgba(251, 191, 36, 0.15); }
+  .card-content { flex-grow: 1; }
+  .card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .card-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .link-card.prototype .badge { background: rgba(6, 182, 212, 0.1); color: var(--cyan); border: 1px solid rgba(6, 182, 212, 0.2); }
+  .link-card.slides .badge { background: rgba(168, 85, 247, 0.1); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.2); }
+  .link-card.video .badge { background: rgba(16, 185, 129, 0.1); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.2); }
+  .link-card.code .badge { background: rgba(251, 191, 36, 0.1); color: var(--yellow); border: 1px solid rgba(251, 191, 36, 0.2); }
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  footer {
+    margin-top: 50px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1 class="brand-title">⚡ <span>VoltStream</span></h1>
+    <p class="subtitle">Seamless EV Charging Ecosystem Portal. Explore our system prototype, walkthrough video, pitch deck, and codebase.</p>
+  </header>
+  <div class="links-grid">
+    <a href="https://gcc-ascend.onrender.com" target="_blank" class="link-card prototype">
+      <div class="icon-wrapper"><i class="fa-solid fa-globe"></i></div>
+      <div class="card-content">
+        <div class="card-header-row">
+          <span class="card-title">Interactive Prototype (Live)</span>
+          <span class="badge">Live App</span>
+        </div>
+        <p class="card-desc">Try out the interoperable EV Charging Map, driver dashboard, live OCPP protocol monitor, and dynamic AI assistant.</p>
+      </div>
+    </a>
+    <a href="https://mahesh-morde.github.io/GCC-ASCEND/" target="_blank" class="link-card slides">
+      <div class="icon-wrapper"><i class="fa-solid fa-file-powerpoint"></i></div>
+      <div class="card-content">
+        <div class="card-header-row">
+          <span class="card-title">Presentation Pitch Deck</span>
+          <span class="badge">Slides</span>
+        </div>
+        <p class="card-desc">Review the full slide deck covering our product offering, technical architecture, and supply chain strategies.</p>
+      </div>
+    </a>
+    <a href="https://youtu.be/h-na91u-GgA" target="_blank" class="link-card video">
+      <div class="icon-wrapper"><i class="fa-solid fa-circle-play"></i></div>
+      <div class="card-content">
+        <div class="card-header-row">
+          <span class="card-title">Walkthrough Video (YouTube)</span>
+          <span class="badge">Demo Video</span>
+        </div>
+        <p class="card-desc">Watch a 5-minute screen recording showcasing live location tracking, OCPP offline caching, and charging simulation.</p>
+      </div>
+    </a>
+    <a href="https://github.com/mahesh-morde/GCC-ASCEND" target="_blank" class="link-card code">
+      <div class="icon-wrapper"><i class="fa-solid fa-code"></i></div>
+      <div class="card-content">
+        <div class="card-header-row">
+          <span class="card-title">Source Code (GitHub)</span>
+          <span class="badge">Codebase</span>
+        </div>
+        <p class="card-desc">Explore the repository, clean Angular 18 design patterns, translation mechanisms, and Docker config.</p>
+      </div>
+    </a>
+  </div>
+  <footer>
+    <p>ET AutoTech Hackathon 2026 &nbsp;|&nbsp; Solution by <a href="https://github.com/mahesh-morde" target="_blank">Mahesh Morde</a></p>
+  </footer>
+</div>
+</body>
+</html>
