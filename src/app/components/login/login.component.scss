@@ -246,3 +246,15 @@
     font-family: monospace;
     color: var(--text-primary);
 }
+@media (max-width: 480px) {
+    .login-form-panel {
+        padding: 20px;
+    }
+    .login-card {
+        padding: 24px 20px;
+        gap: 20px;
+    }
+    .login-header h2 {
+        font-size: 24px;
+    }
+}

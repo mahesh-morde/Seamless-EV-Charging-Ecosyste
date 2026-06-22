@@ -64,7 +64,8 @@
     <!-- Filter Controls Bar -->
     <div class="filter-controls-bar" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 14px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass); border-radius: var(--border-radius-md);">
         <!-- Type Filter Toggles (Button Group Style) -->
-        <div class="toggle-group" style="display: flex; background: rgba(0, 0, 0, 0.2); padding: 4px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-glass);">
+        <!-- Type Filter Toggles (Button Group Style) -->
+        <div class="toggle-group desktop-only" style="display: flex; background: rgba(0, 0, 0, 0.2); padding: 4px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-glass);">
             <button type="button" 
                     [ngStyle]="{'background': selectedType === 'all' ? 'var(--bg-glass-active)' : 'transparent', 'color': selectedType === 'all' ? 'var(--text-primary)' : 'var(--text-muted)'}" 
                     (click)="selectedType = 'all'" 
@@ -86,6 +87,14 @@
                 <i class="fa-solid fa-circle-arrow-down"></i>
                 <span>{{ 'FILTER_TOPUPS' | translate }}</span>
             </button>
+        </div>
+        <!-- Type Filter Dropdown for Mobile -->
+        <div class="mobile-only" style="width: 100%;">
+            <select [(ngModel)]="selectedType" style="width: 100%; padding: 10px; background-color: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm); color: var(--text-primary); font-size: 13px; font-weight: 600; cursor: pointer; outline: none;">
+                <option value="all">{{ 'FILTER_ALL' | translate }}</option>
+                <option value="payment">{{ 'FILTER_PAYMENTS' | translate }}</option>
+                <option value="topup">{{ 'FILTER_TOPUPS' | translate }}</option>
+            </select>
         </div>
 
         <!-- Date Range Filter Calendars -->

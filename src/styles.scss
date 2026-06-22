@@ -118,6 +118,8 @@ h1, h2, h3, h4, h5, h6 {
     padding: 24px;
     flex-shrink: 0;
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 /* Sidebar Collapsed Styles */
@@ -676,4 +678,161 @@ h1 {
 .flex-1 { flex: 1; }
 .flex-2 { flex: 2; }
 .mt-20 { margin-top: 20px; }
-
+.desktop-only { display: block; }
+.mobile-only { display: none; }
+/* Mobile Layout Navigation */
+.mobile-header {
+    display: none;
+    height: 60px;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-glass);
+    padding: 0 16px;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+}
+.mobile-menu-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 20px;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.mobile-logo i {
+    font-size: 20px;
+}
+.mobile-logo .logo-text {
+    font-size: 18px;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+}
+.mobile-header-actions {
+    display: flex;
+    align-items: center;
+}
+.mobile-header-actions .btn-theme-toggle {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 18px;
+    cursor: pointer;
+    outline: none;
+}
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+}
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+    .mobile-only {
+        display: block !important;
+    }
+    .mobile-header {
+        display: flex;
+    }
+    .sidebar-backdrop {
+        display: block;
+    }
+    .app-container {
+        flex-direction: column;
+        padding-top: 60px;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        z-index: 1000;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-glass);
+    }
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+    .sidebar.collapsed {
+        transform: translateX(-100%);
+        width: 280px !important;
+        padding: 24px !important;
+        align-items: stretch !important;
+    }
+    .sidebar.collapsed.mobile-open {
+        transform: translateX(0);
+    }
+    .sidebar.collapsed .logo-text,
+    .sidebar.collapsed .nav-item span,
+    .sidebar.collapsed .vehicle-card,
+    .sidebar.collapsed .user-profile-section div:last-child {
+        display: block !important;
+    }
+    .sidebar.collapsed .nav-item {
+        justify-content: flex-start !important;
+        padding: 14px 18px !important;
+        width: auto !important;
+        height: auto !important;
+        gap: 16px !important;
+    }
+    .sidebar.collapsed .nav-item i {
+        font-size: 18px !important;
+    }
+    .sidebar.collapsed .logout-card {
+        width: auto !important;
+        display: block !important;
+    }
+    .sidebar.collapsed .logout-card button {
+        width: 100% !important;
+        height: auto !important;
+        padding: 10px 14px !important;
+    }
+    .sidebar.collapsed .logout-card button span {
+        display: inline-block !important;
+    }
+    .main-content {
+        padding: 16px;
+        height: auto;
+        overflow-y: visible;
+    }
+    .content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+    .header-actions .btn,
+    .header-actions select {
+        padding: 8px 12px;
+        font-size: 13px;
+        flex: 1;
+        justify-content: center;
+    }
+    .tab-ai-insights .content-header {
+        margin-bottom: 0 !important;
+    }
+}

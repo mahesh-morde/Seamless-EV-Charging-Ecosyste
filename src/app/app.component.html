@@ -1,6 +1,26 @@
-<div class="app-container" *ngIf="eco.isLoggedIn; else loginTemplate">
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar" [class.collapsed]="isSidebarCollapsed" (click)="isSidebarCollapsed ? toggleSidebar() : null">
+<div class="app-container" [class.tab-ai-insights]="eco.activeTab === 'ai-insights'" *ngIf="eco.isLoggedIn; else loginTemplate">
+    <header class="mobile-header">
+        <button class="mobile-menu-btn" (click)="toggleMobileSidebar()" [title]="'TOGGLE_MENU' | translate">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="mobile-logo">
+            <i class="fa-solid fa-bolt-lightning neon-glow-text"></i>
+            <span class="logo-text">Volt<span class="accent-text">Stream</span></span>
+        </div>
+        <div class="mobile-header-actions" style="display: flex; align-items: center; gap: 12px;">
+            <select [ngModel]="ts.getCurrentLanguage()" (change)="changeLang($event)" style="background: transparent; border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm); color: var(--text-primary); font-size: 12px; font-weight: 700; padding: 4px 8px; outline: none; cursor: pointer; height: 32px;">
+                <option value="en" style="background-color: var(--bg-secondary); color: var(--text-primary);">EN</option>
+                <option value="es" style="background-color: var(--bg-secondary); color: var(--text-primary);">ES</option>
+                <option value="hi" style="background-color: var(--bg-secondary); color: var(--text-primary);">HI</option>
+                <option value="kn" style="background-color: var(--bg-secondary); color: var(--text-primary);">KN</option>
+            </select>
+            <button class="btn-theme-toggle" (click)="toggleTheme()" [title]="'TOGGLE_THEME' | translate" style="background: none; border: none; color: var(--text-primary); font-size: 18px; cursor: pointer; outline: none; display: flex; align-items: center; justify-content: center; height: 32px; width: 32px;">
+                <i class="fa-solid" [ngClass]="eco.currentTheme === 'dark' ? 'fa-sun text-yellow' : 'fa-moon text-cyan'"></i>
+            </button>
+        </div>
+    </header>
+    <div class="sidebar-backdrop" *ngIf="isMobileSidebarOpen" (click)="closeMobileSidebar()"></div>
+    <aside class="sidebar" [class.collapsed]="isSidebarCollapsed" [class.mobile-open]="isMobileSidebarOpen" (click)="isSidebarCollapsed ? toggleSidebar() : null">
         <div class="logo" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
             <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
                 <i class="fa-solid fa-bolt-lightning neon-glow-text" style="flex-shrink: 0;"></i>
@@ -131,15 +151,14 @@
             
             <div class="header-actions">
                 <!-- Language Switcher -->
-                <select [ngModel]="ts.getCurrentLanguage()" (change)="changeLang($event)" style="width: auto; padding: 10px 14px; background-color: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm); color: var(--text-primary); cursor: pointer; font-weight: 600;">
+                <select [ngModel]="ts.getCurrentLanguage()" (change)="changeLang($event)" class="desktop-only" style="width: auto; padding: 10px 14px; background-color: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--border-radius-sm); color: var(--text-primary); cursor: pointer; font-weight: 600;">
                     <option value="en">English (EN)</option>
                     <option value="es">Español (ES)</option>
                     <option value="hi">हिन्दी (HI)</option>
                     <option value="kn">ಕನ್ನಡ (KN)</option>
                 </select>
-
                 <!-- Theme Mode Toggle -->
-                <button class="btn btn-secondary" (click)="toggleTheme()" [title]="'TOGGLE_THEME' | translate" style="padding: 10px 14px;">
+                <button class="btn btn-secondary desktop-only" (click)="toggleTheme()" [title]="'TOGGLE_THEME' | translate" style="padding: 10px 14px;">
                     <i class="fa-solid" [ngClass]="eco.currentTheme === 'dark' ? 'fa-sun text-yellow' : 'fa-moon text-cyan'"></i>
                 </button>
 

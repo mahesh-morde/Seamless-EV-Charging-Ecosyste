@@ -3,7 +3,7 @@
         <!-- Left Column: Real-time Chat -->
         <div class="chat-wrapper glass card-wrapper">
             <!-- Agent Switcher Sidebar -->
-            <div class="agents-sidebar">
+            <div class="agents-sidebar desktop-only">
                 <div class="sidebar-header">
                     <i class="fa-solid fa-users-gear"></i>
                     <span>{{ 'AI_AGENTS_SIDEBAR' | translate }}</span>
@@ -24,18 +24,22 @@
                     </button>
                 </div>
             </div>
-
-            <!-- Chat Window -->
             <div class="chat-window">
-                <!-- Chat Window Header -->
                 <div class="chat-header" [style.border-bottom-color]="activeAgent.color + '30'">
                     <div class="active-agent-info">
                         <div class="agent-avatar" [style.background-color]="activeAgent.color + '15'" [style.color]="activeAgent.color">
                             <i class="fa-solid" [ngClass]="activeAgent.icon"></i>
                         </div>
-                        <div class="agent-title-meta">
+                        <div class="agent-title-meta desktop-only">
                             <div class="agent-title-name">{{ activeAgent.nameKey | translate }}</div>
                             <div class="agent-title-spec">{{ activeAgent.specialtyKey | translate }}</div>
+                        </div>
+                        <div class="agent-title-meta mobile-only">
+                            <select [ngModel]="activeAgentId" (change)="selectAgent($any($event.target).value)" style="background: transparent; border: 1px solid var(--border-glass); color: var(--text-primary); font-size: 14px; font-weight: 700; font-family: 'Outfit', sans-serif; padding: 4px 8px; border-radius: var(--border-radius-sm); outline: none;">
+                                <option *ngFor="let agent of eco.aiAgents" [value]="agent.id" style="background-color: var(--bg-secondary); color: var(--text-primary);">
+                                    {{ agent.nameKey | translate }}
+                                </option>
+                            </select>
                         </div>
                     </div>
                     <div class="agent-status">

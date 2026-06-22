@@ -600,3 +600,42 @@ body.light-mode {
         left: 100%;
     }
 }
+@media (max-width: 768px) {
+    .dashboard-columns {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .session-panel {
+        padding: 16px;
+        min-height: auto;
+    }
+    .session-active-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        justify-items: center;
+    }
+    .charging-stats {
+        width: 100%;
+        text-align: center;
+    }
+    .stats-row {
+        justify-content: center;
+    }
+    .action-row {
+        justify-content: center;
+    }
+    .action-row button {
+        width: 100%;
+        justify-content: center;
+    }
+    .iso-simulation-card {
+        padding: 16px;
+    }
+    .cable-electricity-flow-wrapper {
+        width: 100%;
+        overflow: hidden;
+    }
+    .hackathon-console-card {
+        padding: 12px !important;
+    }
+}

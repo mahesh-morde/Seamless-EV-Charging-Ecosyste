@@ -170,123 +170,94 @@
             </div>
         </div>
 
-        <!-- Floating Onboarding Form (Bottom Middle Modal) -->
-        <div *ngIf="showOnboardForm" 
-             class="bottom-middle-modal glass"
-             [ngStyle]="isDragged ? {'left.px': modalPosition.x, 'top.px': modalPosition.y, 'bottom': 'auto', 'transform': 'none'} : {}">
-            <!-- Modal Header -->
-            <div (mousedown)="onDragStart($event)" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid var(--border-glass); padding-bottom: 8px; cursor: move; user-select: none;">
-                <h3 style="margin: 0; font-size: 16px; pointer-events: none;">{{ 'ONBOARD_STATION_TITLE' | translate }}</h3>
-                <button class="btn btn-secondary btn-sm" (click)="closeOnboardForm()" style="padding: 4px 8px; border: none; background: none; color: var(--text-secondary); cursor: pointer;">
-                    <i class="fa-solid fa-xmark"></i>
+    </div>
+    <div *ngIf="showOnboardForm" class="bottom-middle-modal glass" [ngStyle]="isDragged ? {'left.px': modalPosition.x, 'top.px': modalPosition.y, 'bottom': 'auto', 'transform': 'none'} : {}">
+        <div (mousedown)="onDragStart($event)" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid var(--border-glass); padding-bottom: 8px; cursor: move; user-select: none;">
+            <h3 style="margin: 0; font-size: 16px; pointer-events: none;">{{ 'ONBOARD_STATION_TITLE' | translate }}</h3>
+            <button class="btn btn-secondary btn-sm" (click)="closeOnboardForm()" style="padding: 4px 8px; border: none; background: none; color: var(--text-secondary); cursor: pointer;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form (submit)="submitOnboardForm($event)" novalidate>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>{{ 'STATION_NAME' | translate }}</label>
+                    <input type="text" [(ngModel)]="newStation.name" name="name" class="form-control" required [placeholder]="'STATION_NAME_PLACEHOLDER' | translate">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>{{ 'NETWORK_PROVIDER' | translate }}</label>
+                    <select [(ngModel)]="newStation.network" name="network" required>
+                        <option value="Tata Power">{{ 'TATA_POWER' | translate }}</option>
+                        <option value="Zeon">{{ 'ZEON' | translate }}</option>
+                        <option value="ChargeZone">{{ 'CHARGE_ZONE' | translate }}</option>
+                        <option value="Bolt">{{ 'BOLT' | translate }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{{ 'LATITUDE' | translate }}</label>
+                    <input type="number" step="any" [(ngModel)]="newStation.lat" name="lat" (input)="onCoordInput()" class="form-control" required [placeholder]="'LATITUDE_PLACEHOLDER' | translate">
+                </div>
+                <div class="form-group">
+                    <label>{{ 'LONGITUDE' | translate }}</label>
+                    <input type="number" step="any" [(ngModel)]="newStation.lng" name="lng" (input)="onCoordInput()" class="form-control" required [placeholder]="'LONGITUDE_PLACEHOLDER' | translate">
+                </div>
+            </div>
+            <div class="form-group" style="margin-top: 4px; margin-bottom: 12px;">
+                <button type="button" class="btn btn-secondary w-full" [ngStyle]="{'border-color': isPickingLocation ? 'var(--neon-cyan)' : 'var(--border-glass)', 'background': isPickingLocation ? 'rgba(6, 182, 212, 0.15)' : 'var(--bg-secondary)'}" (click)="toggleMapPicker()" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    <i class="fa-solid" [ngClass]="isPickingLocation ? 'fa-crosshairs text-cyan animate-pulse' : 'fa-location-dot'"></i>
+                    <span>{{ (isPickingLocation ? 'PICKING_FROM_MAP' : 'PICK_FROM_MAP') | translate }}</span>
                 </button>
             </div>
-
-            <!-- Form -->
-            <form (submit)="submitOnboardForm($event)" novalidate>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <!-- Name -->
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label>{{ 'STATION_NAME' | translate }}</label>
-                        <input type="text" [(ngModel)]="newStation.name" name="name" class="form-control" required [placeholder]="'STATION_NAME_PLACEHOLDER' | translate">
-                    </div>
-
-                    <!-- Network -->
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label>{{ 'NETWORK_PROVIDER' | translate }}</label>
-                        <select [(ngModel)]="newStation.network" name="network" required>
-                            <option value="Tata Power">{{ 'TATA_POWER' | translate }}</option>
-                            <option value="Zeon">{{ 'ZEON' | translate }}</option>
-                            <option value="ChargeZone">{{ 'CHARGE_ZONE' | translate }}</option>
-                            <option value="Bolt">{{ 'BOLT' | translate }}</option>
-                        </select>
-                    </div>
-
-                    <!-- Latitude -->
-                    <div class="form-group">
-                        <label>{{ 'LATITUDE' | translate }}</label>
-                        <input type="number" step="any" [(ngModel)]="newStation.lat" name="lat" (input)="onCoordInput()" class="form-control" required [placeholder]="'LATITUDE_PLACEHOLDER' | translate">
-                    </div>
-
-                    <!-- Longitude -->
-                    <div class="form-group">
-                        <label>{{ 'LONGITUDE' | translate }}</label>
-                        <input type="number" step="any" [(ngModel)]="newStation.lng" name="lng" (input)="onCoordInput()" class="form-control" required [placeholder]="'LONGITUDE_PLACEHOLDER' | translate">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label>{{ 'SPEED' | translate }}</label>
+                    <select [(ngModel)]="newStation.speed" name="speed" required>
+                        <option value="DC 150kW">DC 150kW</option>
+                        <option value="DC 120kW">DC 120kW</option>
+                        <option value="DC 60kW">DC 60kW</option>
+                        <option value="DC 50kW">DC 50kW</option>
+                        <option value="AC 22kW">AC 22kW</option>
+                        <option value="AC 7.4kW">AC 7.4kW</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{{ 'CONNECTOR' | translate }}</label>
+                    <select [(ngModel)]="newStation.connector" name="connector" required>
+                        <option value="CCS2">CCS2</option>
+                        <option value="Type 2">Type 2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{{ 'PRICE' | translate }}</label>
+                    <div class="amount-input-wrapper">
+                        <span class="currency-symbol">₹</span>
+                        <input type="number" step="0.01" [(ngModel)]="newStation.price" name="price" required placeholder="18.00">
                     </div>
                 </div>
-
-                <!-- Map Picker Toggle -->
-                <div class="form-group" style="margin-top: 4px; margin-bottom: 12px;">
-                    <button type="button" class="btn btn-secondary w-full" [ngStyle]="{'border-color': isPickingLocation ? 'var(--neon-cyan)' : 'var(--border-glass)', 'background': isPickingLocation ? 'rgba(6, 182, 212, 0.15)' : 'var(--bg-secondary)'}" (click)="toggleMapPicker()" style="width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px;">
-                        <i class="fa-solid" [ngClass]="isPickingLocation ? 'fa-crosshairs text-cyan animate-pulse' : 'fa-location-dot'"></i>
-                        <span>{{ (isPickingLocation ? 'PICKING_FROM_MAP' : 'PICK_FROM_MAP') | translate }}</span>
-                    </button>
+                <div class="form-group">
+                    <label>{{ 'GUNS' | translate }}</label>
+                    <input type="number" min="1" max="8" [(ngModel)]="newStation.gunsCount" name="gunsCount" class="form-control" required placeholder="2">
                 </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <!-- Speed -->
-                    <div class="form-group">
-                        <label>{{ 'SPEED' | translate }}</label>
-                        <select [(ngModel)]="newStation.speed" name="speed" required>
-                            <option value="DC 150kW">DC 150kW</option>
-                            <option value="DC 120kW">DC 120kW</option>
-                            <option value="DC 60kW">DC 60kW</option>
-                            <option value="DC 50kW">DC 50kW</option>
-                            <option value="AC 22kW">AC 22kW</option>
-                            <option value="AC 7.4kW">AC 7.4kW</option>
-                        </select>
-                    </div>
-
-                    <!-- Connector -->
-                    <div class="form-group">
-                        <label>{{ 'CONNECTOR' | translate }}</label>
-                        <select [(ngModel)]="newStation.connector" name="connector" required>
-                            <option value="CCS2">CCS2</option>
-                            <option value="Type 2">Type 2</option>
-                        </select>
-                    </div>
-
-                    <!-- Price -->
-                    <div class="form-group">
-                        <label>{{ 'PRICE' | translate }}</label>
-                        <div class="amount-input-wrapper">
-                            <span class="currency-symbol">₹</span>
-                            <input type="number" step="0.01" [(ngModel)]="newStation.price" name="price" required placeholder="18.00">
-                        </div>
-                    </div>
-
-                    <!-- Guns Count -->
-                    <div class="form-group">
-                        <label>{{ 'GUNS' | translate }}</label>
-                        <input type="number" min="1" max="8" [(ngModel)]="newStation.gunsCount" name="gunsCount" class="form-control" required placeholder="2">
-                    </div>
-                </div>
-
-                <!-- Terms & Conditions Checks -->
-                <div class="form-group" style="margin-top: 8px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px;">
-                    <label style="margin-bottom: 4px;">{{ 'TERMS_COMPLIANCE' | translate }}</label>
-                    
-                    <label class="checkbox-label" style="display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--text-secondary); cursor: pointer; text-transform: none; font-weight: normal; letter-spacing: normal; line-height: 1.4; margin-bottom: 0;">
-                        <input type="checkbox" [(ngModel)]="newStation.agreeTC" name="agreeTC" required style="accent-color: var(--neon-cyan); margin-top: 2px;">
-                        <span>{{ 'TC_AGREE' | translate }}</span>
-                    </label>
-
-                    <label class="checkbox-label" style="display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--text-secondary); cursor: pointer; text-transform: none; font-weight: normal; letter-spacing: normal; line-height: 1.4; margin-bottom: 0;">
-                        <input type="checkbox" [(ngModel)]="newStation.certifySpecs" name="certifySpecs" required style="accent-color: var(--neon-cyan); margin-top: 2px;">
-                        <span>{{ 'TC_CERTIFY' | translate }}</span>
-                    </label>
-                </div>
-
-                <!-- Form Buttons -->
-                <div style="display: flex; gap: 10px; margin-top: 16px;">
-                    <button type="button" class="btn btn-secondary" (click)="closeOnboardForm()" style="flex: 1; justify-content: center;">
-                        {{ 'CANCEL' | translate }}
-                    </button>
-                    <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">
-                        {{ 'SUBMIT' | translate }}
-                    </button>
-                </div>
-            </form>
-        </div>
+            </div>
+            <div class="form-group" style="margin-top: 8px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px;">
+                <label style="margin-bottom: 4px;">{{ 'TERMS_COMPLIANCE' | translate }}</label>
+                <label class="checkbox-label" style="display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--text-secondary); cursor: pointer; text-transform: none; font-weight: normal; letter-spacing: normal; line-height: 1.4; margin-bottom: 0;">
+                    <input type="checkbox" [(ngModel)]="newStation.agreeTC" name="agreeTC" required style="accent-color: var(--neon-cyan); margin-top: 2px;">
+                    <span>{{ 'TC_AGREE' | translate }}</span>
+                </label>
+                <label class="checkbox-label" style="display: flex; align-items: flex-start; gap: 8px; font-size: 11px; color: var(--text-secondary); cursor: pointer; text-transform: none; font-weight: normal; letter-spacing: normal; line-height: 1.4; margin-bottom: 0;">
+                    <input type="checkbox" [(ngModel)]="newStation.certifySpecs" name="certifySpecs" required style="accent-color: var(--neon-cyan); margin-top: 2px;">
+                    <span>{{ 'TC_CERTIFY' | translate }}</span>
+                </label>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 16px;">
+                <button type="button" class="btn btn-secondary" (click)="closeOnboardForm()" style="flex: 1; justify-content: center;">
+                    {{ 'CANCEL' | translate }}
+                </button>
+                <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">
+                    {{ 'SUBMIT' | translate }}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
